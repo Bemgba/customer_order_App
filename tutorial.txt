@@ -1,0 +1,11 @@
+create folder PYTHON_WebApp
+pip install django
+django-admin startproject crm1 //..create django project crm1 this way..
+cd crm1
+python manage.py runserver// to start server
+python manage.py startapp accounts //..create an APP call Accounts this way...
+python manage.py migrate // run migrations
+python manage.py createsuperuser// create super admin
+ 
+pip install django-filter// for the SEARCH bar
+pip install pillow //image library
