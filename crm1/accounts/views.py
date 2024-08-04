@@ -1,5 +1,6 @@
 from multiprocessing import context
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseForbidden
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
@@ -96,21 +97,31 @@ def logoutUser(request):
 @admin_only
 def home(request):
     orders = Order.objects.all()
-    # orders = Order.objects.all()[:5]
     customers = Customer.objects.all()
     total_orders = orders.count()
     total_customers = customers.count()
     delivered = orders.filter(status='Delivered').count()
     pending = orders.filter(status='Pending').count()
-    context = {'orders': orders,
-               'customers': customers,
-               'total_orders': total_orders,
-               'total_customers': total_customers,
-               'delivered': delivered,
-               'pending': pending
-               }
 
-    return render(request, 'accounts/dashboard.html', context)
+    # Create a list of customers with their order counts
+    customers_with_order_counts = []
+    for customer in customers:
+        customer_orders = orders.filter(customer=customer)
+        customers_with_order_counts.append({
+            'customer': customer,
+            'order_count': customer_orders.count()
+        })
+
+    context = {
+        'orders': orders,
+        'customers_with_order_counts': customers_with_order_counts,
+        'total_orders': total_orders,
+        'total_customers': total_customers,
+        'delivered': delivered,
+        'pending': pending
+    }
+
+    return render(request, 'accounts/dashboard1.html', context)
 
 @login_required(login_url='login')#prevent unauthorised user access
 @allowed_users(allowed_roles=['customers'])
@@ -135,27 +146,21 @@ def products(request):
 
 
 @login_required(login_url='login')#prevent unauthorised user access
-@allowed_users(allowed_roles=['admins'])
+@allowed_users(allowed_roles=['admins', 'customers'])
 def customer(request, pk_test):
-   # try:
-    # customer=Customer.objects.get(id=pk_test)
-   # except Customer.DoesNotExist:
-    # Handle the case where the customer does not exist
-    # customer = None
     customer = get_object_or_404(Customer, id=pk_test)
     orders = customer.order_set.all()
     order_count = orders.count()
     myFilter = OrderFilter(request.GET, queryset=orders)
     orders = myFilter.qs
-    context = {'customer': customer,
-               'orders': orders,
-               'order_count': order_count,
-               'myFilter': myFilter}
-    # Debugging output
-    # print(f"Customer: {customer}")
-    # print(f"Orders: {orders}")
-    # print(f"Order count: {order_count}")
-    # print(f"Filtered orders: {myFilter.qs}")
+
+    context = {
+        'customer': customer,
+        'orders': orders,
+        'order_count': order_count,
+        'myFilter': myFilter
+    }
+
     return render(request, 'accounts/customer.html', context)
 
 @login_required(login_url='login')#prevent unauthorised user access
@@ -165,7 +170,7 @@ def profile(request):
 @login_required(login_url='login')#prevent unauthorised user access
 def createOrder(request, pk):
     OrderFormSet = inlineformset_factory(
-        Customer, Order, fields=('product', 'status'), extra=10)
+        Customer, Order, fields=('product', 'status'), extra=5)
     customer = Customer.objects.get(id=pk)
     # order=Order.objects.get(id=pk)
     # queryset=Order.object.none()// clear the pre filled form
@@ -220,3 +225,20 @@ def accountSettings(request):
             form.save()
     context = {'form':form}
     return render(request, 'accounts/account_settings.html', context)
+
+def view_all_orders(request):
+    orders = Order.objects.all()
+    # orders = Order.objects.all()[:5]
+    customers = Customer.objects.all()
+    total_orders = orders.count()
+    total_customers = customers.count()
+    delivered = orders.filter(status='Delivered').count()
+    pending = orders.filter(status='Pending').count()
+    context = {'orders': orders,
+               'customers': customers,
+               'total_orders': total_orders,
+               'total_customers': total_customers,
+               'delivered': delivered,
+               'pending': pending
+               }
+    return render(request, 'accounts/view_all_orders.html', context)

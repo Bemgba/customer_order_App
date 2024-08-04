@@ -22,6 +22,9 @@ urlpatterns = [
     path('update_order/<str:pk>', views.updateOrder ,name="update_order"),
     path('delete_order/<str:pk>', views.deleteOrder ,name="delete_order"),
     path('account/', views.accountSettings, name="account"),
+#     path('account/<str:pk_test>/', views.accountSettings, name='account2'),
+    path('view_all_orders/', views.view_all_orders, name="view_all_orders"),
+    
     
     #PASSWORD RESET
     path('reset_password/', 

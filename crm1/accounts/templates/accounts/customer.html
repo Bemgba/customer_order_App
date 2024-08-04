@@ -1,87 +1,79 @@
-
-{% extends 'accounts/base.html' %}
+{% extends 'accounts/dashboard1_base.html' %}
 
 {% block content %}
 <br>
-<div class="row">
-    <div class="col-md">
-        <div class="card card-body">
-            <h5>Customer:</h5>
-            <hr>
-            <a class="btn btn-outline-info btn-sm btn-block" href="">Update Customer</a>
-            <a class="btn btn-outline-info btn-sm btn-block" href="{% url 'create_order' customer.id %}">Place order</a>
-        
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card card-body text-white bg-dark">
+                <h5>Customer:</h5>
+                <hr>
+                <a class="btn btn-outline-info btn-sm btn-block" href="">Update Customer</a>
+                <a class="btn btn-outline-info btn-sm btn-block" href="{% url 'create_order' customer.id %}">Place Order</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-body">
+                <h5>Contact Information</h5>
+                <hr>
+                <p><strong>Name:</strong> {{customer.name}}</p>
+                <p><strong>Email:</strong> {{customer.email}}</p>
+                <p><strong>Phone:</strong> {{customer.phone}}</p>
+            </div>
+        </div>
+        <div class="col-md-4 ">
+            <div class="card card-body text-white bg-dark">
+                <h5>Total Orders</h5>
+                <hr>
+                <h1 class="text-center py-3">{{order_count}}</h1>
+            </div>
         </div>
     </div>
-    <div class="col-md">
-        <div class="card card-body">
-            <h5>Contact Information</h5>
-            <hr>
-            <p><b>Name:</b>{{customer.name}}</p>
-            <p><b>Email:</b>{{customer.email}}</p>
-            <p><b>Phone:</b>{{customer.phone}}</p>
+    <br>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-body">
+                <form method="get" class="form-inline">
+                    {% csrf_token %}
+                    <div class="form-group mb-2">
+                        {{ myFilter.form.as_p }}
+                    </div>
+                    <button class="btn btn-primary mb-2" type="submit">Filter Search</button>
+                </form>
+            </div>
         </div>
     </div>
-    <div class="col-md">
-        <div class="card card-body">
-            <h5>Total Orders</h5>
-            <hr>
-            <h1 style="text-align: center;padding: 10px;">{{order_count}}</h1>
-            
-        </div>
-    </div>
-</div>
-<br>
-<div class="row">
-    <div class="col-md">
-        <div class="card card-body">
-           <form method="get">
-            {% csrf_token %}
-                {{ myFilter.form.as_p }}
-                
-           
-            <button class="btn btn-primary" type="submit">Search</button>
-           <!-- -->
-            
-           </form>
-        </div>
-
-    </div>
-    
-</div>
-
-<div class="row">
-    <div class="col-md">
-        <div class="card card-body">
-            <table>
-                <tr>
-                    <th> Product</th>
-                    <th>Notes</th>
-                    <th>Category</th>
-                    <th>Date Ordered</th>
-                    <th>Status</th>
-                    <th>Update</th>
-                    <th>Remove</th>
-                </tr>
-                {%for order in orders %}
-                <tr>
-                    <td>{{order.product}}</td>
-                    <td>{{order.nates}}</td>
-
-                    <td>{{order.product.category}}</td>
-                    <td>{{order.date_create}}</td>
-                    <td>{{order.status}}</td>
-                    <td><a href="{% url 'update_order' order.id %}">update</a></td>
-                    <td><a href="{% url 'delete_order' order.id %}">delete</a></td>
-                  
-
-
-
-
-
-                </tr>
-                {% endfor%}
-            </table>
+    <br>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Notes</th>
+                            <th>Category</th>
+                            <th>Date Ordered</th>
+                            <th>Status</th>
+                            <th>Update</th>
+                            <th>Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>{{order.product}}</td>
+                            <td>{{order.notes}}</td>
+                            <td>{{order.product.category}}</td>
+                            <td>{{order.date_created}}</td>
+                            <td>{{order.status}}</td>
+                            <td><a class="btn btn-warning btn-sm" href="{% url 'update_order' order.id %}">Update</a></td>
+                            <td><a class="btn btn-danger btn-sm" href="{% url 'delete_order' order.id %}">Delete</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

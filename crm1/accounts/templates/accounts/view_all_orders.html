@@ -1,0 +1,48 @@
+{% extends 'accounts/dashboard1_base.html' %}
+
+{% block content %}
+
+    <h5> Welcome, {{user}}! 👋 </h5>
+       
+    <hr>
+        <div class="row">
+       
+        <div class="col-md-10">
+          <h5>all Orders</h5>
+          <hr />
+          <div class="card card-body">
+            <!--  <a class="btn btn-primary btn-sm btn-block" href="">Create Order</a>-->
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Status</th>
+                  <th>Date Ordered</th>
+                  <th>Update</th>
+                  <th>Remove</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in orders %}
+                <tr>
+                  <td>{{ order.product }}</td>
+                  <td>{{ order.status }}</td>
+                  <td>{{ order.date_create }}</td>
+                  <td><a href="{% url 'update_order' order.id %}">update</a></td>
+                  <td><a href="{% url 'delete_order' order.id %}">delete</a></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+
+</div>
+
+
+
+
+
+{% endblock %}

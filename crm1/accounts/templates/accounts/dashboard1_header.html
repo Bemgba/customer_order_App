@@ -1,0 +1,136 @@
+{% load static%}
+
+<ul class="nav navbar-nav bg-green">
+    {% if request.user.is_staff %}
+    <li class="nav-item active">
+      <a class="nav-link" href="{% url 'home' %}">Dashboard</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'products' %}">Products</a>
+    </li>
+    {% else %}
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'account' %}">Settings</a>
+    </li>
+    {% endif %} 
+    <!-- Messages-->
+    <li class="dropdown custom-dropdown messages-menu">
+        <a href="#" class="nav-link" data-toggle="dropdown">
+               <i class="icon-message "></i>
+               <span class="badge badge-success badge-mini rounded-circle">4</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-right">
+            <li>
+                <!-- inner menu: contains the actual data -->
+                <ul class="menu pl-2 pr-2">
+                    <!-- start message -->
+                    {% if request.user.is_staff %}
+                    <li>
+                        <a href="#">
+                            <div class="avatar float-left">
+                                <img src="{% static 'images/fam.png' %}" alt="">
+                                <span class="avatar-badge busy"></span>
+                            </div>
+                            <h4>
+                                Bemgba
+                                <small><i class="icon icon-clock-o"></i> 5 mins</small>
+                            </h4>
+                            <p>accommodation Payment captured</p>
+                        </a>
+                    </li>
+                    <!-- end message -->
+                    <!-- start message -->
+                    <li>
+                        <a href="#">
+                            <div class="avatar float-left">
+                                <img src="{% static 'images/fam.png' %}" alt="">
+                                <span class="avatar-badge online"></span>
+                            </div>
+                            <h4>
+                                Bemgba
+                                <small><i class="icon icon-clock-o"></i> 5 mins</small>
+                            </h4>
+                            <p>Tuition payment captured</p>
+                        </a>
+                    </li>
+                    <!-- end message -->
+                    <!-- start message -->
+                    <li>
+                        <a href="#">
+                            <div class="avatar float-left">
+                                <img src="{% static 'images/fam.png' %}" alt="">
+                                <span class="avatar-badge idle"></span>
+                            </div>
+                            <h4>
+                                John
+                                <small><i class="icon icon-clock-o"></i> 5 mins</small>
+                            </h4>
+                            <p>Account reconciliation mismatch</p>
+                        </a>
+                    </li>
+                    <!-- end message -->
+                    <!-- start message -->
+                    <li>
+                        <a href="#">
+                            <div class="avatar float-left">
+                                <img src="{% static 'uploads/bem2.jpg' %}" alt="">
+                                <span class="avatar-badge busy"></span>
+                            </div>
+                            <h4>
+                                Information Unit
+                                <small><i class="icon icon-clock-o"></i> 5 mins</small>
+                            </h4>
+                            <p>Terminal exam is scheduled for July 22-29 , 2024</p>
+                        </a>
+                    </li>
+                    <!-- end message -->
+                </ul>
+            </li>
+            <li class="footer s-12 p-2 text-center"><a href="#">See All Messages</a></li>
+        </ul>
+    </li>
+   
+    <!-- User Account-->
+    <li class="dropdown custom-dropdown user user-menu ">
+        <a href="#" class="nav-link" data-toggle="dropdown">
+            <img src="{% static 'images/fam.png' %}" class="user-image" alt="User Image">
+            <i class="icon-more_vert "></i>
+        </a>
+        <div class="dropdown-menu p-4 dropdown-menu-right">
+            <div class="row box justify-content-between my-4">
+                {% else %}
+                <div class="col">
+                    <a href="#">
+                        
+                        <i class="icon-apps purple lighten-2 avatar  r-5"></i>
+                        <div class="pt-1">Change Password</div> 
+                    </a>
+                </div>{% endif %}
+                <div class="col"><a href="{% url 'profile' %}">
+                    <i class="icon-beach_access pink lighten-1 avatar  r-5"></i>
+                    <div class="pt-1">Profile</div>
+                </a></div>
+                <div class="col">
+                    <a href="{% url 'account' %}">
+                        <i class="icon-perm_data_setting indigo lighten-2 avatar  r-5"></i>
+                        <div class="pt-1">Settings</div>
+                    </a>
+                </div>
+            </div>
+            <hr>
+            <div class="row box justify-content-between my-4">
+                <div class="col">
+                    <a href="#"
+                    onclick="event.preventDefault();
+                                  document.getElementById('logout-form').submit();">
+                        <i class="icon-lock-round green lighten-2 avatar  r-5"></i>
+                        <div class="pt-1 color white">Logout</div>
+                    </a>
+                    <form id="logout-form" action="{% url 'logout' %}" method="POST" class="d-none">
+                        {% csrf_token %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </li>
+</ul>

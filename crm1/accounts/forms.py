@@ -10,6 +10,7 @@ class OrderForm(ModelForm):
         model = Order
         #fields = ['customer','product']
         fields = '__all__'
+        exclude = ['customer']
         
 class CreateUserForm(UserCreationForm):
     email = forms.EmailField(required=True)

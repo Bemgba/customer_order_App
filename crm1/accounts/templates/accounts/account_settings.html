@@ -1,4 +1,4 @@
-{% extends 'accounts/base.html' %}
+{% extends 'accounts/dashboard1_base.html' %}
 {% load static %}
 {% block content %}
   <style>
@@ -13,16 +13,18 @@
   <div class="row">
     <div class="col-md-3">
       <div class="card card-body">
-        <a class="btn btn-warning" href="{% url 'home' %}">&#8592; Back to Profile</a>
+        <a class="btn btn-warning" href="{% url 'home' %}">&#8592; Back to Profile</a><br>
+        <a class="btn btn-warning" href="{% url 'customer' pk_test=request.user.customer.pk %}">&#8592; New Order</a>
         <hr />
+        
         <h3 style="text-align: center;">Account Settings</h3>
         <hr />
         
         {% if request.user.customer.profile_pic %}
-      <img class="profile-pic" src="{{ request.user.customer.profile_pic.url }}" />
-    {% else %}
-      <img class="profile-pic" src="{% static 'path/to/default_image.jpg' %}" alt="Default Profile Picture" />
-    {% endif %}
+          <img class="profile-pic" src="{{ request.user.customer.profile_pic.url }}" />
+        {% else %}
+          <img class="profile-pic" src="{% static 'path/to/default_image.jpg' %}" alt="Default Profile Picture" />
+        {% endif %}
       </div>
     </div>
     <div class="col-md-9">

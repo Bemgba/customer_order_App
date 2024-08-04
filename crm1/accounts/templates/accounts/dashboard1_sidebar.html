@@ -1,0 +1,95 @@
+{% load static %}
+<div class="w-80px mt-3 mb-3 ml-3">
+    <img src="{% static 'img/logo.png' %}" alt="">
+</div>
+<div class="relative">
+    <a data-toggle="collapse" href="#userSettingsCollapse" role="button" aria-expanded="false"
+       aria-controls="userSettingsCollapse" class="btn-fab btn-fab-sm absolute fab-right-bottom fab-top btn-primary shadow1">
+        <i class="icon icon-cogs"></i>
+    </a>
+    <div class="user-panel p-3 light mb-2">
+        <div>
+            <div class="float-left image">
+                <img class="user_avatar" src="{% static 'uploads/bem2.jpg' %}" alt="User Image">
+            </div>
+            <div class="float-left info">
+                <h6 class="font-weight-light mt-2 mb-1">{{user}}</h6>
+                <a href="#"><i class="icon-circle text-primary blink"></i> Online</a>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="collapse multi-collapse" id="userSettingsCollapse">
+            <div class="list-group mt-3 shadow">
+                <a href="#" class="list-group-item list-group-item-action">
+                    <i class="mr-2 icon-umbrella text-blue"></i>Profile
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    <i class="mr-2 icon-cogs text-yellow"></i>Settings
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    <i class="mr-2 icon-security text-purple"></i>Change Password</a>
+            </div>
+        </div>
+    </div>
+</div>
+<ul class="sidebar-menu">
+    <li class="header"><strong>ADMIN NAVIGATION</strong></li>
+    <li class="treeview">
+        <a href="#">
+            <i class="icon icon-sailing-boat-water success-text s-18"></i> <span>DASHBOARD</span> 
+            <i class="icon icon-angle-left s-18 pull-right"></i>
+        </a>
+        <ul class="treeview-menu">
+            <li><a href="#"><i class="icon icon-folder5"></i>Admin</a></li>
+            <li><a href="#"><i class="icon icon-folder5"></i>Sales Manager</a></li>
+            <li><a href="#"><i class="icon icon-folder5"></i>Customer Service</a></li>
+            <li><a href="#"><i class="icon icon-folder5"></i>Customer</a></li>
+        </ul>
+    </li>
+    
+    <li class="header light mt-3"><strong>MANAGEMENT</strong></li>
+    <li class="treeview">
+        <a href="#">
+            <i class="icon icon-user success-text s-18"></i> <span>USERS</span>
+            <i class="icon icon-angle-left s-18 pull-right"></i>
+        </a>
+        <ul class="treeview-menu">
+            <li><a href="#"><i class="icon icon-circle-o"></i>Create Customer</a></li>
+            <li><a href="#"><i class="icon icon-circle-o"></i>View Customers</a></li>
+        </ul>
+    </li>
+    <li class="treeview">
+        <a href="#">
+            <i class="icon icon-box success-text s-18"></i> <span>PRODUCTS</span>
+            <i class="icon icon-angle-left s-18 pull-right"></i>
+        </a>
+        <ul class="treeview-menu">
+            <li><a href="#"><i class="icon icon-circle-o"></i>Create Product</a></li>
+            <li><a href="#"><i class="icon icon-circle-o"></i>View Products</a></li>
+        </ul>
+    </li>
+  
+    <li class="treeview">
+        <a href="#">
+            <i class="icon icon-print success-text s-18"></i> <span>SALES REPORTS</span>
+            <i class="icon icon-angle-left s-18 pull-right"></i>
+        </a>
+        <ul class="treeview-menu">
+            <li><a href="#"><i class="icon icon-area-chart success-text s-14"></i>Delivered Orders</a></li>
+            <li><a href="#"><i class="icon icon-bar-chart-o success-text s-14"></i>Canceled Orders</a></li>
+            <li><a href="#"><i class="icon icon-bubble_chart success-text s-14"></i>Most Ordered Items</a></li>
+            <li><a href="#"><i class="icon icon-area-chart success-text s-14"></i>Pending Orders</a></li>
+        </ul>
+    </li>
+    <li class="treeview">
+        <a href="#">
+            <i class="icon icon-cogs"></i> <span>SETTINGS</span>
+            <i class="icon icon-angle-left s-18 pull-right"></i>
+        </a>
+        <ul class="treeview-menu">
+            <li><a href="#"><i class="icon icon-brightness_auto success-text s-14"></i>Add Roles</a></li>
+            <li><a href="#"><i class="icon-users success-text s-14"></i>View All Users</a></li>
+            <li><a href="#"><i class="icon-users success-text s-14"></i>Add Users</a></li>
+        </ul>
+    </li>
+</ul>
