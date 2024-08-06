@@ -18,7 +18,7 @@ class Tag(models.Model):
     def __str__(self):
         return self.name 
     
-    
+  #product  
 class Product(models.Model):
     CATEGORY=(
         ('Indoor','Indoor'),
@@ -37,7 +37,7 @@ class Product(models.Model):
     date_create=models.DateTimeField(auto_now_add=True,null=True)
     def __str__(self):
         return self.name 
-
+#order
 class Order(models.Model):
     STATUS=(
         ('Pending','Pending'),

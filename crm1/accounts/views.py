@@ -8,13 +8,16 @@ from django.forms import inlineformset_factory
 from .forms import CustomerForm, OrderForm, CreateUserForm
 from django.contrib import messages
 from django.contrib.auth.models import Group
-
-# from django.http import HttpResponse
+from django.http import HttpResponse
 # from django.db.models import fields
 # from crm1 import accounts
 from .filters import OrderFilter
 from .decorators import unauthenticated_user,allowed_users,admin_only
 from .models import *
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from django.db.models import Count
 # Create your views here.
 
 # Register
@@ -242,3 +245,92 @@ def view_all_orders(request):
                'pending': pending
                }
     return render(request, 'accounts/view_all_orders.html', context)
+
+
+def generate_pdf_response(filename):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{filename}.pdf"'
+    return response
+
+def format_date(date):
+    return date.strftime("%m/%d/%y")  # Format date as Month:Day:Year  MM/DD/YY
+
+def delivered_orders_pdf(request):
+    response = generate_pdf_response("delivered_orders")
+    p = canvas.Canvas(response, pagesize=letter)
+    p.setTitle("Delivered Orders")
+
+    # Header
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(100, 750, "Delivered Orders Report")
+
+    # Table header
+    p.setFont("Helvetica-Bold", 12)
+    p.drawString(30, 720, "Customer")
+    p.drawString(200, 720, "Product")
+    p.drawString(370, 720, "Date Created")
+    p.drawString(500, 720, "Amount")
+
+    # Table data
+    y = 700
+    total_amount = 0
+    orders = Order.objects.filter(status='Delivered')
+    for order in orders:
+        product_price = float(order.product.price)  # Ensure the price is a float
+        p.setFont("Helvetica", 12)
+        p.drawString(30, y, str(order.customer))
+        p.drawString(200, y, str(order.product))
+        p.drawString(370, y, format_date(order.date_create))
+        p.drawString(500, y, f"N{product_price:.2f}")
+        total_amount += product_price
+        y -= 20
+
+    # Total amount
+    p.setFont("Helvetica-Bold", 12)
+    p.drawString(30, y - 20, f"Total Amount: N{total_amount:.2f}")
+
+    p.showPage()
+    p.save()
+    return response
+
+def customer_delivered_orders_pdf(request, pk_test):
+    customer = get_object_or_404(Customer, id=pk_test)
+    response = generate_pdf_response(f"{customer.name}_delivered_orders")
+    p = canvas.Canvas(response, pagesize=letter)
+    p.setTitle(f"{customer.name} Delivered Orders Report")
+
+    # Header
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(100, 750, f"Delivered Orders for {customer.name}")
+
+    # Table header
+    p.setFont("Helvetica-Bold", 12)
+    p.drawString(30, 720, "Product")
+    p.drawString(200, 720, "Date Created")
+    p.drawString(370, 720, "Amount")
+
+    # Table data
+    y = 700
+    total_amount = 0
+    orders = customer.order_set.filter(status='Delivered')
+    for order in orders:
+        product_price = float(order.product.price)  # Ensure the price is a float
+        p.setFont("Helvetica", 12)
+        p.drawString(30, y, str(order.product))
+        p.drawString(200, y, format_date(order.date_create))
+        p.drawString(370, y, f"N{product_price:.2f}")
+        total_amount += product_price
+        y -= 20
+
+    # Total amount
+    p.setFont("Helvetica-Bold", 12)
+    p.drawString(30, y - 20, f"Total Amount: N{total_amount:.2f}")
+
+    p.showPage()
+    p.save()
+    return response
+
+#most ordered products in descending order
+def most_ordered_products(request):
+    products = Product.objects.annotate(order_count=Count('order')).order_by('-order_count')
+    return render(request, 'accounts/most_ordered_products.html', {'products': products})

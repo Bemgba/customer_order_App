@@ -1,0 +1,30 @@
+{% extends 'accounts/dashboard1_base.html' %}
+
+{% block content %}
+    <h5> Most Ordered Products </h5>
+    <hr>
+    <div class="row">
+        <div class="col-md-10">
+            <h5>All Products</h5>
+            <hr />
+            <div class="card card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Order Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.order_count }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

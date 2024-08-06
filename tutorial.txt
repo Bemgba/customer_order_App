@@ -9,3 +9,10 @@ python manage.py createsuperuser// create super admin
  
 pip install django-filter// for the SEARCH bar
 pip install pillow //image library
+pip install reportlab// to generate pdf
+
+capenter
+painter
+mechanic
+plumber
+Electrician

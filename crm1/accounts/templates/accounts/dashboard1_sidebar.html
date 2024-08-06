@@ -60,26 +60,40 @@
     </li>
     <li class="treeview">
         <a href="#">
-            <i class="icon icon-box success-text s-18"></i> <span>PRODUCTS</span>
+            <i class="icon icon-box success-text s-18"></i> <span>SERVICES</span>
             <i class="icon icon-angle-left s-18 pull-right"></i>
         </a>
         <ul class="treeview-menu">
-            <li><a href="#"><i class="icon icon-circle-o"></i>Create Product</a></li>
-            <li><a href="#"><i class="icon icon-circle-o"></i>View Products</a></li>
+            <li><a href="#"><i class="icon icon-circle-o"></i>Create service</a></li>
+            <li><a href="#"><i class="icon icon-circle-o"></i>View Services</a></li>
         </ul>
     </li>
   
     <li class="treeview">
         <a href="#">
-            <i class="icon icon-print success-text s-18"></i> <span>SALES REPORTS</span>
+            <i class="icon icon-print success-text s-18"></i> <span>REPORTS</span>
             <i class="icon icon-angle-left s-18 pull-right"></i>
         </a>
         <ul class="treeview-menu">
-            <li><a href="#"><i class="icon icon-area-chart success-text s-14"></i>Delivered Orders</a></li>
+            <li><a href="{% url 'delivered_orders_pdf' %}"><i class="icon icon-area-chart success-text s-14"></i>Delivered Orders</a></li>
             <li><a href="#"><i class="icon icon-bar-chart-o success-text s-14"></i>Canceled Orders</a></li>
-            <li><a href="#"><i class="icon icon-bubble_chart success-text s-14"></i>Most Ordered Items</a></li>
+            <li><a href="{% url 'most_ordered_products' %}"><i class="icon icon-bubble_chart success-text s-14"></i>Most Ordered Items</a></li>
             <li><a href="#"><i class="icon icon-area-chart success-text s-14"></i>Pending Orders</a></li>
+           
         </ul>
+        <a href="#">
+            <i class="icon icon-print success-text s-18"></i> <span>DOWNLOADS</span>
+            <i class="icon icon-angle-left s-18 pull-right"></i>
+        </a>
+<ul class="treeview-menu">
+    <li><a href="{% url 'delivered_orders_pdf' %}"><i class="icon icon-area-chart success-text s-14"></i>Delivered Orders</a></li>
+    <li>
+        <a href="{% url 'customer_delivered_orders_pdf' pk_test=request.user.customer.pk %}">
+            <i class="icon icon-bar-chart-o success-text s-14"></i>
+            My Delivered Orders
+        </a>
+    </li>
+</ul>
     </li>
     <li class="treeview">
         <a href="#">

@@ -33,7 +33,12 @@ urlpatterns = [
     path('reset_done/', auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     path('reset_confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path('reset_complette/', auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complette"),
-    
+    #pdf generate
+    path('delivered_orders_pdf/', views.delivered_orders_pdf, name='delivered_orders_pdf'),
+    path('customer/<str:pk_test>/delivered_orders_pdf/', views.customer_delivered_orders_pdf, name='customer_delivered_orders_pdf'),
+    # most-ordered-products
+    path('most-ordered-products/', views.most_ordered_products, name='most_ordered_products'),
+
     
 
    ]
