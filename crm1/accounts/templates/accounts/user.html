@@ -2,7 +2,7 @@
 
 {% block content %}
 {% include 'accounts/status.html' %}
-<h1>My Orders</h1>
+<h1>My Orders</h1><span><a href="{% url 'customer' pk_test=request.user.customer.pk %}">New Order</a></span>
 <div class="row">
     <div class="col-md">
         <div class="card card-body">
