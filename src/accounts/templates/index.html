@@ -137,7 +137,7 @@
                                 </a>
                             </li>
                             <li class="unfold-item unfold-item-has-divider">
-                                <a class="unfold-link d-flex align-items-center text-nowrap" href="{% url 'logout_view'%}">
+                                <a class="unfold-link d-flex align-items-center text-nowrap" href="{% url 'logout'%}">
                                     <span class="unfold-item-icon mr-3">
                                     <i class="gd-power-off"></i>
                                     </span> Sign Out
@@ -472,7 +472,7 @@
                                         <div class="form-group col-8 col-md-4">
                                             <label for="branch">Branch</label>
                                             <select name="branch" id="branch" class="form-control" value required>
-                                                <option value="Mafoluku" selected>Mafoluku</option>
+                                                <option value="Lekki" selected>Lekki</option>
                                             </select>
                                         </div>
 
@@ -1207,9 +1207,9 @@
                         </div>
                         <div>
                             <button type="button" class="btn btn-light float-left rounded-pill px-7 mt-5" data-dismiss="modal" id="noDelete">No</button>
-                            <form action="." method="post">
+                            <form action="." method="delete">
                                 {%csrf_token%}
-                                <input type="hidden" name="form_id" value="deleteModal">
+                                <input type="hidden" name="form_id" value="deleteCustomer">
                                 <input name="customerId" id="customerId" value='{{customer.id}}' type='hidden'>
                                 <button type="submit" class="btn btn-danger float-right rounded-pill px-7 mt-5" id="yesDelete">Yes</button>
                             </form>

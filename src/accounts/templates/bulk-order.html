@@ -1,0 +1,773 @@
+{% extends 'index.html' %}
+
+{% load static %}
+{% block title%} Add New Bulk Order | PJ Quest Admin Application {% endblock %}
+{% block body_block %}
+
+        <!-- Favicon --> 
+        <link rel="shortcut icon" href="/static/public/img/PJ QUEST MINI-LOGO.png">
+
+        <!-- Tom-Select CSS -->
+        <link rel="stylesheet" href="/static/node_modules/tom-select/dist/css/tom-select.bootstrap4.css">
+
+        <!-- J-Query -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+        <!-- Select-2 -->
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="/static/public/graindashboard/css/graindashboard.css">
+
+        <style>
+            input::-webkit-outer-spin-button,
+            input::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+
+            input[type=number] {
+                -moz-appearance:textfield; /* Firefox */
+            }
+            .stepwizard-step p {
+                margin-top: 10px;
+            }
+            .stepwizard-row {
+                display: table-row;
+                position: relative; /* change to relative positioning */
+            }
+            .stepwizard {
+                display: table;
+                width: 100%;
+                position: relative;
+            }
+            .stepwizard-step button[disabled] {
+                opacity: 1 !important;
+                filter: alpha(opacity=100) !important;
+            }
+            .stepwizard-row:before {
+                top: 14px;
+                bottom: 0;
+                position: absolute;
+                content: " ";
+                width: 100%;
+                height: 1px;
+                background-color: #ccc;
+                z-order: 0;
+            }
+            .stepwizard-step {
+                display: table-cell;
+                text-align: center;
+                position: relative;
+            }
+            .btn-circle {
+                width: 30px;
+                height: 30px;
+                text-align: center;
+                padding: 6px 0;
+                font-size: 12px;
+                line-height: 1.428571429;
+                border-radius: 15px;
+            }
+            
+        </style>
+
+    <body class="">
+        <!-- Start Injecting Here -->
+        <div class="py-4 px-3 px-md-4">
+            <!-- Breadcrumb -->
+            <nav class="d-none d-md-block" aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="#">Orders</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Add New Bulk Order</li>
+                </ol>
+            </nav>
+            <!-- End Breadcrumb -->
+
+            <div class="mb-3 mb-md-4 d-flex justify-content-between">
+                <div class="h3 mb-0">Add New Order</div>
+            </div>
+            <div class="card mb-3 mb-md-4 py-3">
+
+                <div class="card-body">
+                    
+
+
+                    <!-- Form -->
+                    <div class="container">
+                        <div class="stepwizard">
+                            <div class="stepwizard-row setup-panel">
+                                <div class="stepwizard-step col-xs-3"> 
+                                    <a href="#step-1" type="button" class="btn btn-success btn-circle">1</a>
+                                    <p><small>Customer & Invoice Details</small></p>
+                                </div>
+                                <div class="stepwizard-step col-xs-3"> 
+                                    <a href="#step-2" type="button" class="btn btn-default btn-circle" disabled="disabled">2</a>
+                                    <p><small>Location Details</small></p>
+                                </div>
+                                <div class="stepwizard-step col-xs-3"> 
+                                    <a href="#step-3" type="button" class="btn btn-default btn-circle" disabled="disabled">3</a>
+                                    <p><small>Pricing</small></p>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                        <form role="form" method="post">
+                            {%csrf_token%}
+                            <!-- Customer & Invoice Details -->
+                            <div class="panel panel-primary setup-content" id="step-1">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Customer & Invoice Details</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-row pb-2">
+
+                                        <div class="form-group col-10 col-md-4">
+                                            <label for="dateTime">Date & Time of Order</label>
+                                            <input type="datetime-local" class="form-control" value="" id="dateTime" name="dateTime" placeholder="Date & Time of Registration" required>
+                                        </div>
+
+                                        {% comment %} <div class="form-group col-10 col-md-4">
+                                            <label for="orderNumber">Order Number</label>
+                                                <!-- Automatically generate the next available invoice number -->
+                                            <input type="number" class="form-control" value="" id="orderNumber" name="orderNumber" placeholder="" required>
+                                        </div> {% endcomment %}
+        
+                                        <div class="form-group col-8 col-md-4">
+                                            <label for="branch">Branch</label>
+                                            <select name="branch" id="branch" class="form-control" value required>
+                                                <option value="Lekki" selected>Lekki</option>
+                                            </select>
+                                        </div>
+                                        
+                                    </div>
+        
+                                    <div class="form-row">
+                                        <div class="form-group col-8 col-md-4">
+                                            <label for="customerName">Customer's Name</label>
+                                            <select id="customerName" class="form-control" value="" name="customerName" placeholder="Type in the Customer's name" required >
+                                                <!-- Options are in JavaScript Below -->
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group col-8 col-md-4">
+                                            <label for="phoneNumber">Pick-up Contact's Phone Number</label>
+                                            <input type="tel" name="phoneNumber" id="phoneNumber" class="form-control" required> <!-- Automatically fill with customer's phone number -->
+                                        </div>
+        
+                                        <div class="form-group col-8 col-md-4">
+                                            
+                                            <label for="email">Pick-up Contact's E-mail Address</label>
+                                            <input type="email" name="email" id="email" class="form-control"> <!-- Automatically fill with customer's email address -->
+                                        
+                                        </div>
+                                        
+                                    </div>
+        
+                                    
+                                    <button class="btn btn-primary nextBtn pull-right float-right rounded-pill px-7 mt-5" type="button">Next</button>
+                                </div>
+                            </div>
+                            <!-- End Customer & Invoice Details -->
+                            
+                            <!-- Location Details -->
+                            <div class="panel panel-primary setup-content" id="step-2">
+                                <div class="panel-heading">
+                                     <h3 class="panel-title">Location Details</h3>
+                                </div>
+                                <div class="panel-body">
+
+
+                                    <div class="container mt-5">
+                                        
+                                        {% comment %} <form> {% endcomment %}
+                                            
+                                            <p>Please enter the details of your delivery request below:</p>
+                            
+                                            <!-- Pickup Location -->
+                                            <!--<div class="form-group">
+                                                <label for="pickup-location">Pickup Location:</label>
+                                                <input type="text" id="pickup-location" name="pickup-location" class="form-control">
+                                            </div>-->
+
+                                            <div class="">
+                                                <div class="form-group">
+                                                    <label for="pickupAddress">Pickup Address</label>
+                                                    <input type="text" name="pickupAddress" class="form-control" id="pickupAddress" required>
+                                                    
+                                                </div>
+                                                
+                                            </div>
+                
+                                            <div class="form-row mt-5">
+                                                <div class="form-group col-12 col-md-6">
+                                                    <label for="pickupCity">Pickup City</label>
+                                                    <select id="pickupCity" class="form-control" name="pickupCity" placeholder="Select a Pickup City"  onchange="fill()" required >
+                                                        <!-- Options are in JavaScript Below -->
+                                                    </select>
+                                                </div>
+                                                <div class="form-group col-12 col-md-6">
+                                                    <label for="pickupTown">Pickup Town</label>
+                                                    <select id="pickupTown" class="form-control" value="" name="pickupTown" placeholder="Select a Pickup Town" required >
+                                                        <!-- Options are in JavaScript Below -->
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="deliveryLocations">Delivery Locations</label>
+                                                <div id="deliveryLocations">
+                                                <!-- This div will contain the dynamically added delivery location rows -->
+                                                </div>
+                                                <button type="button" class="btn btn-primary mt-5" onclick="addDeliveryLocation()">Add Delivery Location</button>
+                                            </div>
+                                            {% comment %} <button type="submit" class="btn btn-primary">Submit</button> {% endcomment %}
+                                        {% comment %} </form> {% endcomment %}
+                                    </div>
+                                    
+                                    
+                                    <button class="btn btn-primary nextBtn pull-right float-right rounded-pill px-7 mt-5" type="button">Next</button>
+                                </div>
+                            </div>
+                            <!-- End Location Details -->
+                            
+                            <!-- Pricing -->
+                            <div class="panel panel-primary setup-content" id="step-3">
+                                <div class="panel-heading">
+                                     <h3 class="panel-title">Pricing</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="row mt-5">
+                                        <label for="subTotal" class="col-form-label col-10">Sub-total</label>
+                                        <div class="input-group flex-nowrap col-2">
+                                            <span class="input-group-text font-weight-bold" id="addon-wrapping">₦‎</span>
+                                            <input type="number" id="subTotal" class="form-control" name="subTotal" aria-label="subTotal" aria-describedby="addon-wrapping" readonly> <!-- Automatically generated based on input on other parts of the form -->
+                                        </div>
+                                    </div>
+                                    <div class="row mt-5">
+                                        <label for="taxes" class="col-form-label col-10">VAT/Taxes</label>
+                                        <div class="input-group flex-nowrap col-2">
+                                            <span class="input-group-text font-weight-bold" id="addon-wrapping">₦‎</span>
+                                            <input type="number" id="taxes" class="form-control" name="taxes" aria-label="taxes" aria-describedby="addon-wrapping">
+                                        </div>
+                                    </div>
+                                    <div class="row mt-5">
+                                        <label for="discounts" class="col-form-label col-10">Discount/Promo</label>
+                                        <div class="input-group flex-nowrap col-2">
+                                            <span class="input-group-text font-weight-bold" id="addon-wrapping">₦‎</span>
+                                            <input type="number" id="discounts" class="form-control" name="discounts" aria-label="discounts" aria-describedby="addon-wrapping">
+                                        </div>
+                                    </div>
+                                    <div class="row mt-5">
+                                        <label for="invoiceTotal" class="col-form-label col-10">Invoice Total</label>
+                                        <div class="input-group flex-nowrap col-2">
+                                            <span class="input-group-text font-weight-bold" id="addon-wrapping">₦‎</span>
+                                            <input type="number" id="invoiceTotal" class="form-control" name="invoiceTotal" aria-label="invoiceTotal" aria-describedby="addon-wrapping"> <!-- Automatically generated based on input on other parts of the form -->
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-primary rounded-pill pull-right float-right mt-5" type="submit">SUBMIT</button>
+                                </div>
+                            </div>
+                            <!-- End Pricing -->
+
+                        </form>
+                    </div>
+
+                    <!-- End Form -->
+                </div>
+            </div>
+
+
+        </div>
+
+
+        <script src="/static/public/graindashboard/js/graindashboard.js"></script>
+        <script src="/static/public/graindashboard/js/graindashboard.vendor.js"></script>
+        <script src="/static/node_modules/tom-select/dist/js/tom-select.base.js"></script>
+        
+        
+        <!-- Multi-Step Functionality -->
+        <script>
+            $(document).ready(function () {
+
+                var navListItems = $('div.setup-panel div a'),
+                    allWells = $('.setup-content'),
+                    allNextBtn = $('.nextBtn');
+
+                    allWells.hide();
+
+                    navListItems.click(function (e) {
+                        e.preventDefault();
+                        var $target = $($(this).attr('href')),
+                            $item = $(this);
+
+                        if (!$item.hasClass('disabled')) {
+                            navListItems.removeClass('btn-success').addClass('btn-default');
+                            $item.addClass('btn-success');
+                            allWells.hide();
+                            $target.show();
+                            $target.find('input:eq(0)').focus();
+                        }
+                    });
+
+                    allNextBtn.click(function () {
+                        var curStep = $(this).closest(".setup-content"),
+                            curStepBtn = curStep.attr("id"),
+                            nextStepWizard = $('div.setup-panel div a[href="#' + curStepBtn + '"]').parent().next().children("a"),
+                            curInputs = curStep.find("input[type='text'],input[type='url']"),
+                            isValid = true;
+
+                        $(".form-group").removeClass("has-error");
+                        for (var i = 0; i < curInputs.length; i++) {
+                            if (!curInputs[i].validity.valid) {
+                                isValid = false;
+                                $(curInputs[i]).closest(".form-group").addClass("has-error");
+                            }
+                        }
+
+                        if (isValid) nextStepWizard.removeAttr('disabled').trigger('click');
+                    });
+
+                    $('div.setup-panel div a.btn-success').trigger('click');
+            });
+        </script>
+        <!-- End Multi-Step Functionality -->
+
+        <!-- Dropdown Options (Customer Name) -->
+        <script>
+            new TomSelect('#customerName', {
+                maxItems: 1,
+                valueField: 'id',
+                labelField: 'name',
+                searchField: 'name',
+                options: [
+                    // Replace these with registered customers' names
+                    {% for customer in customers %}
+                    {id: {{customer.id}}, name: "{{customer.customer_name}}" },
+                    {% endfor %}
+                ],
+                create: false,
+                onChange: function(value) {
+                    let customerId = value;
+                    //Ajax call to server
+                    let xhr = new XMLHttpRequest();
+                    xhr.open("POST", '/get_customer_info/', true);
+                    xhr.setRequestHeader("Content-Type", "application/json");
+                    
+                    // add the csrf token to the headers
+                    let csrftoken = getCookie('csrftoken');
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4 && xhr.status === 200) {
+                            let customer = JSON.parse(xhr.responseText);
+                            document.getElementById("phoneNumber").value = customer.phone;
+                            document.getElementById("email").value = customer.email;
+                            document.getElementById("pickupAddress").value = customer.address;
+                            document.getElementById("pickupCity").value = customer.city;
+                            document.getElementById("pickupTown").value = customer.town;
+                        }else {
+                            // handling error cases
+                        }
+                    };
+                    xhr.send(JSON.stringify({ 'customer_id': customerId }));
+        
+                }
+            });
+            
+            //get csrf cookie
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    let cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        let cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+    
+        </script>
+
+        <script>
+            setInterval(updateam, 1500);
+            var pickupLocation;
+            var deliveryLocation;
+    
+            var pickupZone;
+            var deliveryZone;
+    
+            var priceDisplay;
+    
+    
+            var key;
+            var price;
+            var invoice;
+            var tax;
+            var discount;
+    
+            const zones = {
+
+                'Tinubu Square': 'Zone 1',
+                'Victoria Garden City': 'Zone 1',
+                'Victoria Island': 'Zone 1',
+                'Oniru': 'Zone 1',
+                'Marina': 'Zone 1',
+                'Lekki': 'Zone 1',
+                'Lagos Island': 'Zone 1',
+                'Eti-Osa': 'Zone 1',
+                'Ikoyi': 'Zone 1',
+                'Obalende': 'Zone 1',
+                'Dolphin Estate': 'Zone 1',
+                'Ikota': 'Zone 1',
+                'Eleganza/Orchid Road': 'Zone 1',
+    
+                'Addo Road': 'Zone 1 (ii)',
+                'Badore': 'Zone 1 (ii)',
+                'Abraham Adesanya': 'Zone 1 (ii)',
+                'Sangotedo': 'Zone 1 (ii)',
+                'Abijo': 'Zone 1 (ii)',
+                'Awoyaya': 'Zone 1 (ii)',
+    
+                'Yaba': 'Zone 2',
+                'Ojuelegba': 'Zone 2',
+                'Sabo': 'Zone 2',
+                'Surulere': 'Zone 2',
+                'Shomolu': 'Zone 2',
+                'Palmgrove': 'Zone 2',
+                'Onipanu': 'Zone 2',
+                'Masha': 'Zone 2',
+                'Lawanson': 'Zone 2',
+                'Ijesha': 'Zone 2',
+                'Ijora': 'Zone 2',
+                'Ilupeju': 'Zone 2',
+                'Iwaya': 'Zone 2',
+                'Akerele': 'Zone 2',
+                'Akoka': 'Zone 2',
+                'Aguda': 'Zone 2',
+                'Alagomeji': 'Zone 2',
+                'Ebute Metta': 'Zone 2',
+                'Jibowu': 'Zone 2',
+                'Bariga': 'Zone 2',
+    
+                'Opebi': 'Zone 3',
+                'Oregun': 'Zone 3',
+                'Oshodi': 'Zone 3',
+                'Ogudu': 'Zone 3',
+                'Obanikoro': 'Zone 3',
+                'Ojota': 'Zone 3',
+                'Mende': 'Zone 3',
+                'Maryland': 'Zone 3',
+                'Ketu': 'Zone 3',
+                'Kosofe': 'Zone 3',
+                'Gbagada': 'Zone 3',
+                'Ilasamaja': 'Zone 3',
+                'Anthony Village': 'Zone 3',
+                'Alausa': 'Zone 3',
+                'Adeniyi Jones': 'Zone 3',
+                'Ikeja': 'Zone 3',
+                'Ladipo': 'Zone 3',
+                'Mile 12': 'Zone 3',
+                'Mushin': 'Zone 3',
+                'Agidingbi': 'Zone 3',
+                'Ogba': 'Zone 3',
+                'Omole': 'Zone 3',
+                'Magodo 1': 'Zone 3',
+                'Magodo2': 'Zone 3',
+                'ojodu': 'Zone 3',
+                'ojodu Berger': 'Zone 3',
+                'Ojodu grammer School': 'Zone 3',
+                'Agege': 'Zone 3',
+    
+                'Apapa': 'Zone 4',
+                'Olodi': 'Zone 4',
+                'Maza Maza': 'Zone 4',
+                'Mile 2': 'Zone 4',
+                'Satellite Town': 'Zone 4',
+                'Ajegunle': 'Zone 4',
+                'Amuwo': 'Zone 4',
+                'Odofin': 'Zone 4',
+                'Festac': 'Zone 4',
+                'Alaba': 'Zone 4',
+    
+                'Gowon': 'Zone 5',
+                'Dopemu': 'Zone 5',
+                'isolo': 'Zone 5',
+                'Egbeda': 'Zone 5',
+                'Idi mangoro': 'Zone 5',
+                'Alagbado': 'Zone 5',
+                'iyana ipaja': 'Zone 5',
+                'Ipaja': 'Zone 5',
+                'Abule egba': 'Zone 5',
+                'Ifako – Ijaiye': 'Zone 5',
+    
+                'Ojo': 'Zone 6',
+            };
+    
+            // Define the pricing for each combination of delivery and recipient zones
+            const prices = {
+                "Zone 1 to Zone 1": 1500,
+                "Zone 1 to Zone 1 (ii)": 3000,
+                "Zone 1 to Zone 2": 2000,
+                "Zone 1 to Zone 3": 3000,
+                "Zone 1 to Zone 4": 3500,
+                "Zone 1 to Zone 5": 4000,
+                "Zone 1 to Zone 6": 3500,
+                "Zone 1 (ii) to Zone 2": 2500,
+                "Zone 1 (ii) to Zone 3": 3000,
+                "Zone 1 (ii) to Zone 4": 3500,
+                "Zone 1 (ii) to Zone 5": 4000,
+                "Zone 1 (ii) to Zone 6": 4500,
+                "Zone 2 to Zone 1": 2000,
+                "Zone 2 to Zone 1 (ii)": 2500,
+                "Zone 2 to Zone 2": 1500,
+                "Zone 2 to Zone 3": 2000,
+                "Zone 2 to Zone 4": 2000,
+                "Zone 2 to Zone 5": 2500,
+                "Zone 2 to Zone 6": 3000,
+                "Zone 3 to Zone 1": 3000,
+                "Zone 3 to Zone 1 (ii)": 3000,
+                "Zone 3 to Zone 2": 2000,
+                "Zone 3 to Zone 3": 2000,
+                "Zone 3 to Zone 4": 3000,
+                "Zone 3 to Zone 5": 2500,
+                "Zone 3 to Zone 6": 2500,
+                "Zone 4 to Zone 1": 3500,
+                "Zone 4 to Zone 2": 2000,
+                "Zone 4 to Zone 3": 3000,
+                "Zone 4 to Zone 4": 2000,
+                "Zone 4 to Zone 5": 3000,
+                "Zone 4 to Zone 6": 2000,
+                "Zone 5 to Zone 1": 4000,
+                "Zone 5 to Zone 1 (ii)": 4000,
+                "Zone 5 to Zone 2": 2500,
+                "Zone 5 to Zone 3": 2500,
+                "Zone 5 to Zone 4": 3000,
+                "Zone 5 to Zone 5": 2000,
+                "Zone 5 to Zone 6": 2500,
+                "Zone 6 to Zone 1": 3500,
+                "Zone 6 to Zone 1 (ii)": 4500,
+                "Zone 6 to Zone 2 ": 3000,
+                "Zone 6 to Zone 3 ": 2500,
+                "Zone 6 to Zone 4 ": 2000,
+                "Zone 6 to Zone 5 ": 2500,
+                "Zone 6 to Zone 6": 2000,
+                
+            };
+    
+            function updateam() {
+                // Get the selected pickup location
+                var pickupLocation = document.getElementById('pickupTown').value;
+                var pickupZone = zones[pickupLocation];
+            
+                // Get the element to display the calculated price
+                var priceDisplay = document.getElementById("subTotal");
+                var tax = document.getElementById("taxes");
+                var invoice = document.getElementById("invoiceTotal");
+                var discount = document.getElementById("discounts");
+            
+                // Loop through all delivery locations and calculate the price for each
+                // Loop through all delivery locations and calculate the price for each
+                var totalPrice = 0;
+                for (var i = 1; i < counter; i++) {
+                    console.log(counter);
+                    var deliveryTown = document.getElementsByName(`deliveryTown${i}`)[0];
+                    var priceInput = document.getElementsByName(`price${i}`)[0]
+
+                    var deliveryLocation = deliveryTown.value;
+                    var deliveryZone = zones[deliveryLocation];
+                    var key = `${pickupZone} to ${deliveryZone}`;
+                    var price = prices[key];
+                    if (price) {
+                        totalPrice += price;
+                        priceInput.value = price;
+                    }
+                }
+
+                priceDisplay.value = totalPrice;
+
+                
+            
+                // Add event listeners for the taxes and discount input fields to update the invoice total when they change
+                tax.value = 0;
+                document.getElementById("taxes").addEventListener("change", function(){
+                    tax.value = this.value;
+                });
+                discount.value = 0;
+                document.getElementById("discounts").addEventListener("change", function(){
+                    discount.value = this.value;
+                });
+            
+                var priceNum = Number(totalPrice);
+                var taxNum = Number(tax.value);
+                var discountNum = Number(discount.value);
+                invoice.value = priceNum + taxNum - discountNum;
+            }
+            
+            
+        </script>
+        
+        
+        <!-- End Dropdown Options (Customer Name) -->
+        
+       
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        {% comment %} <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script> {% endcomment %}
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.16.6/dist/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+        
+        <!-- Delivery Locations -->
+        <script>
+            let counter = 1;
+
+            function addDeliveryLocation() {
+                // This function will add a new delivery location row to the form
+                const deliveryLocationsDiv = document.getElementById('deliveryLocations');
+
+                const newRow = document.createElement('div');
+                newRow.classList.add('row', 'my-2');
+                newRow.innerHTML = `
+                    <div class="col-6">
+                        <input type="text" name='receiverName' class="form-control" placeholder="Recipient's Name">
+                    </div>
+                    <div class="col-6">
+                        <input type="text" class="form-control" name="receiverPhone" placeholder="Phone Number">
+                    </div>
+                    <div class="col-6 mt-2">
+                        <input type="email" class="form-control" name="receiverEmail" placeholder="Email Address">
+                    </div>
+                    <div class="col-6 mt-2 col-md-6">
+                        <input type="text" class="form-control" name="packageDescription" placeholder="Package Details">
+                    </div>
+                    <div class="col-12 mt-2">
+                            <label for="deliveryAddress">Delivery Address</label>
+                            <input type="text" name="deliveryAddress${counter}" class="form-control" required>
+                    </div>
+                    <div class="col-12 col-md-6 mt-2">
+                        <select name="deliveryCity${counter}" class="form-control" placeholder="Select a Delivery City"  onchange="d_fill(this, deliveryTown${counter})" required >
+                            <option value="">Please select a delivery city</option>
+                            <option value="1">Lagos Mainland</option>
+                            <option value="2">Lagos Island</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-6 mt-2">
+                        <select name="deliveryTown${counter}" class="form-control" required >
+                            <!-- Options are in JavaScript Below -->
+                        </select>
+                        <input type="hidden" name="price${counter}" value="0">
+                    </div>
+                    <button type="button" class="btn btn-danger mt-2" onclick="removeDeliveryLocation(this)">Remove</button>
+                `;
+
+                deliveryLocationsDiv.appendChild(newRow);
+                counter++;
+            }
+
+            function removeDeliveryLocation(button) {
+                // This function will remove the parent element of the button (i.e. the delivery location row)
+                button.parentElement.remove();
+                console.log('did it')
+                location.reload();
+                updateam();
+            }
+
+            function d_fill(d_city, d_town) {
+                let options = "";
+                let mainland = [
+                    'Yaba','Ojuelegba' ,'Sabo','Surulere','Shomolu','Palmgrove','Onipanu' ,'Masha' ,'Lawanson','Ijesha' ,'Ijora' ,'Ilupeju' ,'Iwaya' ,'Akerele' ,'Akoka','Aguda' ,'Alagomeji', 'Ebute Metta', 'Jibowu', 'Bariga', 'Opebi' ,'Oregun' ,'Oshodi','Ogudu','Obanikoro','Ojota' ,'Mende' ,'Maryland' ,'Ketu' ,'Kosofe','Gbagada' ,'Ilasamaja','Anthony Village','Alausa' ,'Adeniyi Jones ','Ikeja','Ladipo' ,'Mile 12' ,'Mushin','Agidingbi' ,'Ogba','Omole' ,'Magodo 1','Magodo 2','Ojodu','Ojodu Berger','Ojodu grammer School' ,'Agege', 'Apapa Olodi','Maza Maza' ,'Mile 2','Satellite Town' ,'Ajegunle' ,'Amuwo Odofin' ,'Festac','Alaba', 'Gowon', 'Dopemu' , 'Isolo', 'Egbeda', 'Idi mangoro', 'Alagbado', 'Iyana ipaja', 'Ipaja', 'Abule egba', 'Ifako – Ijaiye', 'Ojo'
+                ];
+
+                let island = [
+                    'Tinubu Square', 'Victoria Garden City', 'Victoria Island', 'Oniru', 'Marina', 'Lekki', 'Lagos Island', 'Eti-Osa', 'Ikoyi', 'Obalende', 'Dolphin Estate', 'Ikota', 'Eleganza/Orchid Road', 'Addo Road', 'Badore', 'Abraham Adesanya', 'Sangotedo', 'Abijo', 'Awoyaya'
+                ];
+
+                if (d_city.value === "1") {
+                    for (let i = 0; i < mainland.length; i++) {
+                        options += `<option value="${mainland[i]}">${mainland[i]}</option>`;
+                    }
+                } else if (d_city.value === "2") {
+                    for (let i = 0; i < island.length; i++) {
+                        options += `<option value="${island[i]}">${island[i]}</option>`;
+                    }
+                }
+
+                d_town.innerHTML = options;
+            }
+
+        </script>
+        <!-- End Delivery Locations -->
+
+        <!-- Dropdown Options (Pickup City) -->
+        <script>
+            new TomSelect('#pickupCity',{
+                maxItems: 1,
+                valueField: 'value',
+                labelField: 'city',
+                searchField: 'city',
+                options: [
+                    {value: 1, city: 'Lagos Mainland'},
+                    {value: 2, city: 'Lagos Island'}
+                ],
+                create: false
+            });
+        </script>
+        <!-- End Dropdown Options (Pickup City) -->
+
+        <!-- Dropdown Options (Pickup Town) -->
+        <script>
+            let mainland = [
+                'Yaba','Ojuelegba' ,'Sabo','Surulere','Shomolu','Palmgrove','Onipanu' ,'Masha' ,'Lawanson','Ijesha' ,'Ijora' ,'Ilupeju' ,'Iwaya' ,'Akerele' ,'Akoka','Aguda' ,'Alagomeji', 'Ebute Metta', 'Jibowu', 'Bariga', 'Opebi' ,'Oregun' ,'Oshodi','Ogudu','Obanikoro','Ojota' ,'Mende' ,'Maryland' ,'Ketu' ,'Kosofe','Gbagada' ,'Ilasamaja','Anthony Village','Alausa' ,'Adeniyi Jones ','Ikeja','Ladipo' ,'Mile 12' ,'Mushin','Agidingbi' ,'Ogba','Omole' ,'Magodo 1','Magodo 2','Ojodu','Ojodu Berger','Ojodu grammer School' ,'Agege', 'Apapa Olodi','Maza Maza' ,'Mile 2','Satellite Town' ,'Ajegunle' ,'Amuwo Odofin' ,'Festac','Alaba', 'Gowon', 'Dopemu' , 'Isolo', 'Egbeda', 'Idi mangoro', 'Alagbado', 'Iyana ipaja', 'Ipaja', 'Abule egba', 'Ifako – Ijaiye', 'Ojo'
+            ];
+
+            let island = [
+                'Tinubu Square', 'Victoria Garden City', 'Victoria Island', 'Oniru', 'Marina', 'Lekki', 'Lagos Island', 'Eti-Osa', 'Ikoyi', 'Obalende', 'Dolphin Estate', 'Ikota', 'Eleganza/Orchid Road', 'Addo Road', 'Badore', 'Abraham Adesanya', 'Sangotedo', 'Abijo', 'Awoyaya'
+            ];
+
+            function fill() {
+
+                let city = document.getElementById('pickupCity').value;
+                let town = document.getElementById('pickupTown');
+
+                // const mainland = [
+                //     'Yaba','Ojuelegba' ,'Sabo','Surulere','Shomolu','Palmgrove','Onipanu' ,'Masha' ,'Lawanson','Ijesha' ,'Ijora' ,'Ilupeju' ,'Iwaya' ,'Akerele' ,'Akoka','Aguda' ,'Alagomeji', 'Ebute Metta', 'Jibowu', 'Bariga', 'Opebi' ,'Oregun' ,'Oshodi','Ogudu','Obanikoro','Ojota' ,'Mende' ,'Maryland' ,'Ketu' ,'Kosofe','Gbagada' ,'Ilasamaja','Anthony Village','Alausa' ,'Adeniyi Jones ','Ikeja','Ladipo' ,'Mile 12' ,'Mushin','Agidingbi' ,'Ogba','Omole' ,'Magodo 1','Magodo 2','Ojodu','Ojodu Berger','Ojodu grammer School' ,'Agege', 'Apapa Olodi','Maza Maza' ,'Mile 2','Satellite Town' ,'Ajegunle' ,'Amuwo Odofin' ,'Festac','Alaba', 'Gowon', 'Dopemu' , 'Isolo', 'Egbeda', 'Idi mangoro', 'Alagbado', 'Iyana ipaja', 'Ipaja', 'Abule egba', 'Ifako – Ijaiye', 'Ojo'
+                // ];
+
+                // const island = [
+                //     'Tinubu Square', 'Victoria Garden City', 'Victoria Island', 'Oniru', 'Marina', 'Lekki', 'Lagos Island', 'Eti-Osa', 'Ikoyi', 'Obalende', 'Dolphin Estate', 'Ikota', 'Eleganza/Orchid Road', 'Addo Road', 'Badore', 'Abraham Adesanya', 'Sangotedo', 'Abijo', 'Awoyaya'
+                // ];
+
+                if (city==1){
+                    town.innerHTML = "<option value= '' > Select Pickup Town </option>";
+                    for(let i=0; i<mainland.length;i++){
+                        town.innerHTML = town.innerHTML + "<option value= "+ "'" + mainland[i] + "'" + ">" + mainland[i] + "</option>"
+                    }
+                }
+                else if (city==2){
+                    town.innerHTML = "<option value= '' > Select Pickup Town </option>";
+                    for(let i=0; i<island.length;i++){
+                    town.innerHTML = town.innerHTML + '<option value=' + "'" + island[i] + "'" + ">" + island[i] + "</option>"
+                    }
+                }
+                else {
+                    town.innerHTML = "<option value= '' > Select a City First </option>";
+                }
+                
+
+            }
+
+        </script>
+        <!-- End Dropdown Options (Pickup & Delivery Town) -->
+
+
+        <!-- Stop Injecting Here -->
+        {% endblock %}
+    </body>

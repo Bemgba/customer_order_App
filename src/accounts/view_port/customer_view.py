@@ -32,17 +32,23 @@ def get_customer_info(request):
    
 @login_required(login_url = "/")
 def customer_view(request):
+    print("method: " + request.method)
+
     if request.method == 'POST':
         form_id = request.POST.get('form_id')
-        if form_id == 'deleteModal':
-            custo = request.POST.get('customerId')
-            print(custo)
-            cha = Customer.objects.get(id = custo)
-            cha.delete()
-        elif form_id == 'editCustomer':
+        if form_id == 'editCustomer':
             custom = request.POST.get('customerId')
             customes = Customer.objects.get(id=custom)
             return redirect(request, customes)
+    elif request.method == 'DELETE':
+        form_id = request.DELETE.get('form_id')
+        print(form_id)  # deleteCustomer
+        if form_id == 'deleteCustomer':
+            custo = request.DELETE.get('customerId')
+            print(custo)
+            cha = Customer.objects.get(id = custo)
+            cha.delete()
+        
     context = {
         "customers": Customer.objects.all(),
         # "totalSpend": 
@@ -91,7 +97,7 @@ def viewCustomer_page(request):
         'invoicetotal': invoicetotal,
         'creditBalance': 0 if creditBalance ==None else creditBalance ,
         }
-    return render(request, 'view-Customer.html', context)
+    return render(request, 'view-customer.html', context)
 
 @login_required(login_url = "/")
 def customer_create(request):
@@ -110,8 +116,8 @@ def customer_create(request):
             customer_email = request.POST['email'],
             
             )
-        Counter.objects.create( Customer=customer_creation, orderC=0)
+        Counter.objects.create( customer=customer_creation, orderC=0)
         messages.success(request, 'Customer Creation Successful')
-        return redirect("/pjq_admin/Customer/")
+        return redirect("customer_view")
     
     return render(request, 'new-Customer.html')

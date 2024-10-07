@@ -153,7 +153,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='order',
             name='branch',
-            field=models.CharField(default='Mafoluku', max_length=200),
+            field=models.CharField(default='Lekki', max_length=200),
         ),
         migrations.AddField(
             model_name='order',

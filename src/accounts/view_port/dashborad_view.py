@@ -1,6 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Max, Sum, Count
 from django.shortcuts import render, redirect, get_object_or_404
+from rest_framework.views import APIView, status
+
+from django.http import JsonResponse
+from rest_framework.permissions import IsAuthenticated
 
 from django.utils import timezone
 
@@ -9,208 +13,107 @@ from datetime import datetime, timedelta
 
 today = datetime.now()
 
-@login_required(login_url = "login")
-def index_admin(request):  
-    usif = UserInfoExtend.objects.get(user = request.user)
+class DashboardAPIView(APIView):
+    permission_classes = [IsAuthenticated]  # Equivalent of @login_required
 
-    if usif.user_type == 'super_admin':
-        if request.method == 'POST':
-            # Mark all notifications as read
-            Notification.objects.all().update(is_read=True)
-        else:
+    def get_user_info(self, request):
+        return UserInfoExtend.objects.get(user=request.user)
     
-            usif = UserInfoExtend.objects.get(user = request.user)
-            orders = Order.objects.all()
-            order_dispatched = Order.objects.filter(status__in=['Delivery Assigned']).count()
-            orders_received = Order.objects.filter(status__in=['Order Processing','Fulfilled','Pending','Delivery Assigned', 'Pick-up Assigned']).count()
-
-            first_day_prev_month = today - timedelta(days=30)
-            last_day_prev_month = today  
-            data = Order.objects.filter(status__in=['Order Processing','Fulfilled','Pending','Delivery Assigned', 'Pick-up Assigned'], created_at__gte=first_day_prev_month, created_at__lte=last_day_prev_month).values('created_at', 'pricing')
-            # The annotate function in Django is used to add an additional column to the query results, where the values in the column are derived from the existing data in the queryset. This is useful when you want to perform aggregations or calculations on the data and display the results in your template.
-            infos = Order.objects.filter(created_at__gte=first_day_prev_month, created_at__lte=last_day_prev_month).values('created_at').annotate(Count('id'))
-
-            dates = []
-            date = first_day_prev_month
-            while date <= last_day_prev_month:
-                dates.append(date.strftime("%B %d"))
-                date += timedelta(days=1)
-            
-            total_revenue = 0
-            payment_received = 0
-            for x in Payment.objects.all().values('payment_amount'):
-                payment_received +=x['payment_amount']
-            for y in Order.objects.filter(status__in=['Order Processing', 'Fulfilled', 'Pending', 'Delivery Assigned', 'Pick-up Assigned']).values('pricing'):
-                total_revenue +=y['pricing']
-
-            data_labels = ','.join(f'"{date}"' for date in dates)
-
-            now = datetime.now()
-            thirty_days_ago = now - timedelta(days=30)
-
-            # Initializing the dictionary with keys for each day in the past 30 days, and values set to 0
-            pricing_totals = {(thirty_days_ago + timedelta(days=x)).date(): 0 for x in range(30)}
-            
-            # Iterate through the data
-            for datum in data:
-                # Get the date and pricing value
-                date = datum["created_at"].date()
-                value = datum["pricing"]
-
-                # If the date is not in the dictionary, add it and set the value to the pricing value
-                if date not in pricing_totals:
-                    pricing_totals[date] = value
-                # If the date is already in the dictionary, add the pricing value to the existing value
-                else:
-                    pricing_totals[date] += value
-            # Modify the data to match the format in the data-series
-            modified_data = []
-            for date, value in pricing_totals.items():
-                meta = date.strftime("%m/%d/%Y %I:%M %p")
-                modified_data_string = ''.join(f'{{"meta": "{meta}", "value": "{value}"}}')
-                modified_data.append(modified_data_string)
-                modified_data_string = ','.join(modified_data[0:])
-            
-            # print(modified_data_string)
-            
-            # Initializing the dictionary with keys for each day in the past 30 days, and values set to 0
-            count_totals = {(thirty_days_ago + timedelta(days=x)).date(): 0 for x in range(30)}
-
-            #for the second graph
-            for info in infos:
-                date = info["created_at"].date()
-                value = info["id__count"]
-                if date not in count_totals:
-                    count_totals[date] = value
-                # If the date is already in the dictionary, add the pricing value to the existing value
-                else:
-                    count_totals[date] += value
-            # Modify the data to match the format in the data-series
-            modified_info = []
-            for date, value in count_totals.items():
-                meta = date.strftime("%m/%d/%Y %I:%M %p")
-                modified_info_string = ''.join(f'{{"meta": "{meta}", "value": "{value}"}}')
-                modified_info.append(modified_info_string)
-                modified_info_string = ','.join(modified_info[0:])
-
-            # Filter notifications for the last 30 days for a GET request
-            time_threshold = timezone.now() - timedelta(days=30)
-            notifications = Notification.objects.filter(created_at__gte=time_threshold, is_read=False)
-            
-            context = {
-                'usif': usif,
-                'orders': orders,
-                'order_dispatched': 0 if order_dispatched == None else order_dispatched,
-                'orders_received': 0 if orders_received == None else orders_received,
-                'total_revenue': 0 if total_revenue == None else total_revenue,
-                'payment_received': 0 if payment_received == None else payment_received,
-                'modified_data_string': modified_data_string,
-                'modified_info_string': modified_info_string,
-                'dates': dates,
-                "num_orders_lmonth" : data.count(),
-                "net_profit" : "",
-                "orderpermonths" : [''],
-                "data_labels": data_labels,
-                'notifications': notifications,
-                }
-
-            return render(request, 'dashboard.html', context)
-
-    else:
-        usif = UserInfoExtend.objects.get(user = request.user)
+    def get_orders_and_totals(self, status_filter=None):
         orders = Order.objects.all()
-        order_dispatched = Order.objects.filter(status__in=['Delivery Assigned']).count()
-        orders_received = Order.objects.filter(status__in=['Order Processing','Fulfilled','Pending','Delivery Assigned', 'Pick-up Assigned']).count()
-
-        first_day_prev_month = today - timedelta(days=30)
-        last_day_prev_month = today  
-        data = Order.objects.filter(status__in=['Order Processing','Fulfilled','Pending','Delivery Assigned', 'Pick-up Assigned'], created_at__gte=first_day_prev_month, created_at__lte=last_day_prev_month).values('created_at', 'pricing')
-        # The annotate function in Django is used to add an additional column to the query results, where the values in the column are derived from the existing data in the queryset. This is useful when you want to perform aggregations or calculations on the data and display the results in your template.
-        infos = Order.objects.filter(created_at__gte=first_day_prev_month, created_at__lte=last_day_prev_month).values('created_at').annotate(Count('id'))
-
-        dates = []
-        date = first_day_prev_month
-        while date <= last_day_prev_month:
-            dates.append(date.strftime("%B %d"))
-            date += timedelta(days=1)
+        order_dispatched = orders.filter(status__in=['Delivery Assigned']).count()
+        orders_received = orders.filter(status__in=['Order Processing', 'Fulfilled', 'Pending', 'Delivery Assigned', 'Pick-up Assigned']).count()
+        return orders, order_dispatched, orders_received
+    
+    def get_payment_and_revenue(self):
+        total_revenue = Order.objects.filter(
+            status__in=['Order Processing', 'Fulfilled', 'Pending', 'Delivery Assigned', 'Pick-up Assigned']
+        ).aggregate(total=Sum('pricing'))['total'] or 0
         
-        total_revenue = 0
-        payment_received = 0
-        for x in Payment.objects.all().values('payment_amount'):
-            payment_received +=x['payment_amount']
-        for y in Order.objects.filter(status__in=['Order Processing', 'Fulfilled', 'Pending', 'Delivery Assigned', 'Pick-up Assigned']).values('pricing'):
-            total_revenue +=y['pricing']
+        payment_received = Payment.objects.aggregate(total=Sum('payment_amount'))['total'] or 0
+        return total_revenue, payment_received
+    
+    def get_past_30_days_data(self):
+        today = timezone.now()
+        first_day_prev_month = today - timedelta(days=30)
+        
+        orders_data = Order.objects.filter(
+            status__in=['Order Processing', 'Fulfilled', 'Pending', 'Delivery Assigned', 'Pick-up Assigned'],
+            created_at__gte=first_day_prev_month
+        ).values('created_at', 'pricing')
 
-        data_labels = ','.join(f'"{date}"' for date in dates)
-
+        orders_count_data = Order.objects.filter(
+            created_at__gte=first_day_prev_month
+        ).values('created_at').annotate(count=Count('id'))
+        
+        return orders_data, orders_count_data
+    
+    def process_data_for_charts(self, orders_data, orders_count_data):
         now = datetime.now()
         thirty_days_ago = now - timedelta(days=30)
-
-        # Initializing the dictionary with keys for each day in the past 30 days, and values set to 0
+        
+        # Initialize totals dictionaries for pricing and order counts
         pricing_totals = {(thirty_days_ago + timedelta(days=x)).date(): 0 for x in range(30)}
-        
-        # Iterate through the data
-        for datum in data:
-            # Get the date and pricing value
+        count_totals = pricing_totals.copy()  # Reuse the same keys for counts
+
+        for datum in orders_data:
             date = datum["created_at"].date()
-            value = datum["pricing"]
+            pricing_totals[date] += datum["pricing"]
 
-            # If the date is not in the dictionary, add it and set the value to the pricing value
-            if date not in pricing_totals:
-                pricing_totals[date] = value
-            # If the date is already in the dictionary, add the pricing value to the existing value
-            else:
-                pricing_totals[date] += value
-        # Modify the data to match the format in the data-series
-        modified_data = []
-        for date, value in pricing_totals.items():
-            meta = date.strftime("%m/%d/%Y %I:%M %p")
-            modified_data_string = ''.join(f'{{"meta": "{meta}", "value": "{value}"}}')
-            modified_data.append(modified_data_string)
-            modified_data_string = ','.join(modified_data[0:])
-        
-        # print(modified_data_string)
-        
-        # Initializing the dictionary with keys for each day in the past 30 days, and values set to 0
-        count_totals = {(thirty_days_ago + timedelta(days=x)).date(): 0 for x in range(30)}
-
-        #for the second graph
-        for info in infos:
+        for info in orders_count_data:
             date = info["created_at"].date()
-            value = info["id__count"]
-            if date not in count_totals:
-                count_totals[date] = value
-            # If the date is already in the dictionary, add the pricing value to the existing value
-            else:
-                count_totals[date] += value
-        # Modify the data to match the format in the data-series
-        modified_info = []
-        for date, value in count_totals.items():
-            meta = date.strftime("%m/%d/%Y %I:%M %p")
-            modified_info_string = ''.join(f'{{"meta": "{meta}", "value": "{value}"}}')
-            modified_info.append(modified_info_string)
-            modified_info_string = ','.join(modified_info[0:])
+            count_totals[date] += info["count"]
 
+        # Convert totals to the required string format for chart data
+        modified_data_string = ','.join(f'{{"meta": "{date.strftime("%m/%d/%Y")}", "value": "{value}"}}' for date, value in pricing_totals.items())
+        modified_info_string = ','.join(f'{{"meta": "{date.strftime("%m/%d/%Y")}", "value": "{value}"}}' for date, value in count_totals.items())
         
+        dates = [(thirty_days_ago + timedelta(days=x)).strftime("%B %d") for x in range(30)]
+        data_labels = ','.join(f'"{date}"' for date in dates)
+        
+        return modified_data_string, modified_info_string, data_labels, dates
+    
+    def get_notifications(self):
+        time_threshold = timezone.now() - timedelta(days=30)
+        return Notification.objects.filter(created_at__gte=time_threshold, is_read=False)
+
+    def post(self, request):
+        usif = self.get_user_info(request)
+        
+        if usif.user_type == 'super_admin':
+            Notification.objects.all().update(is_read=True)
+            return JsonResponse({'detail': 'Notifications marked as read'})
+
+        return JsonResponse({'detail': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
+    
+    def get(self, request):
+        usif = self.get_user_info(request)
+        
+        # Fetch necessary data
+        orders, order_dispatched, orders_received = self.get_orders_and_totals()
+        total_revenue, payment_received = self.get_payment_and_revenue()
+        orders_data, orders_count_data = self.get_past_30_days_data()
+        
+        # Process data for charts
+        modified_data_string, modified_info_string, data_labels, dates = self.process_data_for_charts(orders_data, orders_count_data)
+
+        # Get unread notifications
+        notifications = self.get_notifications()
+
+        # Prepare the response data
         context = {
             'usif': usif,
             'orders': orders,
-            'order_dispatched': 0 if order_dispatched == None else order_dispatched,
-            'orders_received': 0 if orders_received == None else orders_received,
-            'total_revenue': 0 if total_revenue == None else total_revenue,
-            'payment_received': 0 if payment_received == None else payment_received,
+            'order_dispatched': order_dispatched or 0,
+            'orders_received': orders_received or 0,
+            'total_revenue': total_revenue or 0,
+            'payment_received': payment_received or 0,
             'modified_data_string': modified_data_string,
             'modified_info_string': modified_info_string,
             'dates': dates,
-            "num_orders_lmonth" : data.count(),
-            "net_profit" : "",
-            "orderpermonths" : [''],
+            "num_orders_lmonth": orders_data.count(),
             "data_labels": data_labels,
-            }
-
+            'notifications': notifications,
+        }
+        
         return render(request, 'dashboard.html', context)
-
-
-@login_required(login_url='login')#prevent unauthorised user access
-def dashboard_view(request):
-    return render(request, 'dashboard.html')

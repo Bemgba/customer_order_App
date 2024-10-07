@@ -1,0 +1,160 @@
+{% extends 'index.html' %}
+
+{% load static %}
+{% block title%} Locations {% endblock %}
+{% block body_block %}
+
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Title -->
+        <title>Locations</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta http-equiv="x-ua-compatible" content="ie=edge"> {% endcomment %}
+
+        <!-- Favicon -->
+        <link rel="shortcut icon" href="/static/public/img/PJ QUEST MINI-LOGO.png">
+
+        <!-- Template -->
+        <link rel="stylesheet" href="/static/public/graindashboard/css/graindashboard.css">
+
+    {% comment %} </head> {% endcomment %}
+
+    <body class="py-4 px-3 px-md-4"> 
+        <!-- Start Injecting here -->
+        
+        <div class=" mb-3 mb-md-4">
+            
+
+            <div class="">
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <!-- Breadcrumb -->
+                        <nav class="d-none d-md-block" aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item">
+                                    <a href="#">Locations</a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page">All Locations</li>
+                            </ol>
+                        </nav>
+                        <!-- End Breadcrumb -->
+                        <div class="mb-3 mb-md-4 d-flex justify-content-between">
+                            <div class="h3 mb-0">All Locations</div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary rounded-pill" href="" data-toggle="modal" data-target="#addLocationModal">
+                            <strong>+</strong> ADD NEW LOCATION
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Locations -->
+                <div class="card table-responsive-xl p-5">
+                    <div class="row mt-2">
+                        <div class="col-md-9"></div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                                <input type="text" class="form-control" id="locations-search" placeholder="Search">
+                          </div>
+                        </div>
+                    </div>
+
+                    <!-- HTML table for displaying location details -->
+                    <table class="table text-nowrap mb-0" id="locationsTable">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="font-weight-semi-bold border-top-0 py-2">Location Name</th>
+                                <th scope="col" class="font-weight-semi-bold border-top-0 py-2">Location Type</th>
+                                <th scope="col" class="font-weight-semi-bold border-top-0 py-2">Location Zone</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Loop through list of locations and display in table rows -->
+                            <tr>
+                                <td>Yaba</td>
+                                <td>Mainland</td>
+                                <td>Zone 1</td>
+                                <td class="">
+                                    <a class="" href="#" data-toggle="modal" data-target="#deleteLocationModal">
+                                        <i class="gd-trash mr-3 text-danger font-weight-semi-bold"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Victoria Island</td>
+                                <td>Island</td>
+                                <td>Zone 2</td>
+                                <td class="">
+                                    <a class="" href="#" data-toggle="modal" data-target="#deleteLocationModal">
+                                        <i class="gd-trash mr-3 text-danger font-weight-semi-bold"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <!-- etc. -->
+                        </tbody>
+                    </table>
+                    
+
+                    <div class="card-footer d-block d-md-flex align-items-center d-print-none">
+                        
+                    </div>
+                    
+                </div>
+                <!-- End Locations -->
+
+            </div>
+        </div>
+
+        
+
+
+
+        <!-- JavaScript -->
+        <script src="/static/public/graindashboard/js/graindashboard.js"></script>
+        <script src="/static/public/graindashboard/js/graindashboard.vendor.js"></script>
+        <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+
+        <script>
+            $(document).ready(function () {
+            $('#riders-table').DataTable({
+                pageLength: 10,
+                // filter: true,
+                // deferRender: true,
+                // scrollY: 200,
+                // scrollCollapse: true,
+                scroller: true
+
+            });
+        });
+
+        </script>
+
+        <!-- Search Functionality -->
+        <script>
+            // For Riders' Table
+            // Listen for changes to the search input
+            $('#locations-search').on('keyup', function() {
+                var query = $(this).val();
+        
+                // Filter the table rows based on the search query
+                $('#locationsTable tbody tr').filter(function() {
+                    //$(this).toggle($(this).text().toLowerCase().indexOf(query) > -1);
+                    $(this).toggle($(this).text().toLowerCase().indexOf(query.toLowerCase()) > -1);
+
+                });
+            });
+        </script>
+        <!-- End Search Functionality -->
+
+        
+
+        <!-- Stop Injecting here -->
+    </body>
+    {%endblock%}
+{% comment %} </html> {% endcomment %}

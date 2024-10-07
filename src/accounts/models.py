@@ -139,7 +139,7 @@ class Order(models.Model):
     delivery_type = models.CharField(max_length =30, default = 'Same-Day Delivery', null = True, blank = True ) #Same-Day Delivery
     customer =  models.ForeignKey(Customer, on_delete=models.CASCADE)
     receipient = models.ForeignKey(Receipient, on_delete=models.CASCADE, null= True)
-    branch =  models.CharField(max_length = 200, default='Mafoluku')
+    branch =  models.CharField(max_length = 200, default='Lekki')
     status = models.CharField(max_length = 200, default='Pending') #Pending, Fulfilled(Delivery Fulfilled), Cancelled(Order Cancelled), Assigned(Pick-up Assigned, Delivery Assigned), Processing(Order Processing) 
     reference_number = models.CharField(max_length=255, unique=True, default='none')
     pricing = models.DecimalField(max_digits=10, decimal_places=2, null = True, blank = True )

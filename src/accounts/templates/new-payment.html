@@ -1,0 +1,231 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block title%} Add New Payment {% endblock %}
+{% block body_block %}
+
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Title -->
+    <title> Add New Payment | PJ Quest Admin Application</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge"> {% endcomment %}
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/static/public/img/PJ QUEST MINI-LOGO.png">
+
+    <!-- Tom-Select CSS -->
+    <link rel="stylesheet" href="/static/node_modules/tom-select/dist/css/tom-select.bootstrap4.css">
+
+    <!-- J-Query -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+
+    <!-- DEMO CHARTS -->
+    <link rel="stylesheet" href="/static/public/demo/chartist.css">
+    <link rel="stylesheet" href="/static/public/demo/chartist-plugin-tooltip.css">
+
+    <!-- Template -->
+    <link rel="stylesheet" href="/static/public/graindashboard/css/graindashboard.css">
+
+
+    
+    <style>
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance:textfield; /* Firefox */
+        }
+    </style>
+{% comment %} </head> {% endcomment %}
+
+<body class="py-4 px-3 px-md-4">
+    <div class="card mb-3 mb-md-4">
+
+        <div class="card-body">
+            <!-- Breadcrumb -->
+            <nav class="d-none d-md-block" aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="#">Payments</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Add New Payment</li>
+                </ol>
+            </nav>
+            <!-- End Breadcrumb -->
+
+            <div class="mb-3 mb-md-4 d-flex justify-content-between">
+                <div class="h3 mb-0">Add New Payment</div>
+            </div>
+
+
+            <!-- Form -->
+            <div>
+                <form id="newPayment" role="form" method="POST" action=".">
+                {% csrf_token %}
+
+                    <div class="form-row pb-2">
+
+                        <div class="form-group col-12 col-md-6">
+                            <label for="dateTime">Date & Time of Payment</label>
+                            <input type="datetime-local" class="form-control" value="" id="dateTime" name="dateTime" placeholder="Date & Time of Registration" required>
+                        </div>
+                        <div class="form-group col-12 col-md-6">
+                            <label for="customerName">Customer/Business Name</label>
+                            <select id="customerName" class="form-control" value="" name="customerName" placeholder="Type in the Customer's name" required onchange="filterOrdersByCustomer(this.value)">
+                                <!-- Options are in JavaScript Below -->
+                            </select>
+                        </div>
+                        
+                        
+                    </div>
+
+                    <div class="form-row">
+                        {% comment %} <div class="form-group col-12 col-md-6">
+                            <label for="orderRef">Order Reference Number</label>
+                            <select id="orderRef" class="form-control" name="orderRef" required>
+                                {% for order in orders %}
+                                <option value="{{ order.reference_number }}">{{ order.reference_number }}</option>
+                                {% endfor %}
+                            </select>
+                        </div> {% endcomment %}
+
+                        {% comment %} <div class="form-group col-12 col-md-6">
+                            <label for="paymentReferenceNumber">Order Reference Number</label>
+                            <select id="orderRef" class="form-control" value="" name="orderRef" placeholder="Type in the Order Number" required >
+                                <!-- Options are in JavaScript Below -->
+                            </select>                        
+                        </div> {% endcomment %}
+                        {% comment %} <div class="form-group col-12 col-md-6">
+                            <label for="paymentReferenceNumber">Payment Reference Number</label>
+                            <input type="" class="form-control" value="" id="paymentReferenceNumber" name="paymentReferenceNumber" placeholder="" required> <!--Automatically enter the next available ref No.-->
+                        </div> {% endcomment %}
+                        
+                    </div>
+
+                    <div id="paymentDetails">
+                        <div class="form-row" id="paymentRow">
+                            
+                            <div class="form-group col-11 col-md-5">
+                                <!-- <label for="paymentBank">Payment Bank</label> -->
+                                <input type="text" class="form-control" value="" id="paymentBank" name="paymentBank" placeholder="Please Select Bank" required>
+                            </div>
+                            <div class="form-group col-11 col-md-5">
+                                <!-- <label for="paymentAmount" class="col-form-label m-0 p-1 pl-7">Payment Amount</label> -->
+                                <div class="input-group">
+                                    <span class="input-group-text text-black-50 font-weight-bold" id="addon-wrapping">₦</span>
+                                    <input type="number" id="paymentAmount" class="form-control" name="paymentAmount" aria-label="paymentAmount" aria-describedby="addon-wrapping" placeholder="Please Enter Amount Paid">
+                                </div>
+                            </div>
+                            <div class="col-1 col-md-1 d-flex align-content-center flex-wrap ">
+                                <i class="gd-plus font-weight-bolder p-2 rounded-pill bg-primary text-white ml-3 add" id="plus-icon"></i>
+                            </div>
+                            <div class="col-1 col-md-1 d-flex align-content-center flex-wrap ">
+                                <i class="gd-minus font-weight-bolder p-2 rounded-pill bg-danger text-white ml-3 cut" id="minus-icon"></i>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary rounded-pill px-7 mt-5 float-right mr-5" value"Submit">Submit</button>
+                    
+                </form>
+            </div>
+            <!-- End Form -->
+        </div>
+    </div>
+
+    <script src="/static/public/graindashboard/js/graindashboard.js"></script>
+    <script src="/static/public/graindashboard/js/graindashboard.vendor.js"></script>
+    <script src="/static/node_modules/tom-select/dist/js/tom-select.base.js"></script>
+
+    <script>
+        function filterOrdersByCustomer(customerId) {
+            // Get the list of orders from the HTML template
+            var orders = document.getElementById("ordersList").children;
+          
+            // Loop through the orders
+            for (var i = 0; i < orders.length; i++) {
+              var order = orders[i];
+          
+              // Check the customer field of the order
+              if (order.customer === customerId) {
+                // If the customer matches, add the reference_number to the HTML template
+                var referenceNumber = order.reference_number;
+                addReferenceNumberToTemplate(referenceNumber);
+              }
+            }
+          }
+          
+        function addReferenceNumberToTemplate(referenceNumber) {
+        // Add the reference number to the HTML template
+        // You can modify this function to add the reference number in the way that you want
+        var referenceNumberElement = document.createElement("li");
+        referenceNumberElement.innerHTML = referenceNumber;
+        document.getElementById("referenceNumbersList").appendChild(referenceNumberElement);
+        }
+          
+    </script>
+    <!-- Dropdown Options (Customer Name) -->
+    <script>
+        new TomSelect('#customerName',{
+            maxItems: 1,
+            valueField: 'id',
+            labelField: 'name',
+            searchField: 'name',
+            options: [
+                // Replace these with registered customers' names
+                {% for customer in customers %}
+                {id: {{customer.id}}, name: "{{customer.customer_name}}" },
+                {% endfor %}
+            ],
+            create: false
+        });
+          
+    </script>
+    <!-- End Dropdown Options (Customer Name) -->
+
+    <!-- Add New rows to form -->
+    <script>
+        const newPaymentForm = document.getElementById('newPayment');
+         const paymentDetails = document.getElementById('paymentDetails');
+         const paymentRow = document.getElementById('paymentRow');
+ 
+         // Listen for click events on the "add" button
+         newPaymentForm.addEventListener('click', function(e) {
+         if (e.target.classList.contains('add')) {
+             // When the user clicks the "add" button, create a new paymentRow
+             // with the same structure as the original paymentRow
+             const newPaymentRow = paymentRow.cloneNode(true);
+             // Clear the values of the input fields in the new paymentRow
+             newPaymentRow.querySelectorAll('input').forEach(function(input) {
+             input.value = '';
+             });
+ 
+             // Append the new paymentRow to the paymentDetails div
+             paymentDetails.appendChild(newPaymentRow);
+         }
+         });
+ 
+         // Listen for click events on the "remove" button
+         newPaymentForm.addEventListener('click', function(e) {
+         if (e.target.classList.contains('cut')) {
+             // When the user clicks the "remove" button, remove the corresponding
+             // paymentRow from the paymentDetails div
+             const paymentRowToRemove = e.target.parentElement.parentElement;
+             paymentDetails.removeChild(paymentRowToRemove);
+         }
+         });
+ 
+    </script>
+</body>
+{% endblock %}
+
+{% comment %} </html> {% endcomment %}

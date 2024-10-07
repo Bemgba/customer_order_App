@@ -1,0 +1,99 @@
+{% extends 'index.html' %}
+
+{% load static %}
+{% block title%} Profile Settings {% endblock %}
+{% block body_block %}
+
+{% comment %} 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Title -->
+    <title>Profile Settings</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge"> {% endcomment %}
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/static/public/img/PJ QUEST MINI-LOGO.png">
+
+    <!-- Template -->
+    <link rel="stylesheet" href="/static/public/graindashboard/css/graindashboard.css">
+
+<body class="has-sidebar has-fixed-sidebar-and-header">
+    
+    <div class="py-4 px-3 px-md-4">
+        <div class="card mb-3 mb-md-4">
+            <div class="card-body">
+                <!-- Breadcrumb -->
+                <nav class="d-none d-md-block" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="#">Profile</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Update Profile Information</li>
+                    </ol>
+                </nav>
+                <!-- End Breadcrumb -->
+                <div class="mb-3 mb-md-4 d-flex justify-content-between">
+                    <div class="h3 mb-0">Update Profile Information</div>
+                </div>
+                <!-- Form -->
+                <div>
+                    <div id="error-message">{{ error_message }}</div>
+                    <form>
+                        {%csrf_token%}
+                        <div class="form-row">
+                            <div class="form-group col-12 col-md-6">
+                                <label for="fullName">Full Name</label>
+                                <!-- Enter User's Full Name Automatically -->
+                                <input type="text" class="form-control" value="{{user.first_name}} {{user.last_name}}" id="fullName" name="fullName" placeholder="User's Full Name" readonly>
+                            </div>
+                            <div class="form-group col-12 col-md-6">
+                                <label for="userName">Username</label>
+                                <!-- Enter User's Username Automatically -->
+                                <input type="text" class="form-control" value="{{ user.username }}" id="userName" name="userName" placeholder="Preferred Username" readonly>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-12">
+                                <div class="font-weight-semi-bold h5 mb-3">Change Password</div>
+                            </div>
+                            <div class="form-group col-12 col-md-4">
+                                <label for="old_password">Current Password</label>
+                                <input type="password" class="form-control" value="" id="old_password" name="old_password" placeholder="Current Password">
+                            </div>
+                            <div class="form-group col-12 col-md-4">
+                                <label for="password">New Password</label>
+                                <input type="password" class="form-control" value="" id="password" name="password" placeholder="New Password">
+                            </div>
+                            <div class="form-group col-12 col-md-4">
+                                <label for="password_confirm">Repeat New Password</label>
+                                <input type="password" class="form-control" value="" id="password_confirm" name="password_confirm" placeholder="Repeat New Password">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary float-right">Update</button>
+                    </form>
+                </div>
+                <!-- End Form -->
+            </div>
+        </div>
+    </div>
+
+
+    <script src="/static/public/graindashboard/js/graindashboard.js"></script>
+    <script src="/static/public/graindashboard/js/graindashboard.vendor.js"></script>
+    <script>
+        const errorMessageElement = document.getElementById('error-message');
+        if (errorMessage) {
+        errorMessageElement.innerHTML = errorMessage;
+        errorMessageElement.style.display = 'block';
+        } else {
+        errorMessageElement.style.display = 'none';
+        }
+
+    </script>
+</body>
+{%endblock%}

@@ -1,0 +1,1053 @@
+{% extends 'index.html' %}
+{% load dash_tags %}
+{% load static %}
+{% block title%} All Orders | PJ Quest Admin Application {% endblock %}
+{% block body_block %}
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/static/public/img/PJ QUEST MINI-LOGO.png">
+    
+    <!-- Template -->
+    <link rel="stylesheet" href="/static/public/graindashboard/css/graindashboard.css">
+
+    <!-- Tables -->
+
+    <style>
+        /* Remove Arrows from number input */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance:textfield; /* Firefox */
+        }
+
+        /* Stepwizard Styling */
+        
+        .stepwizard-step p {
+            margin-top: 10px;
+        }
+        .stepwizard-row {
+            display: table-row;
+        }
+        .stepwizard {
+            display: table;
+            width: 100%;
+            position: relative;
+        }
+        .stepwizard-step button[disabled] {
+            opacity: 1 !important;
+            filter: alpha(opacity=100) !important;
+        }
+        .stepwizard-row:before {
+            top: 14px;
+            bottom: 0;
+            position: absolute;
+            content: " ";
+            width: 100%;
+            height: 1px;
+            background-color: #ccc;
+            z-order: 0;
+        }
+        .stepwizard-step {
+            display: table-cell;
+            text-align: center;
+            position: relative;
+        }
+        .btn-circle {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+        }
+        
+            
+        /* End Stepwizard styling */
+
+        /* Tabs/Nav Styling */
+        
+
+        /* End Tabs Styling */
+
+        
+    </style>
+    {% comment %} </head> {% endcomment %}
+
+    <body class="py-4 px-3 px-md-4">
+      <!-- Start Injecting here -->
+        <!-- Page Title -->
+        <div class="mb-3 mb-md-4 d-flex justify-content-between">
+            <div class="h3 mb-0 font-weight-bold">Orders </div>
+        </div>
+        <!-- End Page Title -->
+
+        <!-- Orders -->
+        
+        <div class="row">
+            <div class="col-sm-12">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a href="#pending" class="nav-link active" data-toggle="tab" data-target="#pending" role="tab" aria-selected="true">
+                            Pending
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="#assigned" class="nav-link" data-toggle="tab" data-target="#assigned" role="tab" aria-selected="false">
+                            Assigned
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="#processing" class="nav-link"  data-toggle="tab" data-target="#processing" role="tab" aria-selected="false">
+                            Processing
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="#fulfilled" class="nav-link"  data-toggle="tab" data-target="#fulfilled" role="tab" aria-selected="false">
+                            Fulfilled
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="#cancelled" class="nav-link"  data-toggle="tab" data-target="#cancelled" role="tab" aria-selected="false">
+                            Cancelled
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+
+                    <!-- Pending Orders -->
+                    <div class="tab-pane active" id="pending">
+                        <div class="row">
+
+                            <div class="col-12">
+
+                                <div class="row mt-2">
+                                    <div class="col-md-9"></div>
+                                    <div class="col-md-3">
+                                      <div class="form-group">
+                                        <!-- <label for="tableSearch">Search:</label> -->
+                                        <input type="text" class="form-control" id="pending-search" placeholder="Search">
+                                      </div>
+                                    </div>
+                                </div>
+                
+                                <div class="card mb-3 mb-md-4">
+                
+                                    <div class="card-header">
+                
+                                        <h5 class="font-weight-semi-bold mb-0 text-primary">Pending Orders</h5>
+                
+                                    </div>
+                
+                                    <div class="card-body pt-0">
+                
+                                        <div class="table-responsive-xl">
+                
+                                            <table class="table text-nowrap mb-0" id="pendingorders">
+                
+                                                <thead>
+                                                    <tr>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Order No</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Customer Name</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Pickup Address & Phone Number</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Amount</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Order Status</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                {% for order in order_pending %}
+                                                <tbody>
+                
+                                                    <tr>
+                                                        <td class="py-3">
+                                                            <a href="{% url 'invoice_generate' order.id %}">
+                                                                {{order.reference_number}}
+                                                            </a>
+                                                        </td>
+                                                        <td class="py-3">
+                                                            <a href="{% url 'viewCustomer_page' %}?customer_id={{ order.customer.id }}">
+                                                                {{order.customer.customer_name}}
+                                                            </a> 
+                                                        </td>
+                                                        <td class="py-3">
+                                                            <div> {{order.customer.customer_address}}, {{order.customer.customer_town}}</div>
+                                                            <span class="text-sm-left"> {{order.customer.customer_no}} </span>
+                                                        </td>
+                                                        <td class="py-3">₦ {% add_commas order.pricing%}</td>
+                                                        <td class="py-3">
+                                                            <span class="badge badge-pill badge-warning">{{order.status}}</span>
+                                                        </td>
+                                                        <td class="py-3">
+                                                            <div class="position-relative">
+                
+                                                                <a class="dropdown-toggle link-dark d-flex" href="#" role="button" id="dropdownMenuLink1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                    <i class="gd-more-alt icon-text-sm"></i>
+                                                                </a>
+                                                                
+                                                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink1">
+                                                                    
+                                                                    {% comment %} <a class="dropdown-item" href="#" data-toggle="modal" data-target="#editInvoiceModal">
+                                                                        <i class="gd-pencil mr-3"></i>
+                                                                        <span class="">Edit</span>
+                                                                    </a> {% endcomment %}
+                
+                                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#assignRiderModal" onclick="assignRider('{{ order.id }}' , '{{order.reference_number}}')">
+                                                                        <i class="gd-id-badge mr-3"></i>
+                                                                        <span class="">Assign</span>
+                                                                    </a>
+                
+                                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#confirmCancelModal" onclick="cancelOrder('{{ order.id }}')">
+                                                                        <i class="gd-close mr-3"></i>
+                                                                        <span class="">Cancel</span>
+                                                                    </a>
+                
+                                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#updateStatusModal" onclick="setStatus( '{{ order.id }}', '{{ order.status }}')">
+                                                                        <i class="gd-check-box mr-3"></i>
+                                                                        <span class="">Update Order Status</span>
+                                                                    </a>
+                
+                                                                </div>
+                                                                
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                
+                                                </tbody>
+                                                {% endfor %}
+                
+                                            </table>
+                
+                                        </div>
+                
+                                    </div>
+                
+                                </div>
+                
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <!-- End Pending Orders -->
+
+                    <!-- Assigned Orders-->
+                    <div class="tab-pane" id="assigned">
+                        <div class="row">
+
+                            <div class="col-12">
+                                <div class="row mt-2">
+                                    <div class="col-md-9"></div>
+                                    <div class="col-md-3">
+                                      <div class="form-group">
+                                        <!-- <label for="tableSearch">Search:</label> -->
+                                        <input type="text" class="form-control" id="assigned-search" placeholder="Search">
+                                      </div>
+                                    </div>
+                                </div>
+                
+                                <div class="card mb-3 mb-md-4">
+                
+                                    <div class="card-header">
+                
+                                        <h5 class="font-weight-semi-bold mb-0 text-primary">Assigned Orders</h5>
+                
+                                    </div>
+                
+                                    <div class="card-body pt-0">
+                
+                                        <div class="table-responsive-xl">
+                
+                                            <table class="table text-nowrap mb-0" id="assignedorders">
+                
+                                                <thead>
+                                                    <tr>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Order No</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Customer Name</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Pickup Address & Phone Number</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Amount</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Order Status</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                {% for order in order_assigned %}
+                                                <tbody>
+                
+                                                    <tr>
+                                                        <td class="py-3">
+                                                            <a href="{% url 'invoice_generate' order.id %}">
+                                                                {{order.reference_number}}
+                                                            </a>
+                                                        </td>
+                                                        <td class="py-3">
+                                                            <a href="{% url 'viewCustomer_page' %}?customer_id={{ order.customer.id }}">
+                                                                {{order.customer.customer_name}}
+                                                            </a> 
+                                                        </td>
+                                                        <td class="py-3">
+                                                            <div> {{order.customer.customer_address}}, {{order.customer.customer_town}} </div>
+                                                            <span class="text-sm-left"> {{order.customer.customer_no}} </span>
+                                                        </td>
+                                                        <td class="py-3">₦{% add_commas order.pricing %}</td>
+                                                        <td class="py-3">
+                                                            {%if order.status == 'Delivery Assigned'%}
+                                                                <span class="badge badge-pill badge-info">{{order.status}}</span>
+                                                            {%else%}
+                                                                <span class="badge badge-pill badge-secondary">{{order.status}}</span>
+                                                            {%endif%}
+                                                        </td>
+                                                        <td class="py-3">
+                                                            <div class="position-relative">
+                                                                
+                                                                <a class="dropdown-toggle link-dark d-flex" href="#" role="button" id="dropdownMenuLink6" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                    <i class="gd-more-alt icon-text-sm"></i>
+                                                                </a>
+                                                                
+                                                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink6">
+                                                                    
+                                                                    {% comment %} <a class="dropdown-item" href="#" data-toggle="modal" data-target="#editInvoiceModal">
+                                                                        <i class="gd-pencil mr-3"></i>
+                                                                        <span class="">Edit</span>
+                                                                    </a> {% endcomment %}
+                
+                                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#assignRiderModal" onclick="assignRider('{{ order.id }}' , '{{order.reference_number}}')">
+                                                                        <i class="gd-id-badge mr-3"></i>
+                                                                        <span class="">Assign</span>
+                                                                    </a>
+                
+                                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#confirmCancelModal" onclick="cancelOrder('{{ order.id }}')">
+                                                                        <i class="gd-close mr-3"></i>
+                                                                        <span class="">Cancel</span>
+                                                                    </a>
+                
+                                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#updateStatusModal" onclick="setStatus( '{{ order.id }}', '{{ order.status }}')">
+                                                                        <i class="gd-check-box mr-3"></i>
+                                                                        <span class="">Update Order Status</span>
+                                                                    </a>
+                
+                                                                </div>
+                
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                
+                                                </tbody>
+                                                {%endfor%}
+                                            </table>
+                
+                                        </div>
+                
+                                    </div>
+                
+                                </div>
+                
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <!-- End Assigned Orders -->
+
+                    <!-- Processing -->
+                    <div class="tab-pane" id="processing">
+                        <div class="row">
+
+                            <div class="col-12">
+                                <div class="row mt-2">
+                                    <div class="col-md-9"></div>
+                                    <div class="col-md-3">
+                                      <div class="form-group">
+                                        <!-- <label for="tableSearch">Search:</label> -->
+                                        <input type="text" class="form-control" id="processing-search" placeholder="Search">
+                                      </div>
+                                    </div>
+                                </div>
+                
+                                <div class="card mb-3 mb-md-4">
+                
+                                    <div class="card-header">
+                
+                                        <h5 class="font-weight-semi-bold mb-0 text-primary">Processing Orders</h5>
+                
+                                    </div>
+                
+                                    <div class="card-body pt-0">
+                
+                                        <div class="table-responsive-xl">
+                
+                                            <table class="table text-nowrap mb-0" id="processingorders">
+                
+                                                <thead>
+                                                    <tr>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Order No</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Customer Name</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Pickup Address & Phone Number</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Amount</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Order Status</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                {% for order in order_processing %}
+                
+                                                <tbody>
+                
+                                                    
+                
+                                                    <tr>
+                                                        <td class="py-3">
+                                                            <a href="{% url 'invoice_generate' order.id %}">
+                                                                {{order.reference_number}}
+                                                            </a>
+                                                        </td>
+                                                        <td class="py-3">
+                                                            <a href="{% url 'viewCustomer_page' %}?customer_id={{ order.customer.id }}">
+                                                                {{order.customer.customer_name}}
+                                                            </a> 
+                                                        </td>
+                                                        <td class="py-3">
+                                                            <div> {{order.customer.customer_address}}, {{order.customer.customer_town}} </div>
+                                                            <span class="text-sm-left">  {{order.customer.customer_no}} </span>
+                                                        </td>
+                                                        <td class="py-3">₦{% add_commas order.pricing %}</td>
+                                                        <td class="py-3">
+                                                            <span class="badge badge-pill badge-primary-lighter">{{order.status}}</span>
+                                                        </td>
+                                                        <td class="py-3">
+                                                            <div class="position-relative">
+                                                                
+                                                                <a class="dropdown-toggle link-dark d-flex" href="#" role="button" id="dropdownMenuLink3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                    <i class="gd-more-alt icon-text-sm"></i>
+                                                                </a>
+                                                                
+                                                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink3">
+                                                                    
+                                                                    {% comment %} <a class="dropdown-item" href="#" data-toggle="modal" data-target="#editInvoiceModal">
+                                                                        <i class="gd-pencil mr-3"></i>
+                                                                        <span class="">Edit</span>
+                                                                    </a> {% endcomment %}
+                
+                                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#assignRiderModal" onclick="assignRider('{{ order.id }}' , '{{order.reference_number}}')">
+                                                                        <i class="gd-id-badge mr-3"></i>
+                                                                        <span class="">Assign</span>
+                                                                    </a>
+                
+                                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#confirmCancelModal" onclick="cancelOrder('{{ order.id }}')">
+                                                                        <i class="gd-close mr-3"></i>
+                                                                        <span class="">Cancel</span>
+                                                                    </a>
+                
+                                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#updateStatusModal" onclick="setStatus( '{{ order.id }}', '{{ order.status }}')">
+                                                                        <i class="gd-check-box mr-3"></i>
+                                                                        <span class="">Update Order Status</span>
+                                                                    </a>
+                
+                                                                </div>
+                
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                
+                
+                                                </tbody>
+                                                {%endfor%}
+
+                                            </table>
+                
+                                        </div>
+                
+                                    </div>
+                
+                                </div>
+                
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <!-- End Processing -->
+
+                    <!-- Fulfilled -->
+                    <div class="tab-pane" id="fulfilled">
+                        <div class="row">
+
+                            <div class="col-12">
+                                <div class="row mt-2">
+                                    <div class="col-md-9"></div>
+                                    <div class="col-md-3">
+                                      <div class="form-group">
+                                        <!-- <label for="tableSearch">Search:</label> -->
+                                        <input type="text" class="form-control" id="fulfilled-search" placeholder="Search">
+                                      </div>
+                                    </div>
+                                </div>
+                
+                                <div class="card mb-3 mb-md-4">
+                
+                                    <div class="card-header">
+                
+                                        <h5 class="font-weight-semi-bold mb-0 text-primary">Fulfilled Orders</h5>
+                
+                                    </div>
+                
+                                    <div class="card-body pt-0">
+                
+                                        <div class="table-responsive-xl">
+                
+                                            <table class="table text-nowrap mb-0" id="fulfilledorders">
+                
+                                                <thead>
+                                                    <tr>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Order No</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Customer Name</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Pickup Address & Phone Number</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Amount</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Order Status</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                {% for order in order_fulfilled %}
+                                                <tbody>
+                
+                                                    <tr>
+                                                        <td class="py-3">
+                                                            <a href="{% url 'invoice_generate' order.id %}">
+                                                                {{order.reference_number}}
+                                                            </a>
+                                                        </td>
+                                                        <td class="py-3">
+                                                            <a href="{% url 'viewCustomer_page' %}?customer_id={{ order.customer.id }}">
+                                                                {{order.customer.customer_name}}
+                                                            </a> 
+                                                        </td>
+                                                        <td class="py-3">
+                                                            <div> {{order.customer.customer_address}}, {{order.customer.customer_town}} </div>
+                                                            <span class="text-sm-left"> {{order.customer.customer_no}} </span>
+                                                        </td>
+                                                        <td class="py-3">₦{% add_commas order.pricing %}</td>
+                                                        <td class="py-3">
+                                                            <span class="badge badge-pill badge-success">{{order.status}}</span>
+                                                        </td>
+                                                        <td class="py-3">
+                                                            {% comment %} <div class="position-relative">
+                                                                
+                                                                <a class="dropdown-toggle link-dark d-flex" href="#" role="button" id="dropdownMenuLink2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                    <i class="gd-more-alt icon-text-sm"></i>
+                                                                </a>
+                                                                
+                                                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink2">
+                                                                    
+                                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#editInvoiceModal">
+                                                                        <i class="gd-pencil mr-3"></i>
+                                                                        <span class="">Edit</span>
+                                                                    </a>
+                
+                                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#assignRiderModal" onclick="assignRider('{{ order.id }}' , '{{order.reference_number}}')">
+                                                                        <i class="gd-id-badge mr-3"></i>
+                                                                        <span class="">Assign</span>
+                                                                    </a>
+                
+                                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#confirmCancelModal" onclick="cancelOrder('{{ order.id }}')">
+                                                                        <i class="gd-close mr-3"></i>
+                                                                        <span class="">Cancel</span>
+                                                                    </a>
+                
+                                                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#updateStatusModal" onclick="setStatus( '{{ order.id }}', '{{ order.status }}')">
+                                                                        <i class="gd-check-box mr-3"></i>
+                                                                        <span class="">Update Order Status</span>
+                                                                    </a>
+                
+                                                                </div>
+                                                                </div> {% endcomment %}
+                                                        </td>
+                                                    </tr>
+
+                                                </tbody>
+                                                {%endfor%}
+                
+                                            </table>
+                
+                                        </div>
+                
+                                    </div>
+                
+                                </div>
+                
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <!-- End Fulfilled -->
+
+                    <!-- Cancelled Orders -->
+                    <div class="tab-pane" id="cancelled">
+                        <div class="row">
+
+                            <div class="col-12">
+                                <div class="row mt-2">
+                                    <div class="col-md-9"></div>
+                                    <div class="col-md-3">
+                                      <div class="form-group">
+                                        <!-- <label for="tableSearch">Search:</label> -->
+                                        <input type="text" class="form-control" id="cancelled-search" placeholder="Search">
+                                      </div>
+                                    </div>
+                                </div>
+                
+                                <div class="card mb-3 mb-md-4">
+                
+                                    <div class="card-header">
+                
+                                        <h5 class="font-weight-semi-bold mb-0 text-primary">Cancelled Orders</h5>
+                
+                                    </div>
+                
+                                    <div class="card-body pt-0">
+                
+                                        <div class="table-responsive-xl">
+                
+                                            <table class="table text-nowrap mb-0" id="cancelledorders">
+                
+                                                <thead>
+                                                    <tr>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Order No</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Customer Name</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Pickup Address & Phone Number</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Amount</th>
+                                                        <th class="font-weight-semi-bold border-top-0 py-2">Order Status</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+
+                                                {% for order in order_cancelled %}
+                                                <tbody>
+
+                                                    <tr>
+                                                        <td class="py-3">
+                                                            <a href="#">
+                                                                {{order.reference_number}}
+                                                            </a>
+                                                        </td>
+                                                        <td class="py-3">
+                                                            <a href="#">
+                                                                {{order.customer.customer_name}}
+                                                            </a> 
+                                                        </td>
+                                                        <td class="py-3">
+                                                            <div> {{order.customer.customer_address}}, {{order.customer.customer_town}} </div>
+                                                            <span class="text-sm-left"> {{order.customer.customer_no}} </span>
+                                                        </td>
+                                                        <td class="py-3">₦{% add_commas order.pricing %}</td>
+                                                        <td class="py-3">
+                                                            {%if order.status == 'Cancelled'%}
+                                                            <span class="badge badge-pill badge-danger">{{order.status}}</span>
+                                                            {%elif order.status == 'Unsuccessful'%}
+                                                            <span class="badge badge-pill badge-warning">{{order.status}}</span>
+                                                            {%else%}
+                                                            <span class="badge badge-pill badge-info">{{order.status}}</span>
+                                                            {%endif%}
+                                                        </td>
+                                                        {% comment %} <td class="py-3">
+                                                            
+                                                            <a class="dropdown-toggle link-dark d-flex" href="#" role="button" id="dropdownMenuLink4" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                <i class="gd-more-alt icon-text-sm"></i>
+                                                            </a>
+                                                            
+                                                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink4">
+                                                                
+                                                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#editInvoiceModal" onclick="showEditModal('{{ order.id }}')">
+                                                                    <i class="gd-pencil mr-3"></i>
+                                                                    <span class="">Edit</span>
+                                                                </a>
+            
+                                                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#assignRiderModal" onclick="assignRider('{{ order.id }}' , '{{order.reference_number}}')">
+                                                                    <i class="gd-id-badge mr-3"></i>
+                                                                    <span class="">Assign</span>
+                                                                </a>
+            
+                                                                <a class="dropdown-item" href="confirmCancelModal" data-toggle="modal" data-target="#confirmCancelModal" onclick="cancelOrder('{{ order.id }}')">
+                                                                    <i class="gd-close mr-3"></i>
+                                                                    <span class="">Cancel</span>
+                                                                </a>
+            
+                                                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#updateStatusModal" onclick="setStatus( '{{ order.id }}', '{{ order.status }}')">
+                                                                    <i class="gd-check-box mr-3"></i>
+                                                                    <span class="">Update Order Status</span>
+                                                                </a>
+            
+                                                            </div>
+                
+                                                        </td> {% endcomment %}
+                                                    </tr>
+                                                    
+                                                </tbody>
+                                                {% endfor %}
+                                            </table>
+                
+                                        </div>
+                
+                                    </div>
+                
+                                </div>
+                
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <!-- End Cancelled Orders -->
+
+                </div>
+            </div>
+        </div>
+  
+        <!-- End Orders -->
+
+
+        
+
+        <script src="/static/public/graindashboard/js/graindashboard.js"></script>
+        <script src="/static/public/graindashboard/js/graindashboard.vendor.js"></script>
+
+        <!-- DEMO CHARTS -->
+        <script src="/static/public/demo/resizeSensor.js"></script>
+        <script src="/static/public/demo/chartist.js"></script>
+        <script src="/static/public/demo/chartist-plugin-tooltip.js"></script>
+        <script src="/static/public/demo/gd.chartist-area.js"></script>
+        <script src="/static/public/demo/gd.chartist-bar.js"></script>
+        <script src="/static/public/demo/gd.chartist-donut.js"></script>
+        <script>
+            $.GDCore.components.GDChartistArea.init('.js-area-chart');
+            $.GDCore.components.GDChartistBar.init('.js-bar-chart');
+            $.GDCore.components.GDChartistDonut.init('.js-donut-chart');
+        </script>
+
+        {% comment %} <script>
+            function setStatus(status, order_id) {
+                document.getElementById('status').value = status;
+                $('#status').val(status);
+                $('#order_id').val(order_id);
+              }
+        </script> {% endcomment %}
+        <script>
+            function showEditModal(orderedid) {
+                $('#editInvoiceModal').modal('show');
+                $('#orderedid').val(orderedid);
+              }
+        </script>
+
+        <script>
+            function setStatus(orderId, status) {
+                $('#updateStatusModal').modal('show');
+                $('#status').val(status);
+                $('#orderId').val(orderId);
+              }
+        </script>
+        <script>
+            function assignRider(order_id, orderref) {
+                $('#assignRiderModal').modal('show');
+                $('#order_id').val(order_id);
+                $('#orderref').val(orderref);
+              }
+        </script>
+        <script>
+            function cancelOrder(orderid) {
+                $('#confirmCancelModal').modal('show');
+                $('#orderid').val(orderid);
+                //$('#orderref').val(orderref);
+              }
+        </script>
+
+        {% comment %} <script>
+            function invoiceGenerate(element) {
+                // Get the order_id from the data attribute
+                var orderid = $(element).data("orderid");
+                // Set the value of the orderid input field
+                $('#orderid').val(orderid);
+              }              
+        </script> {% endcomment %}
+
+        <!-- Multi-Step Functionality -->
+        <script>
+            $(document).ready(function () {
+
+                var navListItems = $('div.setup-panel div a'),
+                    allWells = $('.setup-content'),
+                    allNextBtn = $('.nextBtn');
+
+                    allWells.hide();
+
+                    navListItems.click(function (e) {
+                        e.preventDefault();
+                        var $target = $($(this).attr('href')),
+                            $item = $(this);
+
+                        if (!$item.hasClass('disabled')) {
+                            navListItems.removeClass('btn-success').addClass('btn-default');
+                            $item.addClass('btn-success');
+                            allWells.hide();
+                            $target.show();
+                            $target.find('input:eq(0)').focus();
+                        }
+                    });
+
+                    allNextBtn.click(function () {
+                        var curStep = $(this).closest(".setup-content"),
+                            curStepBtn = curStep.attr("id"),
+                            nextStepWizard = $('div.setup-panel div a[href="#' + curStepBtn + '"]').parent().next().children("a"),
+                            curInputs = curStep.find("input[type='text'],input[type='url']"),
+                            isValid = true;
+
+                        $(".form-group").removeClass("has-error");
+                        for (var i = 0; i < curInputs.length; i++) {
+                            if (!curInputs[i].validity.valid) {
+                                isValid = false;
+                                $(curInputs[i]).closest(".form-group").addClass("has-error");
+                            }
+                        }
+
+                        if (isValid) nextStepWizard.removeAttr('disabled').trigger('click');
+                    });
+
+                    $('div.setup-panel div a.btn-success').trigger('click');
+            });
+        </script>
+        <!-- End Multi-Step Functionality -->
+
+        <!-- Dropdown Options (Customer Name) -->
+        <script>
+            new TomSelect('#customerName',{
+                maxItems: 1,
+                valueField: 'id',
+                labelField: 'name',
+                searchField: 'name',
+                options: [
+                    // Replace these with registered customers' names
+                    {% for customer in customers %}
+                    {id: {{customer.id}}, name: "{{customer.customer_name}}" },
+                    {% endfor %}
+                ],
+                create: false
+            });
+        </script>
+        <!-- End Dropdown Options (Customer Name) -->
+        
+        <!-- Dropdown Options (Delivery Type) -->
+        <script>
+            new TomSelect('#deliveryType',{
+                maxItems: 1,
+                valueField: 'id',
+                labelField: 'type',
+                searchField: 'type',
+                options: [
+                    {id: 1, type: 'Same-Day Delivery'},
+                    {id: 2, type: 'Next-Day Delivery'},
+                    {id: 3, type: 'Express Delivery'}
+                ],
+                create: false
+            });
+        </script>
+        <!-- End Dropdown Options (Delivery Type) -->
+
+        <!-- Dropdown Options (Delivery Quantity) -->
+        <script>
+            new TomSelect('#deliveryQty',{
+                maxItems: 1,
+                valueField: 'id',
+                labelField: 'type',
+                searchField: 'type',
+                options: [
+                    {id: 1, type: 'Single Delivery'},
+                    {id: 2, type: 'Bulk Delivery'}
+                ],
+                create: false
+            });
+        </script>
+        <!-- End Dropdown Options (Delivery Quantity) -->
+
+        <!-- Dropdown Options (Pickup City) -->
+        <script>
+            new TomSelect('#pickupCity',{
+                maxItems: 1,
+                valueField: 'value',
+                labelField: 'city',
+                searchField: 'city',
+                options: [
+                    {value: 1, city: 'Lagos Mainland'},
+                    {value: 2, city: 'Lagos Island'}
+                ],
+                create: false
+            });
+        </script>
+        <!-- End Dropdown Options (Pickup City) -->
+
+        <!-- Dropdown Options (Pickup & Delivery Town) -->
+        <script>
+            const mainland = [
+                'Yaba','Ojuelegba' ,'Sabo','Surulere','Shomolu','Palmgrove','Onipanu' ,'Masha' ,'Lawanson','Ijesha' ,'Ijora' ,'Ilupeju' ,'Iwaya' ,'Akerele' ,'Akoka','Aguda' ,'Alagomeji', 'Ebute Metta', 'Jibowu', 'Bariga', 'Opebi' ,'Oregun' ,'Oshodi','Ogudu','Obanikoro','Ojota' ,'Mende' ,'Maryland' ,'Ketu' ,'Kosofe','Gbagada' ,'Ilasamaja','Anthony Village','Alausa' ,'Adeniyi Jones ','Ikeja','Ladipo' ,'Mile 12' ,'Mushin','Agidingbi' ,'Ogba','Omole' ,'Magodo 1','Magodo 2','Ojodu','Ojodu Berger','Ojodu grammer School' ,'Agege', 'Apapa Olodi','Maza Maza' ,'Mile 2','Satellite Town' ,'Ajegunle' ,'Amuwo Odofin' ,'Festac','Alaba', 'Gowon', 'Dopemu' , 'Isolo', 'Egbeda', 'Idi mangoro', 'Alagbado', 'Iyana ipaja', 'Ipaja', 'Abule egba', 'Ifako – Ijaiye', 'Ojo'
+            ];
+
+            const island = [
+                'Tinubu Square', 'Victoria Garden City', 'Victoria Island', 'Oniru', 'Marina', 'Lekki', 'Lagos Island', 'Eti-Osa', 'Ikoyi', 'Obalende', 'Dolphin Estate', 'Ikota', 'Eleganza/Orchid Road', 'Addo Road', 'Badore', 'Abraham Adesanya', 'Sangotedo', 'Abijo', 'Awoyaya'
+            ];
+
+            function fill() {
+
+                let city = document.getElementById('pickupCity').value;
+                let town = document.getElementById('pickupTown');
+
+                // const mainland = [
+                //     'Yaba','Ojuelegba' ,'Sabo','Surulere','Shomolu','Palmgrove','Onipanu' ,'Masha' ,'Lawanson','Ijesha' ,'Ijora' ,'Ilupeju' ,'Iwaya' ,'Akerele' ,'Akoka','Aguda' ,'Alagomeji', 'Ebute Metta', 'Jibowu', 'Bariga', 'Opebi' ,'Oregun' ,'Oshodi','Ogudu','Obanikoro','Ojota' ,'Mende' ,'Maryland' ,'Ketu' ,'Kosofe','Gbagada' ,'Ilasamaja','Anthony Village','Alausa' ,'Adeniyi Jones ','Ikeja','Ladipo' ,'Mile 12' ,'Mushin','Agidingbi' ,'Ogba','Omole' ,'Magodo 1','Magodo 2','Ojodu','Ojodu Berger','Ojodu grammer School' ,'Agege', 'Apapa Olodi','Maza Maza' ,'Mile 2','Satellite Town' ,'Ajegunle' ,'Amuwo Odofin' ,'Festac','Alaba', 'Gowon', 'Dopemu' , 'Isolo', 'Egbeda', 'Idi mangoro', 'Alagbado', 'Iyana ipaja', 'Ipaja', 'Abule egba', 'Ifako – Ijaiye', 'Ojo'
+                // ];
+
+                // const island = [
+                //     'Tinubu Square', 'Victoria Garden City', 'Victoria Island', 'Oniru', 'Marina', 'Lekki', 'Lagos Island', 'Eti-Osa', 'Ikoyi', 'Obalende', 'Dolphin Estate', 'Ikota', 'Eleganza/Orchid Road', 'Addo Road', 'Badore', 'Abraham Adesanya', 'Sangotedo', 'Abijo', 'Awoyaya'
+                // ];
+
+                if (city==1){
+                    town.innerHTML = "<option value= '' > Select Pickup Town </option>";
+                    for(let i=0; i<mainland.length;i++){
+                        town.innerHTML = town.innerHTML + "<option value= "+ "'" + mainland[i] + "'" + ">" + mainland[i] + "</option>"
+                    }
+                }
+                else if (city==2){
+                    town.innerHTML = "<option value= '' > Select Pickup Town </option>";
+                    for(let i=0; i<island.length;i++){
+                    town.innerHTML = town.innerHTML + '<option value=' + "'" + island[i] + "'" + ">" + island[i] + "</option>"
+                    }
+                }
+                else {
+                    town.innerHTML = "<option value= '' > Select a City First </option>";
+                }
+                
+
+            }
+
+            
+            function d_fill() {
+
+                let d_city = document.getElementById('deliveryCity').value;
+                let d_town = document.getElementById('deliveryTown');
+
+                // const mainland = [
+                //     'Yaba','Ojuelegba' ,'Sabo','Surulere','Shomolu','Palmgrove','Onipanu' ,'Masha' ,'Lawanson','Ijesha' ,'Ijora' ,'Ilupeju' ,'Iwaya' ,'Akerele' ,'Akoka','Aguda' ,'Alagomeji', 'Ebute Metta', 'Jibowu', 'Bariga', 'Opebi' ,'Oregun' ,'Oshodi','Ogudu','Obanikoro','Ojota' ,'Mende' ,'Maryland' ,'Ketu' ,'Kosofe','Gbagada' ,'Ilasamaja','Anthony Village','Alausa' ,'Adeniyi Jones ','Ikeja','Ladipo' ,'Mile 12' ,'Mushin','Agidingbi' ,'Ogba','Omole' ,'Magodo 1','Magodo 2','Ojodu','Ojodu Berger','Ojodu grammer School' ,'Agege', 'Apapa Olodi','Maza Maza' ,'Mile 2','Satellite Town' ,'Ajegunle' ,'Amuwo Odofin' ,'Festac','Alaba', 'Gowon', 'Dopemu' , 'Isolo', 'Egbeda', 'Idi mangoro', 'Alagbado', 'Iyana ipaja', 'Ipaja', 'Abule egba', 'Ifako – Ijaiye', 'Ojo'
+                // ];
+
+                // const island = [
+                //     'Tinubu Square', 'Victoria Garden City', 'Victoria Island', 'Oniru', 'Marina', 'Lekki', 'Lagos Island', 'Eti-Osa', 'Ikoyi', 'Obalende', 'Dolphin Estate', 'Ikota', 'Eleganza/Orchid Road', 'Addo Road', 'Badore', 'Abraham Adesanya', 'Sangotedo', 'Abijo', 'Awoyaya'
+                // ];
+
+                if (d_city==1){
+                    d_town.innerHTML = "<option value= '' > Select Delivery Town </option>";
+                    for(let i=0; i<mainland.length;i++){
+                        d_town.innerHTML = d_town.innerHTML + "<option value= "+ "'" + mainland[i] + "'" + ">" + mainland[i] + "</option>"
+                    }
+                }
+                else if (d_city==2){
+                    d_town.innerHTML = "<option value= '' > Select Delivery Town </option>";
+                    for(let i=0; i<island.length;i++){
+                    d_town.innerHTML = d_town.innerHTML + '<option value=' + "'" + island[i] + "'" + ">" + island[i] + "</option>"
+                    }
+                }
+                else {
+                    d_town.innerHTML = "<option value= '' > Select a City First </option>";
+                }
+
+
+            }
+
+
+        </script>
+        <!-- End Dropdown Options (Pickup & Delivery Town) -->
+
+        <!-- Dropdown Options (Delivery City) -->
+        <script>
+            new TomSelect('#deliveryCity',{
+                maxItems: 1,
+                valueField: 'value',
+                labelField: 'city',
+                searchField: 'city',
+                options: [
+                    {value: 1, city: 'Lagos Mainland'},
+                    {value: 2, city: 'Lagos Island'}
+                ],
+                create: false
+            });
+        </script>
+        <!-- End Dropdown Options (Delivery City) -->
+
+        <!-- Search Functionality -->
+        <script>
+            
+            // For Pending Orders Table
+            // Listen for changes to the search input
+            $('#pending-search').on('keyup', function() {
+            var query = $(this).val();
+    
+            // Filter the table rows based on the search query
+            $('#pendingorders tbody tr').filter(function() {
+                //$(this).toggle($(this).text().toLowerCase().indexOf(query) > -1);
+                $(this).toggle($(this).text().toLowerCase().indexOf(query.toLowerCase()) > -1);
+            });
+            });
+            
+            // For Assigned Orders Table
+            // Listen for changes to the search input
+            $('#assigned-search').on('keyup', function() {
+            var query = $(this).val();
+    
+            // Filter the table rows based on the search query
+            $('#assignedorders tbody tr').filter(function() {
+                //$(this).toggle($(this).text().toLowerCase().indexOf(query) > -1);
+                $(this).toggle($(this).text().toLowerCase().indexOf(query.toLowerCase()) > -1);
+            });
+            });
+
+            // For Processing Orders Table
+            // Listen for changes to the search input
+            $('#processing-search').on('keyup', function() {
+            var query = $(this).val();
+    
+            // Filter the table rows based on the search query
+            $('#processingorders tbody tr').filter(function() {
+                //$(this).toggle($(this).text().toLowerCase().indexOf(query) > -1);
+                $(this).toggle($(this).text().toLowerCase().indexOf(query.toLowerCase()) > -1);
+            });
+            });
+
+            // For fulfilled Orders Table
+            // Listen for changes to the search input
+            $('#fulfilled-search').on('keyup', function() {
+            var query = $(this).val();
+    
+            // Filter the table rows based on the search query
+            $('#fulfilledorders tbody tr').filter(function() {
+                //$(this).toggle($(this).text().toLowerCase().indexOf(query) > -1);
+                $(this).toggle($(this).text().toLowerCase().indexOf(query.toLowerCase()) > -1);
+            });
+            });
+
+            // For Cancelled Orders Table
+            // Listen for changes to the search input
+            $('#cancelled-search').on('keyup', function() {
+            var query = $(this).val();
+    
+            // Filter the table rows based on the search query
+            $('#cancelledorders tbody tr').filter(function() {
+                //$(this).toggle($(this).text().toLowerCase().indexOf(query) > -1);
+                $(this).toggle($(this).text().toLowerCase().indexOf(query.toLowerCase()) > -1);
+            });
+            });
+    
+        </script>
+        <!-- End Search Functionality -->
+
+
+      <!-- End Inject -->
+    </body>
+    {% endblock %}
+
+{% comment %} 
+</html> {% endcomment %}
