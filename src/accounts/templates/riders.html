@@ -1,0 +1,185 @@
+{% extends 'index.html' %}
+
+{% load static %}
+{% block title%} All Riders {% endblock %}
+{% block body_block %}
+
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Title -->
+        <title>All Riders</title>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta http-equiv="x-ua-compatible" content="ie=edge"> {% endcomment %}
+
+        <!-- Favicon -->
+        <link rel="shortcut icon" href="/static/public/img/PJ QUEST MINI-LOGO.png">
+
+        <!-- Template -->
+        <link rel="stylesheet" href="/static/public/graindashboard/css/graindashboard.css">
+
+    {% comment %} </head> {% endcomment %}
+
+    <body class="py-4 px-3 px-md-4"> 
+        <!-- Start Injecting here -->
+        
+        <div class=" mb-3 mb-md-4">
+            
+
+            <div class="">
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <!-- Breadcrumb -->
+                        <nav class="d-none d-md-block" aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item">
+                                    <a href="#">Riders</a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page">All Riders</li>
+                            </ol>
+                        </nav>
+                        <!-- End Breadcrumb -->
+                        <div class="mb-3 mb-md-4 d-flex justify-content-between">
+                            <div class="h3 mb-0">All Riders</div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary rounded-pill" href="" data-toggle="modal" data-target="#addRiderModal">
+                            <strong>+</strong> ADD NEW RIDER
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Riders -->
+                <div class="card table-responsive-xl p-5">
+                    <div class="row mt-2">
+                        <div class="col-md-9"></div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                                <input type="text" class="form-control" id="riders-search" placeholder="Search">
+                          </div>
+                        </div>
+                    </div>
+
+                    <table class="table text-nowrap mb-0" id="riders-table">
+                        <thead>
+                            <tr>
+                                <th class="font-weight-semi-bold border-top-0 py-2">#</th>
+                                <th class="font-weight-semi-bold border-top-0 py-2">Name & Phone Number</th>
+                                <th class="font-weight-semi-bold border-top-0 py-2">Reg Date</th>
+                                <th class="font-weight-semi-bold border-top-0 py-2">Assigned Tasks</th>
+                                <th class="font-weight-semi-bold border-top-0 py-2">Completed Tasks</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {%for rider in riders%}
+                            <tr> 
+                                <td class="py-3">
+                                    {{ forloop.counter }}
+                                </td>
+                                <td class="py-3">
+                                    <div class="font-weight-bold"> {{rider.name}} </div>
+                                    <span class="text-sm-left"> {{rider.phone}} </span>
+                                </td>
+                                <td class="py-3">
+                                    {{rider.registration_date}}
+                                </td>
+                                <td class="py-3">
+                                    {{rider.assignedTasks}}
+                                </td>
+                                <td class="py-3">
+                                    {{rider.completedTasks}}
+                                </td>
+                                <td class="py-3">
+                                    <a class="" href="#" data-toggle="modal" data-target="#deleteRiderModal" onclick="confirmRiderDelete('{{ customer.id }}')"> 
+                                        <i class="gd-trash mr-3 text-danger font-weight-semi-bold"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {%endfor%}
+                        </tbody>
+                    </table>
+
+                    <div class="card-footer d-block d-md-flex align-items-center d-print-none">
+                        
+                    </div>
+                    
+                </div>
+                <!-- End Riders -->
+
+            </div>
+        </div>
+
+       
+
+        <!-- JavaScript -->
+        <script src="/static/public/graindashboard/js/graindashboard.js"></script>
+        <script src="/static/public/graindashboard/js/graindashboard.vendor.js"></script>
+        <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+
+        <script>
+            function confirmRiderDelete(customerId) {
+                $('#deleteRiderModal').modal('show');
+                $('#customerId').val(customerId);
+                //$('#orderref').val(orderref);
+              }
+        </script>
+        
+        <script>
+            $(document).ready(function () {
+            $('#riders-table').DataTable({
+                pageLength: 10,
+                // filter: true,
+                // deferRender: true,
+                // scrollY: 200,
+                // scrollCollapse: true,
+                scroller: true
+
+            });
+        });
+
+        </script>
+
+        <!-- Search Functionality -->
+        <script>
+            // For Riders' Table
+            // Listen for changes to the search input
+            $('#riders-search').on('keyup', function() {
+                var query = $(this).val();
+        
+                // Filter the table rows based on the search query
+                $('#riders-table tbody tr').filter(function() {
+                    //$(this).toggle($(this).text().toLowerCase().indexOf(query) > -1);
+                    $(this).toggle($(this).text().toLowerCase().indexOf(query.toLowerCase()) > -1);
+
+                });
+            });
+        </script>
+        <!-- End Search Functionality -->
+
+        <script>
+
+            let no = document.getElementById('noDelete');
+            let yes = document.getElementById('yesDelete');
+            let confirmD = document.getElementById('confirmDelete');
+            let confirmed = document.getElementById('deleteRiderConfirmed')
+    
+            yes.addEventListener('click', () => {
+                
+                confirmD.hidden=true;
+                confirmed.classList.remove('d-none');;
+            });
+    
+        </script>
+
+        
+
+        <!-- Stop Injecting here -->
+    </body>
+
+{%endblock%}

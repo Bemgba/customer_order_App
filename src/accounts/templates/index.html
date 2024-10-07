@@ -1,0 +1,1568 @@
+<!DOCTYPE html> {% load static %} {% comment %} {% load messages %} {% endcomment %}
+{% load dash_tags %}<html lang="en">
+
+<head>
+    <!-- Title -->
+    <title>Dashboard | {% block title %} Logicstics Application {% endblock %}</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{% static '/public/img/PJ QUEST MINI-LOGO.png' %}">
+
+
+    <!-- DEMO CHARTS -->
+
+    <link href=" {% static '/public/demo/chartist.css' %}" rel="stylesheet">
+    <link href=" {% static '/public/demo/chartist-plugin-tooltip.css' %}" rel="stylesheet">
+
+    <!-- Unicons Link -->
+    <link href=" {% static 'https://unicons.iconscout.com/release/v4.0.0/css/line.css' %}" rel="stylesheet">
+
+    <!-- Template -->
+    <link href=" {% static '/public/graindashboard/css/graindashboard.css' %}" rel="stylesheet">
+
+</head>
+
+<body class="has-sidebar has-fixed-sidebar-and-header">
+    <!-- Header -->
+    <header class="header bg-body">
+        <nav class="navbar flex-nowrap p-0">
+            <div class="navbar-brand-wrapper d-flex align-items-center col-auto">
+                <!-- Logo For Mobile View -->
+                <a class="navbar-brand navbar-brand-mobile" href="{%url 'index_admin'%}">
+                    <img class="img-fluid w-100" src="{% static 'public/img/Quest.png' %}" alt="PJ-Quest Logo">
+                </a>
+                <!-- End Logo For Mobile View -->
+
+                <!-- Logo For Desktop View -->
+                <a class="navbar-brand navbar-brand-desktop" href="{% url 'index_admin'%}">
+                    <img class="side-nav-show-on-closed" src="{% static 'public/img/Quest.png' %}" alt="logo" style="width: auto; height: 33px;">
+                    <div class="d-flex align-items-center justify-content-between ">
+                        <img class="side-nav-hide-on-closed" src="{% static 'public/img/PJ QUEST LOGO copy.png' %}" alt="logo" style="width: 50px; height: auto;">
+                        <!-- <span class="side-nav-hide-on-closed text-primary font-weight-bold ">P.J QUEST LOGISTICS</span> -->
+                    </div>
+                </a>
+                <!-- End Logo For Desktop View -->
+            </div>
+
+            <div class="header-content col px-md-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <!-- Side Nav Toggle -->
+                    <a class="js-side-nav header-invoker d-flex mr-md-2" href="#" data-close-invoker="#sidebarClose" data-target="#sidebar" data-target-wrapper="body">
+                        <i class="gd-align-left"></i>
+                    </a>
+                    <!-- End Side Nav Toggle -->
+
+                    <!-- User Notifications -->
+                    
+                    <div class="dropdown ml-auto">
+                        <a id="notificationsInvoker" class="header-invoker" href="#" aria-controls="notifications" aria-haspopup="true" aria-expanded="false" data-unfold-event="click" data-unfold-target="#notifications" data-unfold-type="css-animation" data-unfold-duration="300" data-unfold-animation-in="fadeIn" data-unfold-animation-out="fadeOut">
+                            {% if notifications %}
+
+                            <span class="indicator indicator-bordered indicator-top-right indicator-success rounded-circle"></span>  <!-- Only show when there's a pending notification -->
+                            {% else %}
+                            <span></span>
+                            {% endif %}
+
+                            <i class="gd-bell"></i>
+                        </a>
+
+                        <div id="notifications" class="dropdown-menu dropdown-menu-center py-0 mt-4 w-18_75rem w-md-22_5rem unfold-css-animation unfold-hidden" aria-labelledby="notificationsInvoker" style="animation-duration: 300ms;">
+                            <div class="card" >
+                                <div class="card-header d-flex align-items-center border-bottom py-3">
+                                    <h5 class="mb-0">Notifications</h5>
+                                    <a class="link small ml-auto" href="{% url 'clear_all_notifications'%}">Clear All</a>
+                                </div>
+                                <div style="height: 300px; overflow-y: scroll; ">
+                                    {%for notification in notifications%}
+                                    <div class="card-body p-0" >
+                                        <div class="list-group list-group-flush">
+                                            <div class="list-group-item list-group-item-action">
+                                                <div class="d-flex align-items-center text-nowrap mb-2">
+                                                    {% comment %} <i class="gd-info-alt icon-text text-primary mr-2"></i> {% endcomment %}
+                                                    {% comment %} <h6 class="font-weight-semi-bold mb-0">New Update</h6> {% endcomment %}
+                                                    <span class="list-group-item-date text-muted ml-auto">{{notification.created_at}}</span>  <!-- How long ago the notification came in -->
+                                                </div>
+                                                <p class="mb-0">
+                                                    {{notification.message}}
+                                                </p>
+                                                <a class="list-group-item-closer text-muted" href="{% url "clear_notification" notification.id %}"><i class="gd-close"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <div class="card-body p-0" >
+                                        <div class="list-group list-group-flush">
+                                            <div class="list-group-item list-group-item-action">
+                                                <div class="d-flex align-items-center text-nowrap mb-2">
+                                                    {% comment %} <i class="gd-info-alt icon-text text-primary mr-2"></i> {% endcomment %}
+                                                    {% comment %} <h6 class="font-weight-semi-bold mb-0">New Update</h6> {% endcomment %}
+                                                    <span class="list-group-item-date text-muted ml-auto">{{notification.created_at}}</span>  <!-- How long ago the notification came in -->
+                                                </div>
+                                                <p class="mb-0">
+                                                    <strong> There is no notification to display </strong> 
+                                                </p>
+                                                {% comment %} <a class="list-group-item-closer text-muted" href="{% url "clear_notification"%}"><i class="gd-close"></i></a> {% endcomment %}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {%endfor%}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End User Notifications -->
+
+                    <!-- User Avatar -->
+                    <div class="dropdown mx-3 dropdown ml-2">
+                        <a id="profileMenuInvoker" class="header-complex-invoker" href="#" aria-controls="profileMenu" aria-haspopup="true" aria-expanded="false" data-unfold-event="click" data-unfold-target="#profileMenu" data-unfold-type="css-animation" data-unfold-duration="300"
+                            data-unfold-animation-in="fadeIn" data-unfold-animation-out="fadeOut">
+
+                            <span class="mr-md-2 avatar-placeholder">{{ usif.user.first_name|first }}</span>
+                            <!-- Replace with first letter of user's name-->
+                            <span class="d-none d-md-block"> {{ usif.user.first_name }} {{ usif.user.last_name }}</span>
+                            <i class="gd-angle-down d-none d-md-block ml-2"></i>
+                        </a>
+
+                        <ul id="profileMenu" class="unfold unfold-user unfold-light unfold-top unfold-centered position-absolute pt-2 pb-1 mt-4 unfold-css-animation unfold-hidden fadeOut" aria-labelledby="profileMenuInvoker" style="animation-duration: 300ms;">
+                            <li class="unfold-item">
+                                <a class="unfold-link d-flex align-items-center text-nowrap" href="{%url 'profileSet_view'%}">
+                                    <span class="unfold-item-icon mr-3">
+                                    <i class="gd-user"></i>
+                                    </span> My Profile
+                                </a>
+                            </li>
+                            <li class="unfold-item unfold-item-has-divider">
+                                <a class="unfold-link d-flex align-items-center text-nowrap" href="{% url 'logout'%}">
+                                    <span class="unfold-item-icon mr-3">
+                                    <i class="gd-power-off"></i>
+                                    </span> Sign Out
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- End User Avatar -->
+                </div>
+            </div>
+        </nav>
+    </header>
+    <!-- End Header -->
+
+    <main class="main">
+        <!-- Sidebar Nav -->
+        <aside id="sidebar" class="js-custom-scroll side-nav mt-4 pb-10">
+
+            <ul id="sideNav" class="side-nav-menu side-nav-menu-top-level mb-0">
+
+                <!-- Dashboard -->
+                <li class="side-nav-menu-item active">
+                    <a class="side-nav-menu-link media align-items-center" href="{% url 'index_admin'%}">
+                        <span class="side-nav-menu-icon d-flex mr-3">
+                            <i class="gd-dashboard"></i>
+                        </span>
+                        <span class="side-nav-fadeout-on-closed media-body">Dashboard</span>
+                    </a>
+                </li>
+                <!-- End Dashboard -->
+
+
+                <!-- Title -->
+                <li class="sidebar-heading h6">Orders, Payments & Invoicing</li>
+                <!-- End Title -->
+
+                <!-- Orders -->
+                <li class="side-nav-menu-item side-nav-has-menu">
+                    <a class="side-nav-menu-link media align-items-center" href="#" data-target="#subOrders">
+                        <span class="side-nav-menu-icon d-flex mr-3">
+                            <i class="gd-receipt"></i>
+                        </span>
+                        <span class="side-nav-fadeout-on-closed media-body">Orders</span>
+                        <span class="side-nav-control-icon d-flex">
+                            <i class="gd-angle-right side-nav-fadeout-on-closed"></i>
+                        </span>
+                        <span class="side-nav__indicator side-nav-fadeout-on-closed"></span>
+                    </a>
+
+                    <!-- Users: subOrders -->
+                    <ul id="subOrders" class="side-nav-menu side-nav-menu-second-level mb-0">
+                        <li class="side-nav-menu-item side-nav-has-menu">
+                            <a class="side-nav-menu-link media align-items-center" href="#" data-target="#orderTypes">
+                                <span class="side-nav-fadeout-on-closed media-body">Add New Order</span>
+                                <span class="side-nav-control-icon d-flex">
+                                    <i class="gd-angle-right side-nav-fadeout-on-closed"></i>
+                                </span>
+                                <span class="side-nav__indicator side-nav-fadeout-on-closed"></span>
+                            </a>
+                            <ul id="orderTypes" class="side-nav-menu side-nav-menu-third-level ml-3 mb-0">
+                                <li>
+                                    <a class="side-nav-menu-link" href="{% url 'create_single_order'%}">
+                                        Single Delivery 
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="side-nav-menu-link" href="{% url 'create_bulk_order'%}">
+                                        Bulk Delivery 
+                                    </a>
+                                </li>
+                            </ul>
+
+                        </li>
+                        <li class="side-nav-menu-item">
+                            <a class="side-nav-menu-link" href="{% url 'order_list' %}">All Orders</a>
+                        </li>
+                    </ul>
+                    <!-- End Users: subOrders -->
+
+                </li>
+                <!-- End Orders -->
+
+                <!-- Customers -->
+                <li class="side-nav-menu-item side-nav-has-menu">
+                    <a class="side-nav-menu-link media align-items-center" href="#" data-target="#subCustomers">
+                        <span class="side-nav-menu-icon d-flex mr-3">
+                            <i class="gd-user"></i>
+                        </span>
+                        <span class="side-nav-fadeout-on-closed media-body">Customers</span>
+                        <span class="side-nav-control-icon d-flex">
+                            <i class="gd-angle-right side-nav-fadeout-on-closed"></i>
+                        </span>
+                        <span class="side-nav__indicator side-nav-fadeout-on-closed"></span>
+                    </a>
+
+                    <!-- Users: subCustomers -->
+                    <ul id="subCustomers" class="side-nav-menu side-nav-menu-second-level mb-0">
+                        <li class="side-nav-menu-item">
+                            <a class="side-nav-menu-link" href="{% url 'new_customer' %}">Add New Customers</a>
+                        </li>
+                        <li class="side-nav-menu-item">
+                            <a class="side-nav-menu-link" href="{% url 'customer_view' %}">All Customers</a>
+                        </li>
+                    </ul>
+                    <!-- End Users: subCustomers -->
+
+                </li>
+                <!-- End Customers -->
+
+                <!-- Payments -->
+                <li class="side-nav-menu-item side-nav-has-menu">
+                    <a class="side-nav-menu-link media align-items-center" href="#" data-target="#subPayments">
+                        <span class="side-nav-menu-icon d-flex mr-3">
+                            <i class="gd-wallet"></i>
+                        </span>
+                        <span class="side-nav-fadeout-on-closed media-body">Payments</span>
+                        <span class="side-nav-control-icon d-flex">
+                            <i class="gd-angle-right side-nav-fadeout-on-closed"></i>
+                        </span>
+                        <span class="side-nav__indicator side-nav-fadeout-on-closed"></span>
+                    </a>
+
+                    <!-- Payments: subPayments -->
+                    <ul id="subPayments" class="side-nav-menu side-nav-menu-second-level mb-0">
+                        <li class="side-nav-menu-item">
+                            <a class="side-nav-menu-link" href="{%url 'new_payment'%}">Add New Payments</a>
+                        </li>
+                        <li class="side-nav-menu-item">
+                            <a class="side-nav-menu-link" href="{% url 'payment_history'%}">Payment History</a>
+                        </li>
+                    </ul>
+                    <!-- End Payments: subPayments -->
+
+                </li>
+                <!-- End Payments -->
+
+
+                <!-- Title -->
+                <li class="sidebar-heading h6">Riders & Locations</li>
+                <!-- End Title -->
+
+                <!-- Riders -->
+
+                <li class="side-nav-menu-item side-nav-has-menu">
+                    <a class="side-nav-menu-link media align-items-center" href="{%url 'rider_view'%}">
+                        <span class="side-nav-menu-icon d-flex mr-3">
+                            <i class="gd-truck"></i>
+                        </span>
+                        <span class="side-nav-fadeout-on-closed media-body">Riders</span>
+                    </a>
+                </li>
+                <!-- End Riders -->
+
+                {% comment %} <!-- Locations -->
+                <li class="side-nav-menu-item side-nav-has-menu">
+                    <a class="side-nav-menu-link media align-items-center" href="{%url 'location_view'%}">
+                        <span class="side-nav-menu-icon d-flex mr-3">
+                            <i class="gd-map-alt"></i>
+                        </span>
+                        <span class="side-nav-fadeout-on-closed media-body">Locations</span>
+                    </a>
+                </li>
+                <!-- End Locations --> {% endcomment %}
+
+                <!-- Title -->
+                <li class="sidebar-heading h6">Reports & Settings</li>
+                <!-- End Title -->
+
+                <!-- Analytics -->
+                {% comment %} <li class="side-nav-menu-item side-nav-has-menu">
+                    <a class="side-nav-menu-link media align-items-center" href="#" data-target="#subAnalytics">
+                        <span class="side-nav-menu-icon d-flex mr-3">
+                            <i class="gd-pie-chart"></i>
+                        </span>
+                        <span class="side-nav-fadeout-on-closed media-body">Analytics</span>
+                        <span class="side-nav-control-icon d-flex">
+                            <i class="gd-angle-right side-nav-fadeout-on-closed"></i>
+                        </span>
+                        <span class="side-nav__indicator side-nav-fadeout-on-closed"></span>
+                    </a>
+
+                    <!-- Users: subAnalytics -->
+                    <ul id="subAnalytics" class="side-nav-menu side-nav-menu-second-level mb-0">
+                        <li class="side-nav-menu-item">
+                            <a class="side-nav-menu-link" href="new-locations.html">Order Analytics</a>
+                        </li>
+                        <li class="side-nav-menu-item">
+                            <a class="side-nav-menu-link" href="locations.html">Payment Analytics</a>
+                        </li>
+                        <li class="side-nav-menu-item">
+                            <a class="side-nav-menu-link" href="locations.html">Rider Analytics</a>
+                        </li>
+                    </ul>
+                    <!-- End Users: subAnalytics -->
+
+                </li> {% endcomment %}
+                <!-- End Analytics -->
+
+                <!-- Settings -->
+                <li class="side-nav-menu-item side-nav-has-menu">
+                    <a class="side-nav-menu-link media align-items-center" href="#" data-target="#subSettings">
+                        <span class="side-nav-menu-icon d-flex mr-3">
+                            <i class="gd-settings"></i>
+                        </span>
+                        <span class="side-nav-fadeout-on-closed media-body">Settings</span>
+                        <span class="side-nav-control-icon d-flex">
+                            <i class="gd-angle-right side-nav-fadeout-on-closed"></i>
+                        </span>
+                        <span class="side-nav__indicator side-nav-fadeout-on-closed"></span>
+                    </a>
+
+                    <!-- Settings: subSettings -->
+                    <ul id="subSettings" class="side-nav-menu side-nav-menu-second-level mb-0">
+                        <li class="side-nav-menu-item">
+                            <a class="side-nav-menu-link" href="{%url 'profileSet_view'%}">Profile Settings</a>
+                        </li>
+                        <li class="side-nav-menu-item side-nav-has-menu">
+                            <a class="side-nav-menu-link media align-items-center" href="#" data-target="#subUserSettings">
+                                <span class="side-nav-fadeout-on-closed media-body">User Settings</span>
+                                <span class="side-nav-control-icon d-flex">
+                                    <i class="gd-angle-right side-nav-fadeout-on-closed"></i>
+                                </span>
+                                <span class="side-nav__indicator side-nav-fadeout-on-closed"></span>
+                            </a>
+                            <ul id="subUserSettings" class="side-nav-menu side-nav-menu-second-level mb-0">
+                                <li class="side-nav-menu-item">
+                                    <a class="side-nav-menu-link" href="{% url 'user_create'%}">Create New User</a>
+                                </li>
+
+                                <li class="side-nav-menu-item">
+                                    <a class="side-nav-menu-link" href="{% url 'user_list'%}">Users</a>
+                                </li>
+                            </ul>
+                        </li>
+
+                    </ul>
+                    <!-- End Settings: subSettings -->
+                </li>
+                <!-- End Settings -->
+
+            </ul>
+
+        </aside>
+        <!-- End Sidebar Nav -->
+
+        <!-- Main Content -->
+        <div class="content">
+            <div class="py-4 px-3 px-md-4">
+
+                <!-- Inject Main page content here -->
+                {% block body_block %}{% endblock %}
+
+            </div>
+
+            <!-- Footer -->
+            <footer class="small p-3 px-md-4 mt-auto">
+                <div class="row justify-content-between">
+                    <div class="col-lg text-center text-lg-left mb-3 mb-lg-0">
+                        <ul class="list-dot list-inline mb-0">
+                            <li class="list-dot-item list-dot-item-not list-inline-item mr-lg-2"><a class="link-dark" href="#">Documentation</a></li>
+                            <li class="list-dot-item list-inline-item mr-lg-2"><a class="link-dark" href="#">Contact us</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg text-center text-lg-right">
+                        &copy; 2022 P.J Quest | All Rights Reserved.
+                    </div>
+                </div>
+            </footer>
+            <!-- End Footer -->
+        </div>
+        <!-- End Main Content -->
+    </main>
+
+    <!-- Edit Invoice Modal -->
+    <div id="editInvoiceModal" class="modal fade" role="dialog" aria-labelledby="editInvoiceLabel" aria-hidden="true" tabindex="-1" style>
+        <div class="modal-dialog" role="document" style="width: 70%;">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <h4 id="editInvoiceLabel" class="modal-title">Edit Invoice</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </header>
+
+                <div class="modal-body">
+                    <!-- Edit Invoice Form N.B: All answers should already be filed -->
+
+                    <div class="container">
+                        <div class="stepwizard">
+                            <div class="stepwizard-row setup-panel">
+                                <div class="stepwizard-step col-xs-3">
+                                    <a href="#step-1" type="button" class="btn btn-success btn-circle">1</a>
+                                    <p><small>Customer & Invoice Details</small></p>
+                                </div>
+                                <div class="stepwizard-step col-xs-3">
+                                    <a href="#step-2" type="button" class="btn btn-default btn-circle" disabled="disabled">2</a>
+                                    <p><small>Location Details</small></p>
+                                </div>
+                                <div class="stepwizard-step col-xs-3">
+                                    <a href="#step-3" type="button" class="btn btn-default btn-circle" disabled="disabled">3</a>
+                                    <p><small>Package Details</small></p>
+                                </div>
+                                <div class="stepwizard-step col-xs-3">
+                                    <a href="#step-4" type="button" class="btn btn-default btn-circle" disabled="disabled">4</a>
+                                    <p><small>Pricing</small></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form role="form" action="" method="post">
+
+                            <!-- Customer & Invoice Details -->
+                            <div class="panel panel-primary setup-content" id="step-1">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Customer & Invoice Details</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-row pb-2">
+
+                                        <div class="form-group col-10 col-md-4">
+                                            <label for="dateTime">Date & Time of Order</label>
+                                            <input type="datetime-local" class="form-control" value="" id="dateTime" name="dateTime" placeholder="Date & Time of Registration" disabled>
+                                        </div>
+
+                                        <div class="form-group col-10 col-md-4">
+                                            <label for="orderNumber">Order Number</label>
+                                            <!-- Automatically generate the next available invoice number -->
+                                            <input type="number" class="form-control" value="" id="orderNumber" name="orderNumber" placeholder="" disabled>
+                                        </div>
+
+                                        <div class="form-group col-8 col-md-4">
+                                            <label for="branch">Branch</label>
+                                            <select name="branch" id="branch" class="form-control" value required>
+                                                <option value="Lekki" selected>Lekki</option>
+                                            </select>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-8 col-md-4">
+                                            <label for="customerName">Customer's Name</label>
+                                            <select id="customerName" class="form-control" value="" name="customerName" placeholder="Type in the Customer's name" disabled>
+                                                <!-- Options are in JavaScript Below -->
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group col-8 col-md-4">
+                                            <label for="phoneNumber">Pick-up Contact's Phone Number</label>
+                                            <input type="tel" name="phoneNumber" id="phoneNumber" class="form-control">
+                                            <!-- Automatically fill with customer's phone number -->
+                                        </div>
+
+                                        <div class="form-group col-8 col-md-4">
+
+                                            <label for="email">Pick-up Contact's E-mail Address</label>
+                                            <input type="email" name="email" id="email" class="form-control">
+                                            <!-- Automatically fill with customer's email address -->
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <button class="btn btn-primary nextBtn pull-right float-right rounded-pill px-7 mt-5" type="button">Next</button>
+                                </div>
+                            </div>
+                            <!-- End Customer & Invoice Details -->
+
+                            <!-- Location Details -->
+                            <div class="panel panel-primary setup-content" id="step-2">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Location Details</h3>
+                                </div>
+                                <div class="panel-body">
+
+                                    <div class="form-row">
+
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="deliveryType">Delivery Type</label>
+                                            <select name="deliveryType" id="deliveryType" class="form-control" placeholder="Select the Delivery Type" required>
+        
+                                                <!-- Options are in JavaScript Below -->
+                                                
+                                            </select>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="">
+                                        <div class="form-group">
+                                            <label for="pickupAddress">Pickup Address</label>
+                                            <input type="text" name="pickupAddress" class="form-control" id="pickupAddress" required>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-row mt-5">
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="pickupCity">Pickup City</label>
+                                            <select id="pickupCity" class="form-control" name="pickupCity" placeholder="Select a Pickup City" onchange="fill()" required>
+                                                <!-- Options are in JavaScript Below -->
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="pickupTown">Pickup Town</label>
+                                            <select id="pickupTown" class="form-control" value="" name="pickupTown" placeholder="Select a Pickup Town" required>
+                                                <!-- Options are in JavaScript Below -->
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="">
+                                        <div class="form-group">
+                                            <label for="deliveryAddress">Delivery Address</label>
+                                            <input type="text" name="deliveryAddress" class="form-control" id="deliveryAddress" required>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-row mt-5">
+
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="deliveryCity">Delivery City</label>
+                                            <select id="deliveryCity" class="form-control" name="deliveryCity" placeholder="Select a Delivery City" onchange="d_fill()" required>
+                                                <!-- Options are in JavaScript Below -->
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="deliveryTown">Delivery Town</label>
+                                            <select id="deliveryTown" class="form-control" value="" name="deliveryTown" placeholder="Select a Delivery Town" required>
+                                                <!-- Options are in JavaScript Below -->
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row mt-5">
+
+                                        <div class="form-group col-10 col-md-4">
+                                            <label for="receiverName">Receiver's Name</label>
+                                            <input type="text" class="form-control" id="receiverName" name="receiverName" required>
+                                        </div>
+
+                                        <div class="form-group col-10 col-md-4">
+                                            <label for="receiverPhone">Receiver's Phone Number</label>
+                                            <input type="tel" class="form-control" id="receiverPhone" name="receiverPhone" required>
+                                        </div>
+
+                                        <div class="form-group col-10 col-md-4">
+                                            <label for="receiverEmail">Receiver's E-mail Address</label>
+                                            <input type="email" class="form-control" id="receiverEmail" name="receiverEmail" required>
+                                        </div>
+                                    </div>
+
+                                    <button class="btn btn-primary nextBtn pull-right float-right rounded-pill px-7 mt-5" type="button">Next</button>
+                                </div>
+                            </div>
+                            <!-- End Location Details -->
+
+                            <!-- Package Details -->
+                            <div class="panel panel-primary setup-content" id="step-3">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Package Details</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-row">
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="packageWeight">Package Weight (In Kg)</label>
+                                            <input type="number" id="packageWeight" class="form-control" name="packageWeight" min="1" max="40" placeholder="Enter Package Weight (In Kg)" required>
+                                        </div>
+                                        <div class="form-group col-12 col-md-6">
+                                            <label for="packageDescription">Package Description (Content)</label>
+                                            <input maxlength="200" type="text" required="required" class="form-control" id="packageDescription" name="packageDescription" placeholder="Enter Package Description (Content)" />
+                                        </div>
+                                    </div>
+
+
+                                    <button class="btn btn-primary nextBtn pull-right float-right rounded-pill px-7 mt-5" type="button">Next</button>
+                                </div>
+                            </div>
+                            <!-- End Package Details -->
+
+                            <!-- Pricing -->
+                            <div class="panel panel-primary setup-content" id="step-4">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Pricing</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="row mt-5">
+                                        <label for="subTotal" class="col-form-label col-8">Sub-total</label>
+                                        <div class="input-group flex-nowrap col-4">
+                                            <span class="input-group-text font-weight-bold" id="addon-wrapping">₦‎</span>
+                                            <input type="number" id="subTotal" class="form-control" name="subTotal" aria-label="subTotal" aria-describedby="addon-wrapping">
+                                            <!-- Automatically generated based on input on other parts of the form -->
+                                        </div>
+                                    </div>
+                                    <div class="row mt-5">
+                                        <label for="taxes" class="col-form-label col-8">VAT/Taxes</label>
+                                        <div class="input-group flex-nowrap col-4">
+                                            <span class="input-group-text font-weight-bold" id="addon-wrapping">₦‎</span>
+                                            <input type="number" id="taxes" class="form-control" name="taxes" aria-label="taxes" aria-describedby="addon-wrapping">
+                                        </div>
+                                    </div>
+                                    <div class="row mt-5">
+                                        <label for="discounts" class="col-form-label col-8">Discount/Promo</label>
+                                        <div class="input-group flex-nowrap col-4">
+                                            <span class="input-group-text font-weight-bold" id="addon-wrapping">₦‎</span>
+                                            <input type="number" id="discounts" class="form-control" name="discounts" aria-label="discounts" aria-describedby="addon-wrapping">
+                                        </div>
+                                    </div>
+                                    <div class="row mt-5">
+                                        <label for="invoiceTotal" class="col-form-label col-8">Invoice Total</label>
+                                        <div class="input-group flex-nowrap col-4">
+                                            <span class="input-group-text font-weight-bold" id="addon-wrapping">₦‎</span>
+                                            <input type="number" id="invoiceTotal" class="form-control" name="invoiceTotal" aria-label="invoiceTotal" aria-describedby="addon-wrapping">
+                                            <!-- Automatically generated based on input on other parts of the form -->
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-primary rounded-pill pull-right float-right mt-5" type="submit">SUBMIT</button>
+                                </div>
+                            </div>
+                            <!-- End Pricing -->
+
+                        </form>
+                    </div>
+
+                    <!-- End Edit Invoice Form -->
+                </div>
+
+                <footer class="modal-footer">
+                    <p></p>
+                </footer>
+            </div>
+        </div>
+    </div>
+    <!-- End Edit Invoice Modal -->
+
+    <!-- Assign Rider Modal -->
+    <div id="assignRiderModal" class="modal fade" role="dialog" aria-labelledby="assignRiderLabel" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog" role="document" style="width: 70%;">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <h4 id="assignRiderLabel" class="modal-title">Assign Rider</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </header>
+
+                <div class="modal-body pt-3 mb-5 mb-md-7 text-center">
+
+                    <form role="form" action="." method="POST">
+                        {%csrf_token%}
+                        <div class="">
+                            <input type="hidden" name="form_id" value="assignRider">
+                            <input type="hidden" id="order_id" name="order_id" value='{{ order.id }}'>
+                            <input type="hidden" id="orderref" name="orderref" value='{{ order.reference_number }}'>
+
+                            <div class="row mt-5">
+                                <label for="assignmentType" class="col-form-label col-4">Type of Assignment</label>
+                                <select id="assignmentType" class="form-control col-4" value="" name="assignmentType" placeholder="Select the Assignment Type" required>
+                                    <option value="1">Pickup</option>
+                                    <option value="2">Delivery</option>
+                                </select>
+                            </div>
+                            <div class="row mt-5">
+                                <label for="riderAssigned" class="col-form-label col-4">Rider to Assign</label>
+                                <select id="riderAssigned" class="form-control col-4" value="" name="riderAssigned" placeholder="Select the Rider" required>
+                                    {% for rider in riders %}
+                                    <option value="{{ rider.name }}">{{ rider.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary rounded-pill mt-5 px-5 float-right" type="submit">SUBMIT</button>
+                    </form>
+                </div>
+
+                <footer class="modal-footer">
+                    <p></p>
+                </footer>
+            </div>
+        </div>
+    </div>
+    <!-- End Assign Rider Modal -->
+
+    <!-- Confirm Cancel Modal done-->
+    <div id="confirmCancelModal" class="modal fade" role="dialog" aria-labelledby="confirmCancelLabel" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog" role="document" style="width: 70%;">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <h4 id="confirmCancelLabel" class="modal-title">Confirm Cancellation</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </header>
+
+                <div class="modal-body pt-3 mb-5 mb-md-7 text-center">
+
+                    <div class="modal-body pt-3 mb-5 mb-md-7 text-center">
+                        {% for message in messages %}
+
+                        <div class="alert alert-success text-danger ">
+                            <a class="close" href="" data-dismiss="alert">×</a> {{ message }}
+                        </div>
+
+                        {% endfor %}
+                        <form role="form" action="." method="POST">
+                            {%csrf_token%}
+                            <input type="hidden" name="form_id" value="cancelOrder">
+                            <input type="hidden" id="orderid" name="orderid" value='{{ order.id }}'>
+                            <div class="">
+                                <div class="">
+                                    <label for="cancelReason" class="col-form-label">Why do you want to cancel this order?</label>
+                                    <strong>Please give a reason, else the request to cancel will not be granted.</strong>
+
+                                    <div class="">
+                                        <div class="form-check position-relative mb-2 custom-control-inline">
+                                            <input type="radio" class="form-check-input d-none" id="customerCancelled" value="customerCancelled" name="cancelReason">
+                                            <label class="radio radio-xxs form-check-label ml-1 col-form-label" for="customerCancelled" data-icon="">Customer Asked to cancel</label>
+                                        </div>
+                                        <div class="form-check position-relative mb-2 custom-control-inline">
+                                            <input type="radio" class="form-check-input d-none" id="pickupFailed" value="pickupFailed" name="cancelReason">
+                                            <label class="radio radio-xxs form-check-label ml-1 col-form-label" for="pickupFailed" data-icon="">Customer Unavailable for Pickup</label>
+                                        </div>
+                                        <div class="form-check position-relative mb-2 custom-control-inline">
+                                            <input type="radio" class="form-check-input d-none" id="other" value="other" name="cancelReason">
+                                            <label class="radio radio-xxs form-check-label ml-1 col-form-label" for="other" data-icon="">Other</label>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="form-row">
+                                            <label for="specify">If "Other", Specify</label>
+                                            <input type="text" name="specify" id="specify" class="form-control">
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-primary rounded-pill mt-5 px-5 float-right" type="submit">SUBMIT</button>
+
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+
+                <footer class="modal-footer">
+                    <p></p>
+                </footer>
+            </div>
+        </div>
+    </div>
+    <!-- End Confirm Cancel Modal -->
+
+    <!-- Update Order Status Modal done-->
+    <div id="updateStatusModal" class="modal fade" role="dialog" aria-labelledby="updateStatusLabel" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog" role="document" style="width: 70%;">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <h4 id="updateStatusLabel" class="modal-title">Update Order Status</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </header>
+
+                <div class="modal-body pt-3 mb-5 mb-md-7 text-center">
+
+                    <div class="modal-body pt-3 mb-5 mb-md-7 text-center">
+                        <form action="" method="post">
+                            {%csrf_token%}
+                            <div class="row mb-5">
+                                <input type="hidden" name="form_id" value="updateOrder">
+                                <input type="hidden" name="orderId" id="orderId" value='{{ order.id }}'>
+                                <input type="hidden" name="riderId" id="riderId" value='{{ rider.id }}'>
+                                <label for="status" class=" col-form-label col-4">Current Status</label>
+                                <input type="text" name="status" id="status" class="form-control col-4" readonly value='{{order.status}}'>
+                                <!-- Fill Automatically -->
+
+                            </div>
+
+                            <div class="row">
+                                <label for="newStatus" class=" col-form-label col-4">New Status</label>
+                                <select name="newStatus" id="newStatus" class="form-control col-4" required>
+                                    <option value="" selected>Choose One</option>
+                                    <option value="received">Received</option>
+                                    <option value="fulfilled">Fulfilled</option>
+                                    <option value="unsuccessful">Unsuccessful</option>
+                                    <option value="processing">Processing</option>
+                                    <option value="returned">Returned to Sender</option>
+                                    
+                                </select>
+                            </div>
+
+                            <button class="btn btn-primary rounded-pill pull-right float-right mt-5" type="submit">SUBMIT</button>
+
+                        </form>
+                    </div>
+
+                </div>
+
+                <footer class="modal-footer">
+                    <p></p>
+                </footer>
+            </div>
+        </div>
+    </div>
+    <!-- End Update Order Status Modal -->
+
+    <!-- Edit Customer Details Modal -->
+    <div id="editCustomerDetails" class="modal fade" role="dialog" aria-labelledby="editCustomerDetailsLabel" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog" role="document" style="width: 70%;">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <h4 id="editCustomerDetailsLabel" class="modal-title">Edit Customer Details</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </header>
+
+                <div class="modal-body">
+
+                    <!-- Edit Customer Details Form N.B: All answers should already be filed -->
+
+                    <form onsubmit="updatecustoma()" action="javascript: updatecustoma(); return false;">
+                        {%csrf_token%}
+
+
+                        <div class="form-row pb-2">
+
+                            <div class="form-group col-12 col-md-6">
+                                <label for="dateTimedet">Date & Time of Registration</label>
+                                <input type="datetime-local" class="form-control" value="" id="dateTimedet" name="dateTimedet" placeholder="Date & Time of Registration" value='{{customer.dt_reg}}' readonly>
+                            </div>
+
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-12 col-md-6">
+                                <label for="customerdetName">Customer/Business Name</label>
+                                <input type="text" class="form-control" value="" id="customerdetName" name="customerName" placeholder="Customer/Business' Full Name" value='{{customer.company_name}}' readonly>
+                            </div>
+                            <div class="form-group col-12 col-md-6">
+                                <label for="contactName">Contact Person</label>
+                                <input type="text" class="form-control" value="" id="contactName" name="contactName" placeholder="Contact person's full name (If this is a business' account)" value='{{customer.customer_name}}'>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-12 col-md-6">
+                                <label for="streetdetAddress">Street Address</label>
+                                <input type="text" class="form-control" value="" id="streetdetAddress" name="streetdetAddress" placeholder="Customer's Address" autocomplete="address-level1" required>
+                            </div>
+                            <div class="form-group col-12 col-md-6">
+                                <label for="alternatedetAddress">Apt, Suite, etc. (optional)</label>
+                                <input type="text" class="form-control" value="" id="alternatedetAddress" name="alternatedetAddress" placeholder="Customer's Apartment/Suite Number (optional)" autocomplete="address-line2">
+                            </div>
+                            <div class="form-group col-12 col-md-6">
+                                <label for="citydet">City</label>
+                                <input type="text" class="form-control" value="" id="citydet" name="citydet" placeholder="Customer's City" autocomplete="address-line3" required>
+                            </div>
+                            <div class="form-group col-12 col-md-6">
+                                <label for="statedet">State</label>
+                                <input type="text" class="form-control" value="" id="statedet" name="statedet" placeholder="Customer's State" autocomplete="address-level4" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-12">
+                                <label for="countrydet">Country</label>
+
+                                <select id="countrydet" name="countrydet" class="form-control">
+                                    <option value="Afghanistan">Afghanistan</option>
+                                    <option value="Åland Islands">Åland Islands</option>
+                                    <option value="Albania">Albania</option>
+                                    <option value="Algeria">Algeria</option>
+                                    <option value="American Samoa">American Samoa</option>
+                                    <option value="Andorra">Andorra</option>
+                                    <option value="Angola">Angola</option>
+                                    <option value="Anguilla">Anguilla</option>
+                                    <option value="Antarctica">Antarctica</option>
+                                    <option value="Antigua and Barbuda">Antigua and Barbuda</option>
+                                    <option value="Argentina">Argentina</option>
+                                    <option value="Armenia">Armenia</option>
+                                    <option value="Aruba">Aruba</option>
+                                    <option value="Australia">Australia</option>
+                                    <option value="Austria">Austria</option>
+                                    <option value="Azerbaijan">Azerbaijan</option>
+                                    <option value="Bahamas">Bahamas</option>
+                                    <option value="Bahrain">Bahrain</option>
+                                    <option value="Bangladesh">Bangladesh</option>
+                                    <option value="Barbados">Barbados</option>
+                                    <option value="Belarus">Belarus</option>
+                                    <option value="Belgium">Belgium</option>
+                                    <option value="Belize">Belize</option>
+                                    <option value="Benin">Benin</option>
+                                    <option value="Bermuda">Bermuda</option>
+                                    <option value="Bhutan">Bhutan</option>
+                                    <option value="Bolivia">Bolivia</option>
+                                    <option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
+                                    <option value="Botswana">Botswana</option>
+                                    <option value="Bouvet Island">Bouvet Island</option>
+                                    <option value="Brazil">Brazil</option>
+                                    <option value="British Indian Ocean Territory">British Indian Ocean Territory</option>
+                                    <option value="Brunei Darussalam">Brunei Darussalam</option>
+                                    <option value="Bulgaria">Bulgaria</option>
+                                    <option value="Burkina Faso">Burkina Faso</option>
+                                    <option value="Burundi">Burundi</option>
+                                    <option value="Cambodia">Cambodia</option>
+                                    <option value="Cameroon">Cameroon</option>
+                                    <option value="Canada">Canada</option>
+                                    <option value="Cape Verde">Cape Verde</option>
+                                    <option value="Cayman Islands">Cayman Islands</option>
+                                    <option value="Central African Republic">Central African Republic</option>
+                                    <option value="Chad">Chad</option>
+                                    <option value="Chile">Chile</option>
+                                    <option value="China">China</option>
+                                    <option value="Christmas Island">Christmas Island</option>
+                                    <option value="Cocos (Keeling) Islands">Cocos (Keeling) Islands</option>
+                                    <option value="Colombia">Colombia</option>
+                                    <option value="Comoros">Comoros</option>
+                                    <option value="Congo">Congo</option>
+                                    <option value="Congo, The Democratic Republic of The">Congo, The Democratic Republic of The</option>
+                                    <option value="Cook Islands">Cook Islands</option>
+                                    <option value="Costa Rica">Costa Rica</option>
+                                    <option value="Cote D'ivoire">Cote D'ivoire</option>
+                                    <option value="Croatia">Croatia</option>
+                                    <option value="Cuba">Cuba</option>
+                                    <option value="Cyprus">Cyprus</option>
+                                    <option value="Czech Republic">Czech Republic</option>
+                                    <option value="Denmark">Denmark</option>
+                                    <option value="Djibouti">Djibouti</option>
+                                    <option value="Dominica">Dominica</option>
+                                    <option value="Dominican Republic">Dominican Republic</option>
+                                    <option value="Ecuador">Ecuador</option>
+                                    <option value="Egypt">Egypt</option>
+                                    <option value="El Salvador">El Salvador</option>
+                                    <option value="Equatorial Guinea">Equatorial Guinea</option>
+                                    <option value="Eritrea">Eritrea</option>
+                                    <option value="Estonia">Estonia</option>
+                                    <option value="Ethiopia">Ethiopia</option>
+                                    <option value="Falkland Islands (Malvinas)">Falkland Islands (Malvinas)</option>
+                                    <option value="Faroe Islands">Faroe Islands</option>
+                                    <option value="Fiji">Fiji</option>
+                                    <option value="Finland">Finland</option>
+                                    <option value="France">France</option>
+                                    <option value="French Guiana">French Guiana</option>
+                                    <option value="French Polynesia">French Polynesia</option>
+                                    <option value="French Southern Territories">French Southern Territories</option>
+                                    <option value="Gabon">Gabon</option>
+                                    <option value="Gambia">Gambia</option>
+                                    <option value="Georgia">Georgia</option>
+                                    <option value="Germany">Germany</option>
+                                    <option value="Ghana">Ghana</option>
+                                    <option value="Gibraltar">Gibraltar</option>
+                                    <option value="Greece">Greece</option>
+                                    <option value="Greenland">Greenland</option>
+                                    <option value="Grenada">Grenada</option>
+                                    <option value="Guadeloupe">Guadeloupe</option>
+                                    <option value="Guam">Guam</option>
+                                    <option value="Guatemala">Guatemala</option>
+                                    <option value="Guernsey">Guernsey</option>
+                                    <option value="Guinea">Guinea</option>
+                                    <option value="Guinea-bissau">Guinea-bissau</option>
+                                    <option value="Guyana">Guyana</option>
+                                    <option value="Haiti">Haiti</option>
+                                    <option value="Heard Island and Mcdonald Islands">Heard Island and Mcdonald Islands</option>
+                                    <option value="Holy See (Vatican City State)">Holy See (Vatican City State)</option>
+                                    <option value="Honduras">Honduras</option>
+                                    <option value="Hong Kong">Hong Kong</option>
+                                    <option value="Hungary">Hungary</option>
+                                    <option value="Iceland">Iceland</option>
+                                    <option value="India">India</option>
+                                    <option value="Indonesia">Indonesia</option>
+                                    <option value="Iran, Islamic Republic of">Iran, Islamic Republic of</option>
+                                    <option value="Iraq">Iraq</option>
+                                    <option value="Ireland">Ireland</option>
+                                    <option value="Isle of Man">Isle of Man</option>
+                                    <option value="Israel">Israel</option>
+                                    <option value="Italy">Italy</option>
+                                    <option value="Jamaica">Jamaica</option>
+                                    <option value="Japan">Japan</option>
+                                    <option value="Jersey">Jersey</option>
+                                    <option value="Jordan">Jordan</option>
+                                    <option value="Kazakhstan">Kazakhstan</option>
+                                    <option value="Kenya">Kenya</option>
+                                    <option value="Kiribati">Kiribati</option>
+                                    <option value="Korea, Democratic People's Republic of">Korea, Democratic People's Republic of</option>
+                                    <option value="Korea, Republic of">Korea, Republic of</option>
+                                    <option value="Kuwait">Kuwait</option>
+                                    <option value="Kyrgyzstan">Kyrgyzstan</option>
+                                    <option value="Lao People's Democratic Republic">Lao People's Democratic Republic</option>
+                                    <option value="Latvia">Latvia</option>
+                                    <option value="Lebanon">Lebanon</option>
+                                    <option value="Lesotho">Lesotho</option>
+                                    <option value="Liberia">Liberia</option>
+                                    <option value="Libyan Arab Jamahiriya">Libyan Arab Jamahiriya</option>
+                                    <option value="Liechtenstein">Liechtenstein</option>
+                                    <option value="Lithuania">Lithuania</option>
+                                    <option value="Luxembourg">Luxembourg</option>
+                                    <option value="Macao">Macao</option>
+                                    <option value="Macedonia, The Former Yugoslav Republic of">Macedonia, The Former Yugoslav Republic of</option>
+                                    <option value="Madagascar">Madagascar</option>
+                                    <option value="Malawi">Malawi</option>
+                                    <option value="Malaysia">Malaysia</option>
+                                    <option value="Maldives">Maldives</option>
+                                    <option value="Mali">Mali</option>
+                                    <option value="Malta">Malta</option>
+                                    <option value="Marshall Islands">Marshall Islands</option>
+                                    <option value="Martinique">Martinique</option>
+                                    <option value="Mauritania">Mauritania</option>
+                                    <option value="Mauritius">Mauritius</option>
+                                    <option value="Mayotte">Mayotte</option>
+                                    <option value="Mexico">Mexico</option>
+                                    <option value="Micronesia, Federated States of">Micronesia, Federated States of</option>
+                                    <option value="Moldova, Republic of">Moldova, Republic of</option>
+                                    <option value="Monaco">Monaco</option>
+                                    <option value="Mongolia">Mongolia</option>
+                                    <option value="Montenegro">Montenegro</option>
+                                    <option value="Montserrat">Montserrat</option>
+                                    <option value="Morocco">Morocco</option>
+                                    <option value="Mozambique">Mozambique</option>
+                                    <option value="Myanmar">Myanmar</option>
+                                    <option value="Namibia">Namibia</option>
+                                    <option value="Nauru">Nauru</option>
+                                    <option value="Nepal">Nepal</option>
+                                    <option value="Netherlands">Netherlands</option>
+                                    <option value="Netherlands Antilles">Netherlands Antilles</option>
+                                    <option value="New Caledonia">New Caledonia</option>
+                                    <option value="New Zealand">New Zealand</option>
+                                    <option value="Nicaragua">Nicaragua</option>
+                                    <option value="Niger">Niger</option>
+                                    <option value="Nigeria" selected>Nigeria</option>
+                                    <option value="Niue">Niue</option>
+                                    <option value="Norfolk Island">Norfolk Island</option>
+                                    <option value="Northern Mariana Islands">Northern Mariana Islands</option>
+                                    <option value="Norway">Norway</option>
+                                    <option value="Oman">Oman</option>
+                                    <option value="Pakistan">Pakistan</option>
+                                    <option value="Palau">Palau</option>
+                                    <option value="Palestinian Territory, Occupied">Palestinian Territory, Occupied</option>
+                                    <option value="Panama">Panama</option>
+                                    <option value="Papua New Guinea">Papua New Guinea</option>
+                                    <option value="Paraguay">Paraguay</option>
+                                    <option value="Peru">Peru</option>
+                                    <option value="Philippines">Philippines</option>
+                                    <option value="Pitcairn">Pitcairn</option>
+                                    <option value="Poland">Poland</option>
+                                    <option value="Portugal">Portugal</option>
+                                    <option value="Puerto Rico">Puerto Rico</option>
+                                    <option value="Qatar">Qatar</option>
+                                    <option value="Reunion">Reunion</option>
+                                    <option value="Romania">Romania</option>
+                                    <option value="Russian Federation">Russian Federation</option>
+                                    <option value="Rwanda">Rwanda</option>
+                                    <option value="Saint Helena">Saint Helena</option>
+                                    <option value="Saint Kitts and Nevis">Saint Kitts and Nevis</option>
+                                    <option value="Saint Lucia">Saint Lucia</option>
+                                    <option value="Saint Pierre and Miquelon">Saint Pierre and Miquelon</option>
+                                    <option value="Saint Vincent and The Grenadines">Saint Vincent and The Grenadines</option>
+                                    <option value="Samoa">Samoa</option>
+                                    <option value="San Marino">San Marino</option>
+                                    <option value="Sao Tome and Principe">Sao Tome and Principe</option>
+                                    <option value="Saudi Arabia">Saudi Arabia</option>
+                                    <option value="Senegal">Senegal</option>
+                                    <option value="Serbia">Serbia</option>
+                                    <option value="Seychelles">Seychelles</option>
+                                    <option value="Sierra Leone">Sierra Leone</option>
+                                    <option value="Singapore">Singapore</option>
+                                    <option value="Slovakia">Slovakia</option>
+                                    <option value="Slovenia">Slovenia</option>
+                                    <option value="Solomon Islands">Solomon Islands</option>
+                                    <option value="Somalia">Somalia</option>
+                                    <option value="South Africa">South Africa</option>
+                                    <option value="South Georgia and The South Sandwich Islands">South Georgia and The South Sandwich Islands</option>
+                                    <option value="Spain">Spain</option>
+                                    <option value="Sri Lanka">Sri Lanka</option>
+                                    <option value="Sudan">Sudan</option>
+                                    <option value="Suriname">Suriname</option>
+                                    <option value="Svalbard and Jan Mayen">Svalbard and Jan Mayen</option>
+                                    <option value="Swaziland">Swaziland</option>
+                                    <option value="Sweden">Sweden</option>
+                                    <option value="Switzerland">Switzerland</option>
+                                    <option value="Syrian Arab Republic">Syrian Arab Republic</option>
+                                    <option value="Taiwan">Taiwan</option>
+                                    <option value="Tajikistan">Tajikistan</option>
+                                    <option value="Tanzania, United Republic of">Tanzania, United Republic of</option>
+                                    <option value="Thailand">Thailand</option>
+                                    <option value="Timor-leste">Timor-leste</option>
+                                    <option value="Togo">Togo</option>
+                                    <option value="Tokelau">Tokelau</option>
+                                    <option value="Tonga">Tonga</option>
+                                    <option value="Trinidad and Tobago">Trinidad and Tobago</option>
+                                    <option value="Tunisia">Tunisia</option>
+                                    <option value="Turkey">Turkey</option>
+                                    <option value="Turkmenistan">Turkmenistan</option>
+                                    <option value="Turks and Caicos Islands">Turks and Caicos Islands</option>
+                                    <option value="Tuvalu">Tuvalu</option>
+                                    <option value="Uganda">Uganda</option>
+                                    <option value="Ukraine">Ukraine</option>
+                                    <option value="United Arab Emirates">United Arab Emirates</option>
+                                    <option value="United Kingdom">United Kingdom</option>
+                                    <option value="United States">United States</option>
+                                    <option value="United States Minor Outlying Islands">United States Minor Outlying Islands</option>
+                                    <option value="Uruguay">Uruguay</option>
+                                    <option value="Uzbekistan">Uzbekistan</option>
+                                    <option value="Vanuatu">Vanuatu</option>
+                                    <option value="Venezuela">Venezuela</option>
+                                    <option value="Viet Nam">Viet Nam</option>
+                                    <option value="Virgin Islands, British">Virgin Islands, British</option>
+                                    <option value="Virgin Islands, U.S.">Virgin Islands, U.S.</option>
+                                    <option value="Wallis and Futuna">Wallis and Futuna</option>
+                                    <option value="Western Sahara">Western Sahara</option>
+                                    <option value="Yemen">Yemen</option>
+                                    <option value="Zambia">Zambia</option>
+                                    <option value="Zimbabwe">Zimbabwe</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-12 col-md-6">
+                                <label for="phoneNumberdet">Phone Number</label>
+                                <input type="tel" class="form-control" value="" id="phoneNumberdet" name="phoneNumberdet" placeholder="Customer's Phone Number" required>
+                            </div>
+                            <div class="form-group col-12 col-md-6">
+                                <label for="email">E-mail Address</label>
+                                <input type="emaildet" class="form-control" value="" id="emaildet" name="emaildet" placeholder="Customer's E-mail Address">
+                            </div>
+
+                        </div>
+
+                        <button class="btn btn-primary float-right rounded-pill px-7 mt-5">Update</button>
+
+                    </form>
+
+                    <!-- End Edit Invoice Form -->
+                </div>
+
+                <footer class="modal-footer">
+                    <p></p>
+                </footer>
+            </div>
+        </div>
+    </div>
+    <!-- End Edit Customer Details Modal -->
+
+    <!-- Confirm Delete Modal done-->
+    <div id="confirmDeleteModal" class="modal fade" role="dialog" aria-labelledby="confirmDeleteLabel" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog" role="document" style="width: 70%;">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <h4 id="confirmDeleteLabel" class="modal-title">Confirm</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </header>
+
+                <div class="modal-body pt-3 mb-5 mb-md-7 text-center">
+
+                    <div class="modal-body pt-3 mb-5 mb-md-7 text-center" id="confirmDelete">
+                        <div>
+                            <h5>
+                                Are you sure you'd like to delete this customer and all their details?
+                            </h5>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-light float-left rounded-pill px-7 mt-5" data-dismiss="modal" id="noDelete">No</button>
+                            <form action="." method="delete">
+                                {%csrf_token%}
+                                <input type="hidden" name="form_id" value="deleteCustomer">
+                                <input name="customerId" id="customerId" value='{{customer.id}}' type='hidden'>
+                                <button type="submit" class="btn btn-danger float-right rounded-pill px-7 mt-5" id="yesDelete">Yes</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="modal-body pt-3 mb-5 mb-md-7 text-center d-none" id="deleteConfirmed">
+                        <div>
+                            <h3>
+                                Customer Deleted!
+                            </h3>
+                        </div>
+                        <button type="button" class="btn btn-primary rounded-pill px-7 mt-5" data-dismiss="modal">OK</button>
+                    </div>
+
+                </div>
+
+                <!-- <footer class="modal-footer">
+                    <p></p>
+                </footer> -->
+            </div>
+        </div>
+    </div>
+    <!-- End Delete Cancel Modal -->
+
+    <!-- Add Rider Modal done-->
+    <div id="addRiderModal" class="modal fade" role="dialog" aria-labelledby="addRiderLabel" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog" role="document" style="width: 70%;">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <h4 id="addRiderLabel" class="modal-title text-center text-capitalize font-weight-semi-bold text-primary">Add New Rider</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </header>
+
+                <div class="modal-body pt-3 mb-5 mb-md-7">
+
+                    <div class="modal-body pt-3 mb-5 mb-md-7" id="riderForm">
+
+                        <form action="." role="form" method="POST">
+                            {%csrf_token%}
+                            <div class="form-row pb-2">
+
+                                <div class="form-group col-12 col-md-6">
+                                    <label for="dateTime">Date & Time of Registration</label>
+                                    <input type="datetime-local" class="form-control" value="" id="dateTime" name="dateTime" placeholder="Date & Time of Registration" required>
+                                </div>
+
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-12 col-md-6">
+                                    <label for="riderName">Rider Name</label>
+                                    <input type="text" class="form-control" value="" id="riderName" name="riderName" placeholder="Rider's Full Name" required>
+                                </div>
+                                <div class="form-group col-12 col-md-6">
+                                    <label for="riderNumber">Phone Number</label>
+                                    <input type="tel" class="form-control" value="" id="riderNumber" name="riderNumber" placeholder="Rider's Phone Number">
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-12 col-md-6">
+                                    <label for="streetAddress">Street Address</label>
+                                    <input type="text" class="form-control" value="" id="streetAddress" name="streetAddress" placeholder="Customer's Address" autocomplete="address-level1" required>
+                                </div>
+                                <div class="form-group col-12 col-md-6">
+                                    <label for="alternateAddress">Apt, Suite, etc. (optional)</label>
+                                    <input type="text" class="form-control" value="" id="alternateAddress" name="alternateAddress" placeholder="Customer's Apartment/Suite Number (optional)" autocomplete="address-line2">
+                                </div>
+                                <div class="form-group col-12 col-md-6">
+                                    <label for="city">City</label>
+                                    <input type="text" class="form-control" value="" id="city" name="city" placeholder="Rider's City of Residence" autocomplete="address-line3" required>
+                                </div>
+                                <div class="form-group col-12 col-md-6">
+                                    <label for="state">State</label>
+                                    <input type="text" class="form-control" value="" id="state" name="state" placeholder="Rider's State of Residence" autocomplete="address-level4" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row mt-5">
+                                <div class="form-group col-12 col-md-6">
+                                    <label for="guarantorName">Guarantor's Name</label>
+                                    <input type="text" class="form-control" value="" id="guarantorName" name="guarantorName" placeholder="Guarantor's Full Name" autocomplete="" required>
+                                </div>
+                                <div class="form-group col-12 col-md-6">
+                                    <label for="guarantorNumber">Guarantor's Phone Number</label>
+                                    <input type="tel" class="form-control" value="" id="guarantorNumber" name="guarantorNumber" placeholder="Guarantor's Phone Number" autocomplete="" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-12 col-md-6">
+                                    <label for="guarantorStreetAddress">Guarantor's Street Address</label>
+                                    <input type="text" class="form-control" value="" id="guarantorStreetAddress" name="guarantorStreetAddress" placeholder="Guarantor's Address" autocomplete="address-level1" required>
+                                </div>
+                                <div class="form-group col-12 col-md-6">
+                                    <label for="guarantorAlternateAddress">Apt, Suite, etc. (optional)</label>
+                                    <input type="text" class="form-control" value="" id="guarantorAlternateAddress" name="guarantorAlternateAddress" placeholder="Customer's Apartment/Suite Number (optional)" autocomplete="address-line2">
+                                </div>
+                                <div class="form-group col-12 col-md-6">
+                                    <label for="guarantorCity">City</label>
+                                    <input type="text" class="form-control" value="" id="guarantorCity" name="guarantorCity" placeholder="Guarantor's City of Residence" autocomplete="address-line3" required>
+                                </div>
+                                <div class="form-group col-12 col-md-6">
+                                    <label for="guarantorState">State</label>
+                                    <input type="text" class="form-control" value="" id="guarantorState" name="guarantorState" placeholder="Guarantor's State of Residence" autocomplete="address-level4" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 float-right mt-5">SUBMIT</button>
+                        </form>
+                    </div>
+
+
+
+                </div>
+
+                <!-- <footer class="modal-footer">
+                    <p></p>
+                </footer> -->
+            </div>
+        </div>
+    </div>
+    <!-- End Add Rider Modal -->
+
+    <!-- Confirm Delete Modal -->
+    <div id="deleteRiderModal" class="modal fade" role="dialog" aria-labelledby="deleteRiderLabel" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog" role="document" style="width: 70%;">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <h4 id="deleteRiderLabel" class="modal-title">Confirm</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </header>
+
+                <div class="modal-body pt-3 mb-5 mb-md-7 text-center">
+
+                    <div class="modal-body pt-3 mb-5 mb-md-7 text-center" id="confirmDelete">
+                        <div>
+                            <h5>
+                                Are you sure you'd like to delete this rider and all their details?
+                            </h5>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-light float-left rounded-pill px-7 mt-5" data-dismiss="modal" id="noDelete">No</button>
+                            <form action="." method="post">
+                                {%csrf_token%}
+                                <input type="hidden" name="form_id" value="deleteRiderModal">
+                                <input name="customerId" id="customerId" value='{{rider.id}}' type='hidden'>
+                                <button type="submit" class="btn btn-danger float-right rounded-pill px-7 mt-5" id="yesDelete">Yes</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="modal-body pt-3 mb-5 mb-md-7 text-center d-none" id="deleteRiderConfirmed">
+                        <div>
+                            <h3>
+                                Rider Deleted!
+                            </h3>
+                        </div>
+                        <button type="button" class="btn btn-primary rounded-pill px-7 mt-5" data-dismiss="modal">OK</button>
+                    </div>
+
+                </div>
+
+                <!-- <footer class="modal-footer">
+                    <p></p>
+                </footer> -->
+            </div>
+        </div>
+    </div>
+    <!-- End Delete Rider Modal -->
+
+    <!-- Add Location Modal -->
+    <div id="addLocationModal" class="modal fade" role="dialog" aria-labelledby="addLocationLabel" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog" role="document" style="width: 70%;">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <h4 id="addLocationLabel" class="modal-title text-center text-capitalize font-weight-semi-bold text-primary">Add New Rider</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </header>
+
+                <div class="modal-body pt-3 mb-5 mb-md-7">
+
+                    <div class="modal-body pt-3 mb-5 mb-md-7" id="riderForm">
+
+                        <!-- HTML form for entering a new location -->
+                        <form action="/register-location" method="post">
+                            <div class="form-group">
+                                <label for="locationName">Location Name</label>
+                                <input type="text" class="form-control" id="locationName" name="locationName">
+                            </div>
+                            <div class="form-group">
+                                <label for="locationType">Location Type</label>
+                                <select class="form-control" id="locationType" name="locationType">
+                                <option value="mainland">Mainland</option>
+                                <option value="island">Island</option>
+                            </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="locationZone">Location Zone</label>
+                                <select class="form-control" id="locationZone" name="locationZone">
+                                <option value="zone1">Zone 1</option>
+                                <option value="zone2">Zone 2</option>
+                                <option value="zone3">Zone 3</option>
+                                <option value="zone4">Zone 4</option>
+                                <option value="zone5">Zone 5</option>
+                                <option value="zone6">Zone 6</option>
+                            </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+
+                    </div>
+
+
+
+                </div>
+
+                <!-- <footer class="modal-footer">
+                    <p></p>
+                </footer> -->
+            </div>
+        </div>
+    </div>
+    <!-- End Add Location Modal -->
+
+    <!-- Delete Location Modal -->
+    <div class="modal fade" id="deleteLocationModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteLocationModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteLocationModalLabel">Confirm Delete</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this location?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Delete Location Modal -->
+
+    <!-- Confirm Delete Modal -->
+    <div id="confirmDeleteTransactionModal" class="modal fade" role="dialog" aria-labelledby="confirmDeleteTransactionLabel" aria-hidden="true" tabindex="-1">
+        <div class="modal-dialog" role="document" style="width: 70%;">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <h4 id="confirmDeleteTransactionLabel" class="modal-title">Confirm</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </header>
+
+                <div class="modal-body pt-3 mb-5 mb-md-7 text-center">
+
+                    <div class="modal-body pt-3 mb-5 mb-md-7 text-center" id="confirmDelete">
+                        <div>
+                            <h5>
+                                Are you sure you'd like to delete this transaction and all its details?
+                            </h5>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-light float-left rounded-pill px-7 mt-5" data-dismiss="modal" id="noDelete">No</button>
+                            <form action="." method="POST">
+                                {%csrf_token%}
+                                <input type="hidden" name="form_id" value="confirmDeleteTransactionModal">
+                                <input type="hidden" name="paymentId" id="paymentId" value={{payment.id}}>
+                                <button type="submit" class="btn btn-danger float-right rounded-pill px-7 mt-5" id="yesDelete">Yes</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="modal-body pt-3 mb-5 mb-md-7 text-center d-none" id="deletePaymentConfirmed">
+                        <div>
+                            <h3>
+                                Payment Deleted!
+                            </h3>
+                        </div>
+                        <button type="button" class="btn btn-primary rounded-pill px-7 mt-5" data-dismiss="modal">OK</button>
+                    </div>
+
+                </div>
+
+                <!-- <footer class="modal-footer">
+                    <p></p>
+                </footer> -->
+            </div>
+        </div>
+    </div>
+    <!-- End Delete Transaction Modal -->
+
+    <script src="public/graindashboard/js/graindashboard.js"></script>
+    <script src="public/graindashboard/js/graindashboard.vendor.js"></script>
+
+    <!-- DEMO CHARTS -->
+    <script src="{% static 'public/demo/resizeSensor.js' %}"></script>
+    <script src="{% static 'public/demo/chartist.js'%}"></script>
+    <script src="{% static 'public/demo/chartist-plugin-tooltip.js' %}"></script>
+    <script src="{% static 'public/demo/gd.chartist-area.js'%}"></script>
+    <script src="{% static 'public/demo/gd.chartist-bar.js' %}"></script>
+    <script src="{% static 'public/demo/gd.chartist-donut.js'%}"></script>
+    <script>
+        $.GDCore.components.GDChartistArea.init('.js-area-chart');
+        $.GDCore.components.GDChartistBar.init('.js-bar-chart');
+        $.GDCore.components.GDChartistDonut.init('.js-donut-chart');
+    </script>
+     {% comment %} <script>
+        // Attach a click event handler to the notificationsInvoker link
+        let csrftoken = document.cookie.split('; ').find(row => row.startsWith('csrftoken=')).split('=')[1];
+        let csrftoken = Cookies.get('csrftoken');
+        document.getElementById("notificationsInvoker").addEventListener("click", function(event) {
+            // Prevent the default action of the link (i.e. navigating to the notifications URL)
+            //event.preventDefault();
+            console.log('why?')
+            
+            
+            // Send an AJAX request to the notifications URL to fetch the notifications data
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "{% url 'notifications' %}", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            xhr.onload = function() {
+            if (xhr.status === 200) {
+                // Update the notifications menu with the response from the server
+                var notificationsMenu = document.getElementById("notifications");
+                notificationsMenu.innerHTML = xhr.responseText;
+        
+                // Send a POST request to mark the notifications as read
+                var markAsReadXhr = new XMLHttpRequest();
+                markAsReadXhr.open("POST", "{% url 'notifications' %}", true);
+                markAsReadXhr.setRequestHeader("Content-Type", "application/json");
+                markAsReadXhr.setRequestHeader("X-CSRFToken", csrftoken);
+                markAsReadXhr.send();
+            } else {
+                console.error(xhr.statusText);
+            }
+            };
+            xhr.onerror = function() {
+            console.error(xhr.statusText);
+            };
+            xhr.send();
+        });
+    </script> {% endcomment %}
+</body>
+
+</html>

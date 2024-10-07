@@ -1,0 +1,742 @@
+{% extends 'index.html' %} {% load dash_tags %}
+{% load static %} {% block title%} Dashboard | PJ Quest Admin Application{% endblock %} {% block body_block %}
+
+<head>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/static/public/img/PJ QUEST MINI-LOGO.png">
+
+    <!-- DEMO CHARTS -->
+    <link rel="stylesheet" href="/static/public/demo/chartist.css">
+    <link rel="stylesheet" href="/static/public/demo/chartist-plugin-tooltip.css">
+
+    <!-- Template -->
+    <link rel="stylesheet" href="/static/public/graindashboard/css/graindashboard.css">
+    <style>
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+            /* Firefox */
+        }
+
+        .stepwizard-step p {
+            margin-top: 10px;
+        }
+
+        .stepwizard-row {
+            display: table-row;
+        }
+
+        .stepwizard {
+            display: table;
+            width: 100%;
+            position: relative;
+        }
+
+        .stepwizard-step button[disabled] {
+            opacity: 1 !important;
+            filter: alpha(opacity=100) !important;
+        }
+
+        .stepwizard-row:before {
+            top: 14px;
+            bottom: 0;
+            position: absolute;
+            content: " ";
+            width: 100%;
+            height: 1px;
+            background-color: #ccc;
+            z-order: 0;
+        }
+
+        .stepwizard-step {
+            display: table-cell;
+            text-align: center;
+            position: relative;
+        }
+
+        .btn-circle {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 12px;
+            line-height: 1.428571429;
+            border-radius: 15px;
+        }
+    </style>
+</head>
+
+<!-- Start Injecting here -->
+<!-- Page Title -->
+<div class="mb-3 mb-md-4 d-flex justify-content-between">
+    <div class="h3 mb-0">Welcome back, {{usif.user.first_name}} </div>
+    {% for message in messages %}
+
+    <div class="alert alert-success text-danger ">
+        <a class="close" href="" data-dismiss="alert">×</a> <span class="d-flex mr-6">{{ message }}</span>
+    </div>
+
+    {% endfor %}
+</div>
+<!-- End Page Title -->
+
+<!-- Overview -->
+<div class="row mb-6 mb-xl-8">
+
+    <div class="col-md-5 col-xl-3">
+        <!-- Widget: Orders Received -->
+        <div class="card flex-row align-items-center p-1 p-md-2">
+            <div class="icon icon-lg bg-soft-primary rounded-circle mr-3">
+                <i class="gd-receipt icon-text d-inline-block text-primary"></i>
+            </div>
+            <div>
+                <h4 class="lh-1 mb-1">{{orders_received}}</h4>
+                <h6 class="mb-0">Orders Received</h6>
+            </div>
+        </div>
+        <!-- End Widget: Orders Received -->
+    </div>
+
+    <div class="col-md-5 col-xl-3">
+        <!-- Widget: Orders Dispatched -->
+        <div class="card flex-row align-items-center p-1 p-md-2">
+            <div class="icon icon-lg bg-soft-secondary rounded-circle mr-3">
+                <i class="gd-truck icon-text d-inline-block text-secondary"></i>
+            </div>
+            <div>
+                <h4 class="lh-1 mb-1">{{order_dispatched}}</h4>
+                <h6 class="mb-0">Orders Dispatched</h6>
+            </div>
+        </div>
+        <!-- End Widget: Orders Dispatched -->
+    </div>
+
+    <div class="col-md-5 col-xl-3">
+        <!-- Widget: Net Revenue -->
+        <div class="card flex-row align-items-center p-1 p-md-2">
+            <div class="icon icon-lg bg-soft-warning rounded-circle mr-3">
+                <i class="gd-bar-chart icon-text d-inline-block text-warning"></i>
+            </div>
+            <div>
+                <h4 class="lh-1 mb-1">₦ {% add_commas total_revenue%} </h4>
+                <h6 class="mb-0">Net Revenue</h6>
+            </div>
+        </div>
+        <!-- End Widget: Net Revenue -->
+    </div>
+
+    <div class="col-md-5 col-xl-3">
+        <!-- Widget: Payments Received -->
+        <div class="card flex-row align-items-center p-1 p-md-2">
+            <div class="icon icon-lg bg-soft-success rounded-circle mr-3">
+                <i class="gd-wallet icon-text d-inline-block text-success"></i>
+            </div>
+            <div>
+                <h4 class="lh-1 mb-1">₦ {% add_commas payment_received%}</h4>
+                <h6 class="mb-0">Payments Received</h6>
+
+            </div>
+        </div>
+        <!-- End Widget: Payments Received -->
+    </div>
+
+</div>
+<!-- Overview End -->
+
+<!-- Order & Revenue History -->
+<div class="row">
+    <div class="col-12">
+        <!-- Card -->
+        <div class="card mb-3 mb-md-4">
+            <div class="card-header border-bottom p-0">
+                <ul id="wallets" class="nav nav-v2 nav-primary nav-justified d-block d-xl-flex w-100" role="tablist">
+                    <li class="nav-item border-bottom border-xl-bottom-0">
+                        <a class="nav-link d-flex align-items-center py-2 px-3 p-xl-4 active" href="#order-history"
+                            role="tab" aria-selected="true" data-toggle="tab">
+                            <span class="h6 font-weight-semi-bold text-uppercase mb-0">Order History</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item border-bottom border-xl-bottom-0 border-xl-left">
+                        <a class="nav-link d-flex align-items-center py-2 px-3 p-xl-4" href="#revenue-history"
+                            role="tab" aria-selected="false" data-toggle="tab">
+                            <span class="h6 font-weight-semi-bold text-uppercase mb-0">Revenue History</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+            <div id="histories" class="card-body tab-content">
+                <div class="tab-pane fade show active" id="order-history" role="tabpanel">
+                    <div class="text-center">
+                        <div class="mb-3 mb-md-0">
+                            <div class="h3 mb-0">
+                                {{num_orders_lmonth}}
+                            </div>
+                            <small class="text-muted">Total Orders In The Last Month</small>
+                        </div>
+
+                        {% comment %} <div class="col-8 col-md-6 border-left">
+                            {%if net_profit > 0.00 %}
+                            <div class="h3 mb-0">
+                                <span class="text-success">+</span>{{net_profit}}<sup class="h5">%</sup>
+                            </div>
+                            <small class="text-muted">Net Profit (%)</small> {% elif net_profit
+                                < 0.00%} <div class="h3 mb-0">
+                                <span class="text-danger">-</span>{{net_profit}}<sup class="h5">%</sup>
+                            </div>
+                            <small class="text-muted">Net Loss (%)</small> {%else%}
+                            <div class="h3 mb-0">
+                                <span class="text-primary"></span>{{net_profit}}<sup class="h5">%</sup>
+                            </div>
+                            <small class="text-muted">(%)</small> {% endif %} {% endcomment %}
+                        </div>
+
+                        <div class="js-area-chart chart chart--axis-x--nowrap chart--points-invisible position-relative mh-15_6 safari-overflow-hidden pt-4 pt-md-5 pb-1"
+                            data-series='[
+                                        
+                                            [
+                                            {{modified_info_string}}
+                                                ]
+                                                    ]' data-labels='[
+                                {{ data_labels }}
+                                ]' data-labels-qty="10" data-labels-start-from="1" data-prefix="" data-height="250"
+                            data-mobile-height="75" data-high="200" data-low="0" data-offset-x="30" data-offset-y="60"
+                            data-is-line-smooth='[false]' data-line-width='["1px"]' data-line-colors='["#008080"]'
+                            data-fill-opacity="0.5" data-fill-colors='["#ADD6D6"]' data-text-size-x="14px"
+                            data-text-color-x="#4a4e69" data-text-offset-top-x="10" data-text-align-axis-x="center"
+                            data-text-size-y="14px" data-text-color-y="#868e96" data-is-show-tooltips="true"
+                            data-is-tooltip-divided="true"
+                            data-tooltip-custom-class="chart-tooltip--divided chart-tooltip__value--bg-black chart-tooltip__meta--bg-primary small text-white"
+                            data-tooltip-currency="" data-is-show-points="true"
+                            data-point-custom-class='chart__point--donut chart__point--has-line-helper chart__point--border-xxs border-primary rounded-circle'
+                            data-point-dimensions='{"width":7,"height":7}'>
+                        </div>
+                    </div>
+
+
+                    <div class="tab-pane fade" id="revenue-history" role="tabpanel">
+                        <div class="row text-center">
+                            <div class="col-8 col-md-6 mb-3 mb-md-0">
+                                <div class="h3 mb-0">
+                                    ₦ {% add_commas payment_received%}
+                                </div>
+                                <small class="text-muted">Total Sales</small>
+                            </div>
+
+                            {% comment %} <div class="col-8 col-md-6 border-left">
+                                <div class="h3 mb-0">
+                                    <span class="text-danger">-</span>2.38<sup class="h5">%</sup>
+                                </div>
+                                <small class="text-muted">Net Profit (%)</small>
+                            </div> {% endcomment %}
+                        </div>
+
+                        <div class="js-area-chart chart chart--axis-x--nowrap chart--points-invisible position-relative mh-15_6 safari-overflow-hidden pt-4 pt-md-5 pb-1"
+                            data-series='[
+                                [
+                                {{modified_data_string}}
+                                ]
+                            ]' data-labels='[
+                            {{ data_labels }}
+                            ]' data-labels-qty="6" data-labels-start-from="1" data-prefix="₦" data-height="250"
+                            data-mobile-height="75" data-high="100000" data-low="0" data-offset-x="30"
+                            data-offset-y="60" data-is-line-smooth='[false]' data-line-width='["1px"]'
+                            data-line-colors='["#008080"]' data-fill-opacity="0.5" data-fill-colors='["#ADD6D6"]'
+                            data-text-size-x="14px" data-text-color-x="#4a4e69" data-text-offset-top-x="10"
+                            data-text-align-axis-x="center" data-text-size-y="14px" data-text-color-y="#868e96"
+                            data-is-show-tooltips="true" data-is-tooltip-divided="true"
+                            data-tooltip-custom-class="chart-tooltip--divided chart-tooltip__value--bg-black chart-tooltip__meta--bg-primary small text-white"
+                            data-tooltip-currency="NGN " data-is-show-points="true"
+                            data-point-custom-class='chart__point--donut chart__point--has-line-helper chart__point--border-xxs border-primary rounded-circle'
+                            data-point-dimensions='{"width":8,"height":8}'>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+    <!-- End Card -->
+    {% comment %}
+</div>
+</div> {% endcomment %}
+<!-- End Order & Revenue History  -->
+
+<!-- Recent Orders -->
+<div class="row">
+
+    <div class="col-12">
+
+        <div class="card mb-3 mb-md-4">
+
+            <div class="card-header">
+
+                <h5 class="font-weight-semi-bold mb-0">Recent Orders</h5>
+
+            </div>
+
+            <div class="card-body pt-0">
+
+                <div class="table-responsive-xl">
+
+                    <table class="table text-nowrap mb-0">
+
+                        <thead>
+                            <tr>
+                                <th class="font-weight-semi-bold border-top-0 py-2">Order No</th>
+                                <th class="font-weight-semi-bold border-top-0 py-2">Customer Name</th>
+                                <th class="font-weight-semi-bold border-top-0 py-2">Pickup Address & Phone Number</th>
+                                <th class="font-weight-semi-bold border-top-0 py-2">Amount</th>
+                                <th class="font-weight-semi-bold border-top-0 py-2">Order Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {%for order in orders %}
+                            <tr>
+                                <td class="py-3">
+                                    <a href="{% url 'invoice_generate' order.id %}">
+                                        {{order.reference_number}}
+                                    </a>
+                                </td>
+                                <td class="py-3">{{order.customer.customer_name}}</td>
+                                <td class="py-3">
+                                    <div> {{order.customer.customer_address}}, {{order.customer.customer_town}} </div>
+                                    <span class="text-sm-left"> {{order.customer.customer_no}} </span>
+                                </td>
+                                <td class="py-3">₦{% add_commas order.pricing%}</td>
+                                {% if order.status == 'Fulfilled' %}
+                                <td class="py-3">
+                                    <span class="badge badge-pill badge-success">{{order.status}}</span>
+                                </td>
+                                {% elif order.status == 'Pending' %}
+                                <td class="py-3">
+                                    <span class="badge badge-pill badge-warning">{{order.status}}</span>
+                                </td>
+                                {% elif order.status == 'Cancelled' %}
+                                <td class="py-3">
+                                    <span class="badge badge-pill badge-danger">{{order.status}}</span>
+                                </td>
+                                {% elif order.status == 'Delivery Assigned'%}
+                                <td class="py-3">
+                                    <span class="badge badge-pill badge-info">{{order.status}}</span>
+                                </td>
+                                {% elif order.status == 'Pick-up Assigned'%}
+                                <td class="py-3">
+                                    <span class="badge badge-pill badge-secondary">{{order.status}}</span>
+                                </td>
+                                {% elif order.status == 'Order Processing'%}
+                                <td class="py-3">
+                                    <span class="badge badge-pill badge-primary-lighter">{{order.status}}</span>
+                                </td>
+                                {% endif %}
+                                <td class="py-3">
+                                    <div class="position-relative">
+                                        <a id="actionsDropdownInvoker1" class="link-dark d-flex" href="#"
+                                            aria-controls="actionsDropdown1" aria-haspopup="true" aria-expanded="false"
+                                            data-unfold-target="#actionsDropdown1" data-unfold-event="click"
+                                            data-unfold-type="css-animation" data-unfold-duration="300"
+                                            data-unfold-animation-in="fadeIn" data-unfold-animation-out="fadeOut">
+                                            <i class="gd-more-alt icon-text"></i>
+                                        </a>
+
+                                        <ul id="actionsDropdown1"
+                                            class="unfold unfold-light unfold-top unfold-right position-absolute py-3 mt-1 unfold-css-animation unfold-hidden fadeOut"
+                                            aria-labelledby="actionsDropdownInvoker1"
+                                            style="min-width: 150px; animation-duration: 300ms; right: 0px;">
+                                            <li class="unfold-item">
+                                                <a class="dropdown-item" href="#" data-toggle="modal"
+                                                    data-target="#editInvoiceModal"
+                                                    onclick="showEditModal('{{ order.id }}')">
+                                                    <i class="gd-pencil mr-3"></i>
+                                                    <span class="">Edit</span>
+                                                </a>
+                                            </li>
+                                            <li class="unfold-item">
+                                                <a class="unfold-link media align-items-center text-nowrap" href="#"
+                                                    data-toggle="modal" data-target="#assignRiderModal"
+                                                    onclick="assignRider('{{ order.id }}', '{{order.reference_number}}')">
+                                                    <i class="gd-id-badge unfold-item-icon mr-3"></i>
+                                                    <span class="media-body">Assign</span>
+                                                </a>
+                                            </li>
+                                            <li class="unfold-item">
+                                                <a class="unfold-link media align-items-center text-nowrap" href="#"
+                                                    data-toggle="modal" data-target="#confirmCancelModal"
+                                                    onclick="cancelOrder('{{ order.id }}')">
+                                                    <i class="gd-close unfold-item-icon mr-3"></i>
+                                                    <span class="media-body">Cancel</span>
+                                                </a>
+                                            </li>
+                                            <li class="unfold-item">
+                                                <a class="unfold-link media align-items-center text-nowrap" href="#"
+                                                    onclick="setStatus( '{{ order.id }}', '{{ order.status }}')">
+                                                    <i class="gd-check unfold-item-icon mr-3"></i>
+                                                    <span class="">Update Order Status</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+
+
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<!-- End Recent Orders -->
+
+<script src="/static/public/graindashboard/js/graindashboard.js"></script>
+<script src="/static/public/graindashboard/js/graindashboard.vendor.js"></script>
+
+<!-- DEMO CHARTS -->
+<script src="/static/public/demo/resizeSensor.js"></script>
+<script src="/static/public/demo/chartist.js"></script>
+<script src="/static/public/demo/chartist-plugin-tooltip.js"></script>
+<script src="/static/public/demo/gd.chartist-area.js"></script>
+<script src="/static/public/demo/gd.chartist-bar.js"></script>
+<script src="/static/public/demo/gd.chartist-donut.js"></script>
+<script>
+    $.GDCore.components.GDChartistArea.init('.js-area-chart');
+    $.GDCore.components.GDChartistBar.init('.js-bar-chart');
+    $.GDCore.components.GDChartistDonut.init('.js-donut-chart');
+</script>
+<script>
+    function showEditModal(orderedid) {
+        $('#editInvoiceModal').modal('show');
+        $('#orderedid').val(orderedid);
+    }
+</script>
+<script>
+    function setStatus(orderId, status) {
+        $('#updateStatusModal').modal('show');
+        $('#status').val(status);
+        $('#orderId').val(orderId);
+    }
+</script>
+<script>
+    function assignRider(order_id, orderref) {
+        $('#assignRiderModal').modal('show');
+        $('#order_id').val(order_id);
+        $('#orderref').val(orderref);
+    }
+</script>
+<script>
+    function cancelOrder(orderid) {
+        $('#confirmCancelModal').modal('show');
+        $('#orderid').val(orderid);
+        //$('#orderref').val(orderref);
+    }
+</script>
+
+<!-- Multi-Step Functionality -->
+<script>
+    $(document).ready(function () {
+
+        var navListItems = $('div.setup-panel div a'),
+            allWells = $('.setup-content'),
+            allNextBtn = $('.nextBtn');
+
+        allWells.hide();
+
+        navListItems.click(function (e) {
+            e.preventDefault();
+            var $target = $($(this).attr('href')),
+                $item = $(this);
+
+            if (!$item.hasClass('disabled')) {
+                navListItems.removeClass('btn-success').addClass('btn-default');
+                $item.addClass('btn-success');
+                allWells.hide();
+                $target.show();
+                $target.find('input:eq(0)').focus();
+            }
+        });
+
+        allNextBtn.click(function () {
+            var curStep = $(this).closest(".setup-content"),
+                curStepBtn = curStep.attr("id"),
+                nextStepWizard = $('div.setup-panel div a[href="#' + curStepBtn + '"]').parent().next()
+                .children("a"),
+                curInputs = curStep.find("input[type='text'],input[type='url']"),
+                isValid = true;
+
+            $(".form-group").removeClass("has-error");
+            for (var i = 0; i < curInputs.length; i++) {
+                if (!curInputs[i].validity.valid) {
+                    isValid = false;
+                    $(curInputs[i]).closest(".form-group").addClass("has-error");
+                }
+            }
+
+            if (isValid) nextStepWizard.removeAttr('disabled').trigger('click');
+        });
+
+        $('div.setup-panel div a.btn-success').trigger('click');
+    });
+</script>
+<!-- End Multi-Step Functionality -->
+
+<!-- Dropdown Options (Customer Name) -->
+<script>
+    new TomSelect('#customerName', {
+        maxItems: 1,
+        valueField: 'id',
+        labelField: 'name',
+        searchField: 'name',
+        options: [
+            // Replace these with registered customers' names
+            {
+                %
+                for customer in customers %
+            } {
+                id: {
+                    {
+                        customer.id
+                    }
+                },
+                name: "{{customer.customer_name}}"
+            }, {
+                % endfor %
+            }
+        ],
+        create: false
+    });
+</script>
+<!-- End Dropdown Options (Customer Name) -->
+
+<!-- Dropdown Options (Delivery Type) -->
+<script>
+    new TomSelect('#deliveryType', {
+        maxItems: 1,
+        valueField: 'id',
+        labelField: 'type',
+        searchField: 'type',
+        options: [{
+            id: 1,
+            type: 'Same-Day Delivery'
+        }, {
+            id: 2,
+            type: 'Next-Day Delivery'
+        }, {
+            id: 3,
+            type: 'Express Delivery'
+        }],
+        create: false
+    });
+</script>
+<!-- End Dropdown Options (Delivery Type) -->
+
+<!-- Dropdown Options (Delivery Quantity) -->
+<script>
+    new TomSelect('#deliveryQty', {
+        maxItems: 1,
+        valueField: 'id',
+        labelField: 'type',
+        searchField: 'type',
+        options: [{
+            id: 1,
+            type: 'Single Delivery'
+        }, {
+            id: 2,
+            type: 'Bulk Delivery'
+        }],
+        create: false
+    });
+</script>
+<!-- End Dropdown Options (Delivery Quantity) -->
+
+<!-- Dropdown Options (Pickup City) -->
+<script>
+    new TomSelect('#pickupCity', {
+        maxItems: 1,
+        valueField: 'value',
+        labelField: 'city',
+        searchField: 'city',
+        options: [{
+            value: 1,
+            city: 'Lagos Mainland'
+        }, {
+            value: 2,
+            city: 'Lagos Island'
+        }],
+        create: false
+    });
+</script>
+<!-- End Dropdown Options (Pickup City) -->
+
+<!-- Dropdown Options (Pickup & Delivery Town) -->
+<script>
+    const mainland = [
+        'Yaba', 'Ojuelegba', 'Sabo', 'Surulere', 'Shomolu', 'Palmgrove', 'Onipanu', 'Masha', 'Lawanson', 'Ijesha',
+        'Ijora', 'Ilupeju', 'Iwaya', 'Akerele', 'Akoka', 'Aguda', 'Alagomeji', 'Ebute Metta', 'Jibowu', 'Bariga',
+        'Opebi', 'Oregun', 'Oshodi', 'Ogudu', 'Obanikoro', 'Ojota', 'Mende', 'Maryland', 'Ketu', 'Kosofe',
+        'Gbagada', 'Ilasamaja', 'Anthony Village', 'Alausa', 'Adeniyi Jones ', 'Ikeja', 'Ladipo', 'Mile 12',
+        'Mushin', 'Agidingbi', 'Ogba', 'Omole', 'Magodo 1', 'Magodo 2', 'Ojodu', 'Ojodu Berger',
+        'Ojodu grammer School', 'Agege', 'Apapa Olodi', 'Maza Maza', 'Mile 2', 'Satellite Town', 'Ajegunle',
+        'Amuwo Odofin', 'Festac', 'Alaba', 'Gowon', 'Dopemu', 'Isolo', 'Egbeda', 'Idi mangoro', 'Alagbado',
+        'Iyana ipaja', 'Ipaja', 'Abule egba', 'Ifako – Ijaiye', 'Ojo'
+    ];
+
+    const island = [
+        'Tinubu Square', 'Victoria Garden City', 'Victoria Island', 'Oniru', 'Marina', 'Lekki', 'Lagos Island',
+        'Eti-Osa', 'Ikoyi', 'Obalende', 'Dolphin Estate', 'Ikota', 'Eleganza/Orchid Road', 'Addo Road', 'Badore',
+        'Abraham Adesanya', 'Sangotedo', 'Abijo', 'Awoyaya'
+    ];
+
+    function fill() {
+
+        let city = document.getElementById('pickupCity').value;
+        let town = document.getElementById('pickupTown');
+
+        // const mainland = [
+        //     'Yaba','Ojuelegba' ,'Sabo','Surulere','Shomolu','Palmgrove','Onipanu' ,'Masha' ,'Lawanson','Ijesha' ,'Ijora' ,'Ilupeju' ,'Iwaya' ,'Akerele' ,'Akoka','Aguda' ,'Alagomeji', 'Ebute Metta', 'Jibowu', 'Bariga', 'Opebi' ,'Oregun' ,'Oshodi','Ogudu','Obanikoro','Ojota' ,'Mende' ,'Maryland' ,'Ketu' ,'Kosofe','Gbagada' ,'Ilasamaja','Anthony Village','Alausa' ,'Adeniyi Jones ','Ikeja','Ladipo' ,'Mile 12' ,'Mushin','Agidingbi' ,'Ogba','Omole' ,'Magodo 1','Magodo 2','Ojodu','Ojodu Berger','Ojodu grammer School' ,'Agege', 'Apapa Olodi','Maza Maza' ,'Mile 2','Satellite Town' ,'Ajegunle' ,'Amuwo Odofin' ,'Festac','Alaba', 'Gowon', 'Dopemu' , 'Isolo', 'Egbeda', 'Idi mangoro', 'Alagbado', 'Iyana ipaja', 'Ipaja', 'Abule egba', 'Ifako – Ijaiye', 'Ojo'
+        // ];
+
+        // const island = [
+        //     'Tinubu Square', 'Victoria Garden City', 'Victoria Island', 'Oniru', 'Marina', 'Lekki', 'Lagos Island', 'Eti-Osa', 'Ikoyi', 'Obalende', 'Dolphin Estate', 'Ikota', 'Eleganza/Orchid Road', 'Addo Road', 'Badore', 'Abraham Adesanya', 'Sangotedo', 'Abijo', 'Awoyaya'
+        // ];
+
+        if (city == 1) {
+            town.innerHTML = "<option value= '' > Select Pickup Town </option>";
+            for (let i = 0; i < mainland.length; i++) {
+                town.innerHTML = town.innerHTML + "<option value= " + "'" + mainland[i] + "'" + ">" + mainland[i] +
+                    "</option>"
+            }
+        } else if (city == 2) {
+            town.innerHTML = "<option value= '' > Select Pickup Town </option>";
+            for (let i = 0; i < island.length; i++) {
+                town.innerHTML = town.innerHTML + '<option value=' + "'" + island[i] + "'" + ">" + island[i] +
+                    "</option>"
+            }
+        } else {
+            town.innerHTML = "<option value= '' > Select a City First </option>";
+        }
+
+
+    }
+
+
+    function d_fill() {
+
+        let d_city = document.getElementById('deliveryCity').value;
+        let d_town = document.getElementById('deliveryTown');
+
+        // const mainland = [
+        //     'Yaba','Ojuelegba' ,'Sabo','Surulere','Shomolu','Palmgrove','Onipanu' ,'Masha' ,'Lawanson','Ijesha' ,'Ijora' ,'Ilupeju' ,'Iwaya' ,'Akerele' ,'Akoka','Aguda' ,'Alagomeji', 'Ebute Metta', 'Jibowu', 'Bariga', 'Opebi' ,'Oregun' ,'Oshodi','Ogudu','Obanikoro','Ojota' ,'Mende' ,'Maryland' ,'Ketu' ,'Kosofe','Gbagada' ,'Ilasamaja','Anthony Village','Alausa' ,'Adeniyi Jones ','Ikeja','Ladipo' ,'Mile 12' ,'Mushin','Agidingbi' ,'Ogba','Omole' ,'Magodo 1','Magodo 2','Ojodu','Ojodu Berger','Ojodu grammer School' ,'Agege', 'Apapa Olodi','Maza Maza' ,'Mile 2','Satellite Town' ,'Ajegunle' ,'Amuwo Odofin' ,'Festac','Alaba', 'Gowon', 'Dopemu' , 'Isolo', 'Egbeda', 'Idi mangoro', 'Alagbado', 'Iyana ipaja', 'Ipaja', 'Abule egba', 'Ifako – Ijaiye', 'Ojo'
+        // ];
+
+        // const island = [
+        //     'Tinubu Square', 'Victoria Garden City', 'Victoria Island', 'Oniru', 'Marina', 'Lekki', 'Lagos Island', 'Eti-Osa', 'Ikoyi', 'Obalende', 'Dolphin Estate', 'Ikota', 'Eleganza/Orchid Road', 'Addo Road', 'Badore', 'Abraham Adesanya', 'Sangotedo', 'Abijo', 'Awoyaya'
+        // ];
+
+        if (d_city == 1) {
+            d_town.innerHTML = "<option value= '' > Select Delivery Town </option>";
+            for (let i = 0; i < mainland.length; i++) {
+                d_town.innerHTML = d_town.innerHTML + "<option value= " + "'" + mainland[i] + "'" + ">" + mainland[i] +
+                    "</option>"
+            }
+        } else if (d_city == 2) {
+            d_town.innerHTML = "<option value= '' > Select Delivery Town </option>";
+            for (let i = 0; i < island.length; i++) {
+                d_town.innerHTML = d_town.innerHTML + '<option value=' + "'" + island[i] + "'" + ">" + island[i] +
+                    "</option>"
+            }
+        } else {
+            d_town.innerHTML = "<option value= '' > Select a City First </option>";
+        }
+
+
+    }
+</script>
+<!-- End Dropdown Options (Pickup & Delivery Town) -->
+
+<!-- Dropdown Options (Delivery City) -->
+<script>
+    new TomSelect('#deliveryCity', {
+        maxItems: 1,
+        valueField: 'value',
+        labelField: 'city',
+        searchField: 'city',
+        options: [{
+            value: 1,
+            city: 'Lagos Mainland'
+        }, {
+            value: 2,
+            city: 'Lagos Island'
+        }],
+        create: false
+    });
+
+    function editCustoma(customerid) {
+        // $('#editCustomerDetails').modal('show');
+        // $('#customerId').val(customerid);
+        customerids = customerid;
+
+        const xhttp = new XMLHttpRequest();
+
+        xhttp.open("GET", "/customer/detail?id=" + customerid);
+        xhttp.send();
+
+        xhttp.onload = function () {
+            var resp = JSON.parse(this.response)
+            document.getElementById("dateTimedet").value = resp['data'];
+            document.getElementById("customerdetName").value = resp['company_name'];
+            document.getElementById("streetdetAddress").value = resp['customer_address'];
+            // document.getElementById("alternatedetAddress").value = resp['customer_apart'];
+            // document.getElementById("citydet").value = resp['customer_city'];
+            // document.getElementById("statedet").value = resp['customer_state'];
+            // document.getElementById("countrydet").value = resp['customer_country'];
+            // document.getElementById("phoneNumberdet").value = resp['customer_no'];
+            // document.getElementById("contactName").value = resp['customer_name'];
+            // document.getElementById("emaildet").value = resp['customer_email'];
+        }
+    }
+
+    {
+        % comment %
+    }
+
+    function updatecustoma() {
+        const xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/customer/detail/");
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.send("id=" + customerids + "&csrfmiddlewaretoken=" + document.getElementsByName("csrfmiddlewaretoken")[4]
+            .value + "&customer_address=" + document.getElementById("streetdetAddress").value + "&customer_apart=" +
+            document.getElementById("alternatedetAddress").value + "&customer_city=" + document.getElementById(
+                "citydet").value + "&customer_state=" + document.getElementById("statedet").value +
+            "&customer_country=" + document.getElementById("countrydet").value + "&customer_no=" + document
+            .getElementById("phoneNumberdet").value + "&customer_name=" + document.getElementById("contactName")
+            .value + "&customer_email=" + document.getElementById("emaildet").value);
+    } {
+        % endcomment %
+    }
+</script>
+<!-- End Dropdown Options (Delivery City) -->
+
+
+<!-- End Inject -->
+
+{% endblock %} {% comment %} </body>
+
+</html> {% endcomment %}

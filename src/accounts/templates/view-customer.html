@@ -1,0 +1,285 @@
+{% extends 'index.html' %}
+{% load dash_tags %}
+{% load static %}
+{% block title%} View Customer {% endblock %}
+{% block body_block %}
+
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Title -->
+    <title>View Customer </title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge"> {% endcomment %}
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/static/public/img/PJ QUEST MINI-LOGO.png">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/public/graindashboard/css/graindashboard.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .card-header .block-handle {
+            position: absolute;
+            background-image: url(data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjMDAwMDAwIiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+ICAgIDxkZWZzPiAgICAgICAgPHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6IiBpZD0iYSIvPiAgICA8L2RlZnM+ICAgIDxjbGlwUGF0aCBpZD0iYiI+ICAgICAgICA8dXNlIG92ZXJmbG93PSJ2aXNpYmxlIiB4bGluazpocmVmPSIjYSIvPiAgICA8L2NsaXBQYXRoPiAgICA8cGF0aCBjbGlwLXBhdGg9InVybCgjYikiIGQ9Ik0yMCA5SDR2MmgxNlY5ek00IDE1aDE2di0ySDR2MnoiLz48L3N2Zz4=);
+            background-position: center center;
+            background-size: 95%;
+            width: 1.125rem;
+            height: .5rem;
+            /* top: 50%; */
+            right: .9375rem;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+            opacity: .15;
+        }
+
+        .user-activity__item {
+            display: -ms-flexbox;
+            display: flex;
+            margin-left: 1.875rem;
+            border-left: 1px solid #e9ecef;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 400;
+        }
+
+        .user-activity__item:last-child {
+            border-bottom: 0;
+        }
+
+        .user-activity__item__icon {
+            text-align: center;
+            border-radius: 50%;
+            float: left;
+            width: 1.875rem;
+            height: 1.875rem;
+            min-width: 1.875rem;
+            background: #f5f6f8;
+            margin-left: -.9375rem;
+            margin-right: .9375rem;
+            box-shadow: 0 0 0 2px #fff,inset 0 0 3px rgba(0,0,0,.2);
+        }
+
+        .user-activity__item__content {
+            float: left;
+        }
+
+        .user-activity__item__action {
+            float: right;
+        }
+        
+        .btn.btn-white {
+            border: 0.7px solid #e1e5eb;
+            border-radius: 5px;
+        }
+        
+        .user-activity__item__icon i {
+            font-size: 1rem;
+            line-height: 1.875rem;
+            color: #aeb9c4;
+            top: 1px;
+            position: relative;
+        }
+    </style>
+{% comment %} </head> {% endcomment %}
+
+<body class="">
+
+    <!-- Start Injecting Here -->
+    <div class="py-4 px-3 px-md-4">
+
+        <div class="mb-3 mb-md-4">
+
+            <div class="">
+                <!-- Breadcrumb -->
+                <nav class="d-none d-md-block" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="#">Customers</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">View Customer</li>
+                    </ol>
+                </nav>
+                <!-- End Breadcrumb -->
+
+                <div class="mb-3 mb-md-4 d-flex justify-content-between">
+                    <div class="h3 mb-0">View Customer</div>
+                </div>
+
+
+                <!--  -->
+                <div class="main-content-container container-fluid px-4">
+                
+                    <div class="row mt-4">
+
+                        <div class="col-sm-12 col-lg-4">
+                          <!-- User Details Card -->
+                          <div class="card card-small user-details mb-4" style="box-shadow: 0 2px 0 rgba(90,97,105,.11),0 4px 8px rgba(90,97,105,.12),0 10px 10px rgba(90,97,105,.06),0 7px 70px rgba(90,97,105,.1); border-radius: .625rem;">
+                                <div class="card-header p-0">
+                                    <img src="/static/public/img/up-user-details-background.jpeg" class="w-100 position-relative rounded-top" style="max-height: 7.1875rem;" alt="Customer Details Background Image">
+                                </div>
+                                <div class="card-body p-0" style="margin-top: -3.125rem; z-index: 1;">
+
+                                    <div class="user-details__avatar mx-auto" style=" border-radius: 50%; overflow: hidden; max-width: 6.25rem; box-shadow: 0 2px 0 rgba(90,97,105,.11),0 4px 8px rgba(90,97,105,.12),0 10px 10px rgba(90,97,105,.06),0 7px 70px rgba(90,97,105,.1);">
+
+                                        <img src="/static/public/img/avatar.webp" style="width: 100%;"  alt="Customer Avatar">
+
+                                    </div>
+
+                                    <h4 class="text-center m-0 mt-2">{{customer.customer_name}}</h4>
+
+                                    {% comment %} <p class="text-center text-light m-0 mb-2">Last seen about 4 days ago.</p> <!--Last time they reached out or had a transaction--> {% endcomment %}
+
+                                    <ul class="user-details__social user-details__social--primary d-table m-0 p-0 list-unstyled mx-auto mb-4">
+
+                                        <li class="mx-1">
+
+                                            <a href="https://wa.me/{{customer.customer_no|add_prefixphone}}" style="display: inline-block; border-radius: 50%; text-align: center; width: 1.875rem; line-height: 1.875rem; background: #e9ecef; color: #818ea3;"><!--Link to text them on whatsapp. Automatically make the phone number on the link same as the one on file-->
+                                                <i class="fab fa-whatsapp"></i>
+                                            </a>
+
+                                        </li>
+                                        
+                                    </ul>
+
+                                    <div class="user-details__user-data border-top border-bottom p-4">
+                                        <div class="row mb-3">
+                                            <div class="col w-50">
+                                                <span class="font-weight-semi-bold">Email</span><br>
+                                                <span>
+                                                    <a href="mailto:{{customer.customer_email}}">
+                                                        {{customer.customer_email}}
+                                                    </a> 
+                                                </span>
+                                            </div>
+                                            <div class="col w-50">
+                                                <span class="font-weight-semi-bold">Phone Number</span> <br>
+                                                <span>
+                                                    <a href="tel:{{customer.customer_no|add_prefixphone }}">
+                                                        {{customer.customer_no|hyphenate_phone}}
+                                                    </a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="user-details__tags p-4">
+                                        
+                                    </div>
+                                </div>
+                          </div>
+                          <!-- End User Details Card -->
+
+                        </div>
+
+                        <div class="col-lg-8">
+
+                          <!-- User Statistics -->
+                          <div class="card card-small user-stats mb-4" style="box-shadow: 0 2px 0 rgba(90,97,105,.11),0 4px 8px rgba(90,97,105,.12),0 10px 10px rgba(90,97,105,.06),0 7px 70px rgba(90,97,105,.1); border-radius: .625rem;">
+
+                                <div class="card-body">
+
+                                    <div class="row">
+
+                                        <div class="col-6 col-sm-4 text-center">
+                                            <h4 class="m-0 font-weight-bold">{{orderCount}}</h4>
+                                            <span class="text-primary opacity-md text-uppercase small">Orders</span>
+                                        </div>
+
+                                        <div class="col-6 col-sm-4 text-center">
+                                            <h4 class="m-0 font-weight-bold">₦{{paymenttotal}}</h4>
+                                            <span class="text-primary opacity-md text-uppercase small">Total Spend</span>
+                                        </div>
+
+                                        <div class="col-6 col-sm-4 text-center">
+                                            <h4 class="m-0 font-weight-bold">₦{{creditBalance}}</h4>
+                                            <span class="text-primary opacity-md text-uppercase small">Credit Balance</span>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                          </div>
+                          <!-- End User Statistics -->
+
+                          <!-- User Activity -->
+                        
+                            <div class="card card-small user-activity mb-4" style="box-shadow: 0 2px 0 rgba(90,97,105,.11),0 4px 8px rgba(90,97,105,.12),0 10px 10px rgba(90,97,105,.06),0 7px 70px rgba(90,97,105,.1); border-radius: .625rem;">
+
+                                <div class="card-header border-bottom">
+                                    <h6 class="m-0 font-weight-semi-bold">Recent Activity</h6>
+                                    <div class="block-handle"></div>
+                                </div>
+                                
+                                <div class="card-body p-0">
+                                    {%for order in orders%}
+
+                                    <div class="user-activity__item pr-3 py-3">
+                                        <div class="user-activity__item__icon my-auto">
+                                            <i class="gd-user"></i>
+                                        </div>
+                                        <div class="user-activity__item__content">
+                                            <span class="text-light small">{{order.created_at}}</span>
+                                            <p>
+                                                New delivery 
+                                                <a href="#order_link">{{order.reference_number}}</a>. <br>
+                                                <strong>Order total:</strong>  ₦{{order.pricing}}
+                                            </p>
+                                        </div>
+                                        <div class="user-activity__item__action ml-auto d-flex">
+                                            {% if order.id %}
+                                                <button class="ml-auto my-auto btn btn-sm btn-white" onclick="window.location.href='{% url 'invoice_generate' order.id %}';">View Details</button>
+                                            {% endif %}                                                                                
+                                        </div>
+                                    </div>  
+                                    {%endfor%}
+                                    {%for payment in payments %}
+                                    <div class="user-activity__item pr-3 py-3">
+                                        <div class="user-activity__item__icon my-auto">
+                                            <i class="gd-user"></i>
+                                        </div>
+                                        <div class="user-activity__item__content">
+                                            <span class="text-light small">{{payment.order_date}}</span>
+                                            <p>
+                                                New payment 
+                                                <a href="#order_link"> {{payment.id}}</a>.<br>
+                                                <strong>Payment total:</strong>₦{{payment.payment_amount}} <br>
+                                            </p>
+                                        </div>
+                                        <div class="user-activity__item__action ml-auto d-flex">
+                                            <button class="ml-auto my-auto btn btn-sm btn-white" onclick="window.location.href='{%url 'payment_history'%}';">View Details</button>
+                                        </div>
+                                    </div>      
+                                    
+                                </div>
+                                {%endfor%}
+
+                                <div class="card-footer border-top">
+                                
+                                </div>
+
+                            </div>
+                        
+                          <!-- End User Activity -->
+                        </div>
+
+                    </div>
+                    
+                </div>
+                <!--  -->
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="/static/public/graindashboard/js/graindashboard.js"></script>
+    <script src="/static/public/graindashboard/js/graindashboard.vendor.js"></script>
+
+    <!-- Stop Injecting Here -->
+
+</body>
+{%endblock%}

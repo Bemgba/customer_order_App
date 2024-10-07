@@ -1,0 +1,191 @@
+{% extends 'index.html' %}
+{% load dash_tags %}
+{% load static %}
+{% block title%} Payment History  | PJ Quest Admin Application {% endblock %}
+{% block body_block %}
+
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- Title -->
+    <title> Payment History </title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge"> {% endcomment %}
+
+    <!-- J-Query -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- Favicon --> 
+    <link rel="shortcut icon" href="/static/public/img/PJ QUEST MINI-LOGO.png">
+
+    <!-- Tom-Select CSS -->
+    <link rel="stylesheet" href="/static/node_modules/tom-select/dist/css/tom-select.bootstrap4.css">
+
+    <!-- Tables -->
+    {% comment %} <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script> {% endcomment %}
+
+
+{% comment %} </head> {% endcomment %}
+<body class="py-4 px-3 px-md-4">
+    
+    <!-- Page Title -->
+    <div class="mb-3 mb-md-4 d-flex justify-content-between">
+        <div class="h3 mb-0">Payment History </div>
+    </div>
+    <!-- End Page Title -->
+
+    <div class="">
+        
+        <div class="row">
+
+            <div class="col-12">
+                <div class="row mt-2">
+                    <div class="col-md-9"></div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                            <input type="text" class="form-control" id="payments-search" placeholder="Search">
+                      </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3 mb-md-4">
+
+                    <div class="card-header">
+                        
+
+                    </div>
+
+                    <div class="card-body pt-0">
+
+                        <div class="table-responsive-xl">
+
+                            <table class="table text-nowrap mb-0" id="paymentHistoryTable">
+
+                                <thead>
+                                    <tr>
+                                        <th class="font-weight-semi-bold border-top-0 py-2">Payment Ref.</th>
+                                        <th class="font-weight-semi-bold border-top-0 py-2">Date</th>
+                                        <th class="font-weight-semi-bold border-top-0 py-2">Customer Name</th>
+                                        <th class="font-weight-semi-bold border-top-0 py-2">Bank</th>
+                                        <th class="font-weight-semi-bold border-top-0 py-2">Amount</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for payment in payments %}
+                                    <tr>
+                                        <td class="py-3">
+                                            <a href="#">
+                                                {% comment %} PJQ-P-03423 {% endcomment %}
+                                                {{payment.id}}
+                                            </a>
+                                        </td>
+                                        <td class="py-3">
+                                            {% comment %} 01 Dec, 2022 {% endcomment %}
+                                            {{payment.order_date}}                                            
+                                        </td>
+                                        <td class="py-3">
+                                            {% comment %} Okiki  {% endcomment %}
+                                            {{payment.customer.customer_name}}
+                                        </td>
+                                        <td class="py-3">
+                                            {% comment %} Access Bank {% endcomment %}
+                                            {{payment.bank}}
+                                        </td>
+                                        <td class="py-3">
+                                            {% comment %} ₦1,500.00 {% endcomment %}
+                                            ₦{% add_commas payment.payment_amount %}
+                                        </td>
+                                        <td class="py-3">
+                                            
+                                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#confirmDeleteTransactionModal" onclick="deleteTransaction('{{ payment.id }}')">
+                                                <i class="gd-trash text-danger"></i>
+                                            </a>
+                                            
+                                        </td>
+                                    </tr>
+                                    {%endfor%}
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            
+        </div>
+          
+    </div>
+
+
+
+    <!-- JavaScript -->
+    <script src="/static/public/graindashboard/js/graindashboard.js"></script>
+    <script src="/static/public/graindashboard/js/graindashboard.vendor.js"></script>
+    <script src="/static/node_modules/tom-select/dist/js/tom-select.base.js"></script>
+
+
+    <script>
+        $(document).ready(function() {
+            $('#paymentHistoryTable').DataTable({
+                pageLength: 10,
+                //filter: true,
+                //deferRender: true,
+                //scrollY: 200,
+                //scrollCollapse: true,
+                //scroller: true
+            });
+        });
+
+        function deleteTransaction(paymentId) {
+            $('#confirmDeleteTransactionModal').modal('show');
+            $('#paymentId').val(paymentId);
+            //$('#orderref').val(orderref);
+          }
+    </script>
+
+
+
+    <script>
+
+        let no = document.getElementById('noDelete');
+        let yes = document.getElementById('yesDelete');
+        let confirmD = document.getElementById('confirmDelete');
+        let confirmed = document.getElementById('deletePaymentConfirmed')
+
+        yes.addEventListener('click', () => {
+            
+            confirmD.hidden=true;
+            confirmed.classList.remove('d-none');;
+        });
+
+    </script>
+
+    <!-- Search Functionality -->
+    <script>
+        // For Payment History Table
+        // Listen for changes to the search input
+        $('#payments-search').on('keyup', function() {
+            var query = $(this).val();
+    
+            // Filter the table rows based on the search query
+            $('#paymentHistoryTable tbody tr').filter(function() {
+                //$(this).toggle($(this).text().toLowerCase().indexOf(query) > -1);
+                $(this).toggle($(this).text().toLowerCase().indexOf(query.toLowerCase()) > -1);
+            });
+        });
+    </script>
+    <!-- End Search Functionality -->
+    
+</body>
+{%endblock%}
+
+{% comment %} </html> {% endcomment %}

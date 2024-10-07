@@ -1,0 +1,23 @@
+asgiref==3.8.1
+boto3==1.11.8
+botocore==1.14.8
+Django==5.1.1
+django-filter==24.3
+django-storages==1.8
+docutils==0.15.2
+gunicorn==20.0.4
+# jimespath==0.9.4
+pillow==10.4.0
+# python-datautil==2.8.1
+pytz==2019.3
+s3transfer==0.3.0
+six==1.14.0
+sqlparse==0.3.0
+urllib3==1.25.8
+whitenoise==5.0.1
+django-rest-knox==5.0.2
+
+python-dotenv==1.0.1
+python-decouple==3.8
+requests==2.32.3
+slugify==0.0.1

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+{% extends 'index.html' %}
+{% load static %}
+
+{% block title%} Create User {% endblock %}
+{% block body_block %}
+{% comment %} <html lang="en">
+<head>
+    <!-- Title -->
+    <title>Create User | PJ Quest Admin Application</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge"> {% endcomment %}
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{% static '/static/public/img/PJ QUEST MINI-LOGO.png' %}">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href=" {% static '/static/public/graindashboard/css/graindashboard.css' %}">
+
+{% comment %} </head>
+
+<body class=""> {% endcomment %}
+
+    <!-- Start Injecting Here -->
+    <div class="py-4 px-3 px-md-4">
+        <div class="card mb-3 mb-md-4">
+
+            <div class="card-body">
+                <!-- Breadcrumb -->
+                <nav class="d-none d-md-block" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="#">Users</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Create New User</li>
+                    </ol>
+                </nav>
+                <!-- End Breadcrumb -->
+
+                <div class="mb-3 mb-md-4 d-flex justify-content-between">
+                    <div class="h3 mb-0">Create New User</div>
+                </div>
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    {% if message.tags %} class="{{ message.tags }}"{% endif %}
+                        {{ message }}
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                <!-- Form -->
+                <div>
+                    <form role="form" action="." method="POST">
+                        {%csrf_token%}
+                        <div class="form-row">
+                            <div class="form-group col-12 col-md-6">
+                                <label for="fullName">Full Name</label>
+                                <input type="text" class="form-control" value="" id="fullName" name="fullName" placeholder="User's Full Name">
+                            </div>
+                            <div class="form-group col-12 col-md-6">
+                                <label for="userName">Username</label>
+                                <input type="text" class="form-control" value="" id="userName" name="userName" placeholder="Preferred Username">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-12 col-md-6">
+                                <label for="password">Password</label>
+                                <input type="password" class="form-control" value="" id="password" name="password" placeholder="New Password">
+                            </div>
+                            <div class="form-group col-12 col-md-6">
+                                <label for="password_confirm">Confirm Password</label>
+                                <input type="password" class="form-control" value="" id="password_confirm" name="password_confirm" placeholder="Confirm Password">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary float-right rounded-pill px-7 mt-5">Create</button>
+                    </form>
+                </div>
+                <!-- End Form -->
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <script src="/static/public/graindashboard/js/graindashboard.js"></script>
+    <script src="/static/public/graindashboard/js/graindashboard.vendor.js"></script>
+
+    {% endblock %}
+
+    <!-- Stop Injecting Here -->
+
+{% comment %} </body>
+</html> {% endcomment %}
