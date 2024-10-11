@@ -6,11 +6,11 @@
     <link rel="shortcut icon" href="/static/public/img/PJ QUEST MINI-LOGO.png">
 
     <!-- DEMO CHARTS -->
-    <link rel="stylesheet" href="/static/public/demo/chartist.css">
-    <link rel="stylesheet" href="/static/public/demo/chartist-plugin-tooltip.css">
+    <link rel="stylesheet" href="{% static "public/demo/chartist.css" %}">
+    <link rel="stylesheet" href="{% static "public/demo/chartist-plugin-tooltip.css" %}">
 
     <!-- Template -->
-    <link rel="stylesheet" href="/static/public/graindashboard/css/graindashboard.css">
+    <link rel="stylesheet" href="{% static "public/graindashboard/css/graindashboard.css" %}">
     <style>
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button {
@@ -406,16 +406,16 @@
 </div>
 <!-- End Recent Orders -->
 
-<script src="/static/public/graindashboard/js/graindashboard.js"></script>
-<script src="/static/public/graindashboard/js/graindashboard.vendor.js"></script>
+<script src="{% static "public/graindashboard/js/graindashboard.js" %}"></script>
+<script src="{% static "public/graindashboard/js/graindashboard.vendor.js" %}"></script>
 
 <!-- DEMO CHARTS -->
-<script src="/static/public/demo/resizeSensor.js"></script>
-<script src="/static/public/demo/chartist.js"></script>
-<script src="/static/public/demo/chartist-plugin-tooltip.js"></script>
-<script src="/static/public/demo/gd.chartist-area.js"></script>
-<script src="/static/public/demo/gd.chartist-bar.js"></script>
-<script src="/static/public/demo/gd.chartist-donut.js"></script>
+<script src="{% static "public/demo/resizeSensor.js" %}"></script>
+<script src="{% static "public/demo/chartist.js" %}"></script>
+<script src="{% static "public/demo/chartist-plugin-tooltip.js" %}"></script>
+<script src="{% static "public/demo/gd.chartist-area.js" %}"></script>
+<script src="{% static "public/demo/gd.chartist-bar.js" %}"></script>
+<script src="{% static "public/demo/gd.chartist-donut.js" %}"></script>
 <script>
     $.GDCore.components.GDChartistArea.init('.js-area-chart');
     $.GDCore.components.GDChartistBar.init('.js-bar-chart');

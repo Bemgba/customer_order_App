@@ -32,7 +32,7 @@ def get_customer_info(request):
    
 @login_required(login_url = "/")
 def customer_view(request):
-    print("method: " + request.method)
+    # print("method: " + request.method)
 
     if request.method == 'POST':
         form_id = request.POST.get('form_id')
@@ -40,11 +40,11 @@ def customer_view(request):
             custom = request.POST.get('customerId')
             customes = Customer.objects.get(id=custom)
             return redirect(request, customes)
-    elif request.method == 'DELETE':
-        form_id = request.DELETE.get('form_id')
-        print(form_id)  # deleteCustomer
+    elif request.method == 'GET':
+        form_id = request.GET.get('form_id')
+        # print(form_id)  # deleteCustomer
         if form_id == 'deleteCustomer':
-            custo = request.DELETE.get('customerId')
+            custo = request.GET.get('customerId')
             print(custo)
             cha = Customer.objects.get(id = custo)
             cha.delete()
@@ -121,3 +121,35 @@ def customer_create(request):
         return redirect("customer_view")
     
     return render(request, 'new-Customer.html')
+
+@login_required(login_url = "/")
+def customer_details(request):
+    if request.method == "GET":
+        cust = Customer.objects.get(id = request.GET['id'])
+        return JsonResponse({
+            'dt_reg' : cust.dt_reg.strftime("%Y-%m-%dT%H:%M"),
+            'customer_address' : cust.customer_address,
+            'customer_apart' : cust.customer_apart,
+            'customer_city' : cust.customer_city,
+            'customer_state' : cust.customer_state,
+            'customer_country' : cust.customer_country,
+            'customer_no' : cust.customer_no,
+            'customer_name' : cust.customer_name,
+            'customer_email' : cust.customer_email,
+            'company_name' : cust.company_name,
+        })
+    elif request.method == "POST":
+        cust = Customer.objects.get(id = request.POST['id'])
+
+        cust.customer_address = request.POST['customer_address']
+        cust.customer_apart = request.POST['customer_apart']
+        cust.customer_city = request.POST['customer_city']
+        cust.customer_state = request.POST['customer_state']
+        cust.customer_country = request.POST['customer_country']
+        cust.customer_no = request.POST['customer_no']
+        cust.customer_name = request.POST['customer_name']
+        cust.customer_email = request.POST['customer_email']
+        cust.save()
+        return JsonResponse({
+            "message" : "successful"
+        })
