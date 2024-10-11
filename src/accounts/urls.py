@@ -46,6 +46,7 @@ urlpatterns = [
     path ('Interface/Create/New-Customer/', customer_view.customer_create, name = 'new_customer' ),
     path ('Interface/Action/Customer/', customer_view.customer_view, name='customer_view'),
     path ('Interface/Fetch/Customer/', customer_view.viewCustomer_page, name='viewCustomer_page'),
+    path ('Interface/Fetch/Customer/Detail/', customer_view.customer_details, name='customer_details'),
 
     #Payment 
     path ('Interface/Create/New-Payment/', payment_view.new_payment, name = 'new_payment' ),

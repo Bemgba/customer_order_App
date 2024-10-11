@@ -59,7 +59,7 @@ def new_payment(request):
         return redirect('payment_history')
     else:
         context = { 
-            "customers" : customer.objects.all(),
+            "customers" : Customer.objects.all(),
             "orders" : Order.objects.filter(paid=False),
             }
         return render(request, 'new-payment.html', context)
