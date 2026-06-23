@@ -1,0 +1,147 @@
+{% extends 'accounts/dashboard1_base.html' %}
+
+{% block content %}
+
+<!-- Page header -->
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="font-display font-bold text-2xl text-ink-900">Ingredient Consumption History</h1>
+    <p class="text-sm text-ink-500 mt-0.5">Usage log per ingredient</p>
+  </div>
+  <a href="{% url 'ingredient_list' %}"
+     class="btn btn-sm border border-ink-200 text-ink-600 hover:bg-ink-50 bg-white rounded-xl normal-case font-semibold">
+    ← Back to Inventory
+  </a>
+</div>
+
+<!-- Filters card -->
+<div class="bg-white rounded-2xl shadow-card border border-ink-100 p-5 mb-5">
+  <form method="get">
+    <div class="flex flex-wrap gap-4 items-end">
+
+      <div class="flex-1 min-w-[160px]">
+        <label class="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1.5 block">From Date</label>
+        <input type="date" name="from_date" value="{{ from_date }}"
+               class="input w-full rounded-xl border-ink-200 focus:border-brand-400 focus:outline-none text-sm bg-sand-50 focus:bg-white">
+      </div>
+
+      <div class="flex-1 min-w-[160px]">
+        <label class="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1.5 block">To Date</label>
+        <input type="date" name="to_date" value="{{ to_date }}"
+               class="input w-full rounded-xl border-ink-200 focus:border-brand-400 focus:outline-none text-sm bg-sand-50 focus:bg-white">
+      </div>
+
+      <div class="flex-1 min-w-[200px]">
+        <label class="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1.5 block">Ingredient</label>
+        <select name="ingredient"
+                class="select w-full rounded-xl border-ink-200 focus:border-brand-400 text-sm bg-sand-50 focus:bg-white focus:outline-none">
+          <option value="">— All Ingredients —</option>
+          {% for ing in ingredients %}
+          <option value="{{ ing.id }}" {% if selected_ingredient == ing.id|stringformat:"s" %}selected{% endif %}>
+            {{ ing.name }}{% if is_ceo %} ({{ ing.branch.name }}){% endif %}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button type="submit" class="btn bg-brand-600 hover:bg-brand-700 border-none text-white rounded-xl font-semibold normal-case">
+          Filter
+        </button>
+        <a href="{% url 'consumption_history' %}"
+           class="btn border border-ink-200 text-ink-600 hover:bg-ink-50 bg-white rounded-xl font-semibold normal-case">
+          Clear
+        </a>
+      </div>
+
+    </div>
+  </form>
+</div>
+
+<!-- Summary card -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+  <div class="bg-white rounded-2xl shadow-card border border-ink-100 p-5">
+    <p class="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1">Summary</p>
+    <div class="flex items-baseline gap-2 mt-3">
+      <span class="font-display font-bold text-3xl text-ink-900">{{ summary.total_records|default:0 }}</span>
+      <span class="text-sm text-ink-500">total records</span>
+    </div>
+    <div class="flex items-baseline gap-2 mt-2">
+      <span class="font-mono font-bold text-xl text-brand-700">{{ summary.total_consumption|default:0|floatformat:2 }}</span>
+      <span class="text-sm text-ink-500">units consumed</span>
+    </div>
+  </div>
+  <div class="bg-brand-50 rounded-2xl border border-brand-100 p-5 flex items-center">
+    <p class="text-xs text-brand-700">
+      Consumption records are automatically created when orders are marked as <strong>"Preparing"</strong>.
+      Ingredients are deducted from inventory based on product recipes.
+    </p>
+  </div>
+</div>
+
+<!-- Consumption table -->
+<div class="bg-white rounded-2xl shadow-card border border-ink-100 overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="bg-brand-50 text-brand-800 text-xs uppercase tracking-wider">
+          <th class="px-4 py-3 text-left font-bold w-10">#</th>
+          {% if is_ceo %}<th class="px-4 py-3 text-left font-bold">Branch</th>{% endif %}
+          <th class="px-4 py-3 text-left font-bold">Ingredient</th>
+          <th class="px-4 py-3 text-right font-bold">Qty Used</th>
+          <th class="px-4 py-3 text-left font-bold">Order</th>
+          <th class="px-4 py-3 text-left font-bold">Consumed By</th>
+          <th class="px-4 py-3 text-left font-bold">Date &amp; Time</th>
+          <th class="px-4 py-3 text-left font-bold">Notes</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-ink-100">
+        {% for consumption in consumptions_page %}
+        <tr class="hover:bg-sand-50 transition-colors">
+          <td class="px-4 py-3 text-ink-400 text-xs">{{ forloop.counter }}</td>
+          {% if is_ceo %}
+          <td class="px-4 py-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-brand-100 text-brand-800">
+              {{ consumption.ingredient.branch.name }}
+            </span>
+          </td>
+          {% endif %}
+          <td class="px-4 py-3 font-bold text-ink-900">{{ consumption.ingredient.name }}</td>
+          <td class="px-4 py-3 text-right">
+            <span class="font-mono font-bold text-ink-800">{{ consumption.quantity_used }}</span>
+            <span class="text-ink-400 text-xs ml-0.5">{{ consumption.ingredient.unit }}</span>
+          </td>
+          <td class="px-4 py-3">
+            {% if consumption.order %}
+            <a href="{% url 'order_detail' consumption.order.id %}"
+               class="font-mono text-xs text-brand-700 hover:underline font-semibold">
+              {{ consumption.order.reference }}
+            </a>
+            {% else %}
+            <span class="text-ink-400">—</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-3 text-ink-600 text-xs">{{ consumption.consumed_by.username|default:"—" }}</td>
+          <td class="px-4 py-3 text-xs text-ink-500">{{ consumption.consumed_at|date:"M d, Y H:i" }}</td>
+          <td class="px-4 py-3 text-xs text-ink-500">{{ consumption.notes|default:"—" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="{% if is_ceo %}8{% else %}7{% endif %}" class="px-4 py-12 text-center">
+            <div class="text-4xl mb-3">📋</div>
+            <p class="text-ink-400 text-sm">No consumption records found for the selected filters.</p>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if consumptions_page.has_other_pages %}
+  <div class="px-4 py-3 border-t border-ink-100">
+    {% include 'accounts/pagination.html' with page_obj=consumptions_page %}
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

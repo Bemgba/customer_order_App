@@ -1,0 +1,40 @@
+{% extends 'accounts/dashboard1_base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h5 class="mb-0">{{ action }} Category</h5>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'category_list' %}">← Back</a>
+</div>
+<hr>
+
+<div class="card card-body" style="max-width:500px">
+    <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="form-group">
+            <label><strong>Name</strong></label>
+            {{ form.name }}
+            {% if form.name.errors %}
+            <small class="text-danger">{{ form.name.errors|join:", " }}</small>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>Description <small class="text-muted">(optional)</small></label>
+            {{ form.description }}
+            {% if form.description.errors %}
+            <small class="text-danger">{{ form.description.errors|join:", " }}</small>
+            {% endif %}
+        </div>
+
+        <hr>
+        <a class="btn btn-secondary btn-sm" href="{% url 'category_list' %}">Cancel</a>
+        <button class="btn btn-primary btn-sm" type="submit">
+            {% if action == 'Add' %}Create Category{% else %}Save Changes{% endif %}
+        </button>
+    </form>
+</div>
+{% endblock %}

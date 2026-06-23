@@ -1,0 +1,175 @@
+{% extends 'accounts/dashboard1_base.html' %}
+
+{% block content %}
+
+<!-- Page header -->
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="font-display font-bold text-2xl text-ink-900">{{ customer.name }}</h1>
+    <p class="text-sm text-ink-500 mt-0.5">Customer Profile</p>
+  </div>
+  <a href="{% url 'menu' %}" class="btn bg-brand-600 hover:bg-brand-700 border-none text-white rounded-xl font-semibold normal-case">
+    + Place Order
+  </a>
+</div>
+
+<!-- Top info cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+
+  <!-- Actions card -->
+  <div class="bg-brand-900 rounded-2xl shadow-card p-6 flex flex-col gap-3 pattern-ankara">
+    <h2 class="font-display font-bold text-lg text-white">Customer Actions</h2>
+    <div class="border-t border-white/10"></div>
+    <a href="#" class="btn btn-sm border border-white/30 text-white bg-white/10 hover:bg-white/20 rounded-xl normal-case font-semibold">
+      Update Customer
+    </a>
+    <a href="{% url 'menu' %}" class="btn btn-sm bg-brand-500 hover:bg-brand-400 border-none text-white rounded-xl normal-case font-semibold">
+      Place New Order
+    </a>
+  </div>
+
+  <!-- Contact info card -->
+  <div class="bg-white rounded-2xl shadow-card border border-ink-100 p-6">
+    <h2 class="font-display font-bold text-lg text-ink-900 mb-4">Contact Information</h2>
+    <div class="space-y-2.5">
+      <div>
+        <span class="text-xs font-bold text-ink-500 uppercase tracking-wider">Name</span>
+        <p class="text-sm font-semibold text-ink-800 mt-0.5">{{ customer.name }}</p>
+      </div>
+      <div>
+        <span class="text-xs font-bold text-ink-500 uppercase tracking-wider">Email</span>
+        <p class="text-sm text-ink-700 mt-0.5">{{ customer.email|default:"—" }}</p>
+      </div>
+      <div>
+        <span class="text-xs font-bold text-ink-500 uppercase tracking-wider">Phone</span>
+        <p class="text-sm mt-0.5">
+          {% if customer.phone %}
+          <a href="tel:{{ customer.phone }}" class="text-brand-700 hover:underline font-semibold">{{ customer.phone }}</a>
+          {% else %}—{% endif %}
+        </p>
+      </div>
+      <div>
+        <span class="text-xs font-bold text-ink-500 uppercase tracking-wider">Branch</span>
+        <p class="text-sm text-ink-700 mt-0.5">{{ customer.branch|default:"—" }}</p>
+      </div>
+      {% if customer.address %}
+      <div>
+        <span class="text-xs font-bold text-ink-500 uppercase tracking-wider">Address</span>
+        <p class="text-sm text-ink-700 mt-0.5">
+          {{ customer.address }}{% if customer.lga %}, {{ customer.lga }}{% endif %}{% if customer.state %}, {{ customer.state }}{% endif %}
+        </p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Order count card -->
+  <div class="bg-brand-800 rounded-2xl shadow-card p-6 flex flex-col items-center justify-center text-center">
+    <p class="text-xs font-bold text-brand-200 uppercase tracking-wider mb-2">Total Orders</p>
+    <p class="font-display font-bold text-6xl text-white">{{ order_count }}</p>
+    <p class="text-brand-300 text-sm mt-2">lifetime orders</p>
+  </div>
+
+</div>
+
+<!-- Orders table -->
+<div class="flex items-center justify-between mb-3">
+  <h2 class="font-display font-bold text-xl text-ink-900">Orders</h2>
+  <span class="text-sm text-ink-500">{{ orders_page.paginator.count }} total</span>
+</div>
+
+<div class="bg-white rounded-2xl shadow-card border border-ink-100 overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="bg-brand-50 text-brand-800 text-xs uppercase tracking-wider">
+          <th class="px-4 py-3 text-left font-bold">Ref</th>
+          <th class="px-4 py-3 text-left font-bold">Items</th>
+          <th class="px-4 py-3 text-right font-bold">Total (₦)</th>
+          <th class="px-4 py-3 text-left font-bold">Payment</th>
+          <th class="px-4 py-3 text-left font-bold">Status</th>
+          <th class="px-4 py-3 text-left font-bold">Date</th>
+          <th class="px-4 py-3 text-left font-bold"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-ink-100">
+        {% for order in orders_page %}
+        <tr class="hover:bg-sand-50 transition-colors">
+          <td class="px-4 py-3">
+            <span class="font-mono font-bold text-ink-800 text-xs">{{ order.reference }}</span>
+          </td>
+          <td class="px-4 py-3">
+            <div class="flex flex-wrap gap-1">
+              {% for item in order.items.all %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-ink-100 text-ink-700">
+                {{ item.quantity }}× {{ item.product }}
+              </span>
+              {% endfor %}
+            </div>
+          </td>
+          <td class="px-4 py-3 text-right">
+            <span class="font-mono font-bold text-ink-800">
+              {% if order.payment %}₦{{ order.payment.amount|floatformat:2 }}{% else %}—{% endif %}
+            </span>
+          </td>
+          <td class="px-4 py-3">
+            {% if order.payment %}
+              {% if order.payment.status == 'Paid' %}
+                <span class="rail-pill fill-paid">Paid</span>
+              {% elif order.payment.status == 'Failed' %}
+                <span class="rail-pill fill-failed">Failed</span>
+              {% elif order.payment.status == 'Refunded' %}
+                <span class="rail-pill fill-refunded">Refunded</span>
+              {% else %}
+                <span class="rail-pill fill-pending">{{ order.payment.status }}</span>
+              {% endif %}
+            {% else %}—{% endif %}
+          </td>
+          <td class="px-4 py-3">
+            {% if order.status == 'Delivered' %}
+              <span class="rail-pill fill-delivered">{{ order.status }}</span>
+            {% elif order.status == 'Confirmed' %}
+              <span class="rail-pill fill-confirmed">{{ order.status }}</span>
+            {% elif order.status == 'Preparing' %}
+              <span class="rail-pill fill-preparing">{{ order.status }}</span>
+            {% elif order.status == 'Out for Delivery' %}
+              <span class="rail-pill fill-outfordel">{{ order.status }}</span>
+            {% elif order.status == 'Pending' %}
+              <span class="rail-pill fill-pending">{{ order.status }}</span>
+            {% elif order.status == 'Cancelled' %}
+              <span class="rail-pill fill-cancelled">{{ order.status }}</span>
+            {% else %}
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-ink-100 text-ink-600">{{ order.status }}</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-3 text-xs text-ink-500">{{ order.date_create|date:"d/m/Y H:i" }}</td>
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-1.5">
+              <a href="{% url 'order_detail' order.id %}"
+                 class="btn btn-xs border border-brand-300 text-brand-700 hover:bg-brand-50 bg-transparent rounded-lg normal-case font-semibold">
+                View
+              </a>
+              <a href="{% url 'delete_order' order.id %}"
+                 class="btn btn-xs border border-blossom-300 text-blossom-700 hover:bg-blossom-50 bg-transparent rounded-lg normal-case font-semibold">
+                Del
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="px-4 py-12 text-center text-ink-400 text-sm">No orders found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if orders_page.has_other_pages %}
+  <div class="px-4 py-3 border-t border-ink-100">
+    {% include 'accounts/pagination.html' with page_obj=orders_page %}
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

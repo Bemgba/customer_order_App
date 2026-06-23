@@ -1,0 +1,285 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Menu - {{ COMPANY_NAME }}</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#f8f8f8;color:#111827}
+.lift{transition:transform .15s,box-shadow .15s}
+.lift:hover{transform:translateY(-3px);box-shadow:0 12px 32px -8px rgba(0,0,0,.2)}
+.price-badge{position:absolute;bottom:5px;left:5px;background:rgba(6,78,59,.88);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;font-family:monospace;letter-spacing:-.2px}
+.add-btn{display:block;width:100%;padding:5px 0;border-radius:8px;background:#059669;color:#fff;font-size:11px;font-weight:800;border:none;cursor:pointer;transition:background .15s;text-align:center}
+.add-btn:hover{background:#047857}
+.cat-link{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;font-size:13px;font-weight:600;color:#374151;text-decoration:none;transition:all .15s;white-space:nowrap}
+.cat-link:hover{background:#ecfdf5;color:#065f46}
+.cat-link.active{background:#059669;color:#fff;font-weight:700}
+.prod-grid{display:grid;gap:10px}
+::-webkit-scrollbar{height:4px;width:4px}
+::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:999px}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header style="position:sticky;top:0;z-index:50;background:#fff;border-bottom:2px solid #fce7f3;box-shadow:0 2px 16px rgba(219,39,119,.08)">
+  <div style="max-width:1600px;margin:0 auto;padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+    <a href="{% url 'menu' %}" style="font-weight:800;font-size:18px;color:#065f46;text-decoration:none;letter-spacing:-.4px;white-space:nowrap">{{ COMPANY_NAME }}</a>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <a href="{% url 'order_track' %}" style="padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600;color:#374151;border:1.5px solid #e5e7eb;text-decoration:none;background:#fff">Track Order</a>
+      {% if user.is_authenticated %}
+        {% if user.profile.is_ceo or user.is_superuser or user.profile.roles.exists %}
+        <a href="{% url 'home' %}" style="padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;color:#065f46;border:1.5px solid #a7f3d0;text-decoration:none;background:#ecfdf5">Dashboard</a>
+        {% else %}
+        <a href="{% url 'my_orders' %}" style="padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;color:#065f46;border:1.5px solid #a7f3d0;text-decoration:none;background:#ecfdf5">My Orders</a>
+        {% endif %}
+        <a href="{% url 'logout' %}" style="padding:6px 10px;border-radius:999px;font-size:12px;font-weight:600;color:#6b7280;border:1.5px solid #e5e7eb;text-decoration:none;background:#fff">Logout</a>
+      {% else %}
+        <a href="{% url 'login' %}" style="padding:6px 14px;border-radius:999px;font-size:12px;font-weight:700;color:#fff;text-decoration:none;background:#db2777">Login</a>
+      {% endif %}
+      <a href="{% url 'cart_view' %}" style="display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:999px;font-weight:700;font-size:13px;color:#fff;text-decoration:none;background:#059669;box-shadow:0 2px 8px rgba(5,150,105,.3)">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 5h14.6"/></svg>
+        <span id="cart-badge" style="font-family:monospace;min-width:14px;text-align:center">{{ cart_count }}</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- MESSAGES -->
+{% if messages %}
+<div style="max-width:1600px;margin:0 auto;padding:12px 20px 0">
+  {% for msg in messages %}
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-radius:12px;font-size:13px;font-weight:600;margin-bottom:8px;border-width:1.5px;border-style:solid;{% if 'error' in msg.tags %}border-color:#fecdd3;background:#fff1f2;color:#be123c{% elif 'success' in msg.tags %}border-color:#a7f3d0;background:#ecfdf5;color:#065f46{% else %}border-color:#fed7aa;background:#fffbeb;color:#92400e{% endif %}">
+    <span>{{ msg }}</span>
+    <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;font-size:20px;opacity:.4;line-height:1;padding:0 0 0 12px">&times;</button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- HERO BANNER -->
+<div style="max-width:1600px;margin:0 auto;padding:16px 20px 8px">
+  <div style="border-radius:20px;background:linear-gradient(135deg,#064e3b 0%,#059669 50%,#db2777 100%);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;min-height:90px">
+    <div style="position:relative;z-index:1">
+      <h1 style="color:#fff;font-weight:800;font-size:22px;margin:0 0 5px;letter-spacing:-.5px">Fresh &amp; Delicious</h1>
+      <p style="color:rgba(255,255,255,.8);font-size:13px;margin:0;font-weight:500">Handcrafted meals, delivered with love. Order now!</p>
+    </div>
+    <a href="{% url 'cart_view' %}" style="position:relative;z-index:1;padding:10px 22px;background:#fff;color:#065f46;border-radius:12px;font-weight:800;font-size:13px;text-decoration:none;white-space:nowrap;flex-shrink:0">View Cart &rarr;</a>
+    <div style="position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.07)"></div>
+    <div style="position:absolute;right:20px;top:28px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.05)"></div>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT: sidebar + product grid -->
+<div style="max-width:1600px;margin:0 auto;padding:12px 20px 100px;display:flex;gap:20px;align-items:flex-start">
+
+  <!-- CATEGORY SIDEBAR (sticky, desktop only) -->
+  <aside id="cat-sidebar" style="width:200px;flex-shrink:0;position:sticky;top:72px;display:none">
+    <div style="background:#fff;border-radius:16px;border:1.5px solid #e5e7eb;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">
+      <p style="font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #f3f4f6">Categories</p>
+      <nav style="display:flex;flex-direction:column;gap:2px">
+        <a href="#all" class="cat-link active" onclick="setActive(this)">
+          <span style="width:8px;height:8px;border-radius:50%;background:#059669;flex-shrink:0;display:inline-block"></span>
+          All Items
+        </a>
+        {% for category, items in products_by_category.items %}
+        <a href="#cat-{{ forloop.counter }}" class="cat-link" onclick="setActive(this)">
+          <span style="width:8px;height:8px;border-radius:50%;background:#e5e7eb;flex-shrink:0;display:inline-block"></span>
+          {{ category }}
+          <span style="margin-left:auto;font-size:11px;font-weight:600;color:#9ca3af;background:#f3f4f6;padding:1px 7px;border-radius:20px">{{ items|length }}</span>
+        </a>
+        {% endfor %}
+      </nav>
+
+      <!-- Mini cart summary in sidebar -->
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid #f3f4f6">
+        <p style="font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Your Cart</p>
+        <p style="font-size:22px;font-weight:800;color:#111827;font-family:monospace;text-align:center;margin:4px 0 2px" id="sidebar-count">{{ cart_count }}</p>
+        <p style="font-size:12px;color:#6b7280;text-align:center;margin-bottom:10px">item{{ cart_count|pluralize }}</p>
+        <p style="font-size:15px;font-weight:800;color:#059669;font-family:monospace;text-align:center;margin-bottom:12px" id="sidebar-total">&#8358;{{ grand_total|floatformat:0 }}</p>
+        <a href="{% url 'cart_view' %}" style="display:block;width:100%;text-align:center;padding:9px 0;border-radius:10px;background:#059669;color:#fff;font-weight:700;font-size:13px;text-decoration:none">View Cart</a>
+        {% if cart_count > 0 %}
+        <a href="{% url 'checkout' %}" style="display:block;width:100%;text-align:center;padding:9px 0;border-radius:10px;background:#fff;color:#059669;font-weight:700;font-size:13px;text-decoration:none;border:1.5px solid #a7f3d0;margin-top:6px">Checkout</a>
+        {% endif %}
+      </div>
+    </div>
+  </aside>
+
+  <!-- PRODUCT SECTIONS -->
+  <main id="all" style="flex:1;min-width:0">
+
+    <!-- Mobile category pills (hidden on desktop) -->
+    <div id="mob-cats" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:10px;scrollbar-width:none">
+      <a href="#all" style="display:inline-flex;align-items:center;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:700;border:1.5px solid #059669;background:#ecfdf5;color:#065f46;text-decoration:none;white-space:nowrap;flex-shrink:0">All</a>
+      {% for category, items in products_by_category.items %}
+      <a href="#cat-{{ forloop.counter }}" style="display:inline-flex;align-items:center;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:700;border:1.5px solid #d1d5db;background:#fff;color:#374151;text-decoration:none;white-space:nowrap;flex-shrink:0">{{ category }}</a>
+      {% endfor %}
+    </div>
+
+    {% for category, items in products_by_category.items %}
+    <section id="cat-{{ forloop.counter }}" style="margin-bottom:28px;scroll-margin-top:76px">
+
+      <!-- Category heading -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <span style="width:4px;height:22px;border-radius:4px;background:#059669;flex-shrink:0;display:block"></span>
+        <h2 style="font-weight:800;font-size:15px;color:#111827;margin:0">{{ category }}</h2>
+        <span style="font-size:11px;font-weight:600;color:#6b7280;background:#f3f4f6;padding:2px 8px;border-radius:20px">{{ items|length }}</span>
+        <div style="flex:1;height:1px;background:#e5e7eb"></div>
+      </div>
+
+      <!-- 8-col grid (JS controls columns) -->
+      <div class="prod-grid" id="grid-{{ forloop.counter }}">
+        {% for product in items %}
+        <div class="lift" style="background:#fff;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;border:1px solid #f3f4f6;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+          <!-- Square image -->
+          <div style="position:relative;width:100%;padding-top:100%;overflow:hidden;background:linear-gradient(135deg,#fce7f3,#ecfdf5)">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .2s" onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'"/>
+            {% else %}
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2rem;background:linear-gradient(135deg,#fce7f3,#ecfdf5)">&#127869;</div>
+            {% endif %}
+            <span class="price-badge">&#8358;{% if product.price %}{{ product.price|floatformat:0 }}{% else %}-{% endif %}</span>
+          </div>
+          <!-- Name + Add button -->
+          <div style="padding:7px 7px 8px;display:flex;flex-direction:column;flex:1">
+            <p style="font-size:10.5px;font-weight:700;color:#1f2937;line-height:1.4;margin:0 0 6px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical" title="{{ product.name }}">{{ product.name }}</p>
+            <button class="add-btn" data-url="{% url 'cart_add' product.id %}">+ Add</button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+    </section>
+    {% empty %}
+    <div style="text-align:center;padding:80px 20px">
+      <p style="font-size:3rem;margin-bottom:12px">&#127869;</p>
+      <p style="font-size:16px;font-weight:700;color:#374151">No menu items available yet</p>
+      <p style="font-size:13px;color:#6b7280;margin-top:4px">Check back soon!</p>
+    </div>
+    {% endfor %}
+
+  </main>
+</div>
+
+<!-- MOBILE FLOATING CART -->
+<div id="mob-fab" style="position:fixed;bottom:16px;right:16px;z-index:100;display:{% if cart_count > 0 %}flex{% else %}none{% endif %}">
+  <a href="{% url 'cart_view' %}" style="display:flex;align-items:center;gap:8px;background:#059669;color:#fff;padding:12px 20px;border-radius:999px;font-weight:800;font-size:13px;text-decoration:none;box-shadow:0 8px 24px -4px rgba(5,150,105,.5)">
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 5h14.6"/></svg>
+    <span id="mob-count">{{ cart_count }}</span> item{{ cart_count|pluralize }}
+    &nbsp;&middot;&nbsp;
+    <span id="mob-total" style="font-family:monospace">&#8358;{{ grand_total|floatformat:0 }}</span>
+  </a>
+</div>
+
+<script>
+(function() {
+  // Show sidebar on desktop, hide on mobile
+  function layout() {
+    var sb = document.getElementById('cat-sidebar');
+    var mc = document.getElementById('mob-cats');
+    if (window.innerWidth >= 1024) {
+      sb.style.display = 'block';
+      mc.style.display = 'none';
+    } else {
+      sb.style.display = 'none';
+      mc.style.display = 'flex';
+    }
+  }
+  layout();
+  window.addEventListener('resize', layout);
+
+  // Responsive column count for product grid
+  function setCols() {
+    var w = window.innerWidth;
+    // with sidebar: effective width is narrower, so fewer cols on mid sizes
+    var hasSidebar = w >= 1024;
+    var c;
+    if (hasSidebar) {
+      c = w >= 1400 ? 8 : w >= 1200 ? 7 : w >= 1024 ? 6 : 5;
+    } else {
+      c = w >= 768 ? 6 : w >= 640 ? 4 : 3;
+    }
+    document.querySelectorAll('.prod-grid').forEach(function(g) {
+      g.style.gridTemplateColumns = 'repeat(' + c + ',minmax(0,1fr))';
+    });
+  }
+  setCols();
+  window.addEventListener('resize', setCols);
+
+  // Sidebar active state
+  window.setActive = function(el) {
+    document.querySelectorAll('.cat-link').forEach(function(a) {
+      a.classList.remove('active');
+      a.querySelector('span').style.background = '#e5e7eb';
+    });
+    el.classList.add('active');
+    el.querySelector('span').style.background = '#fff';
+  };
+
+  // Highlight active category on scroll
+  var sections = document.querySelectorAll('section[id^="cat-"]');
+  window.addEventListener('scroll', function() {
+    var scrollY = window.scrollY + 100;
+    sections.forEach(function(sec) {
+      var top = sec.offsetTop;
+      var bot = top + sec.offsetHeight;
+      if (scrollY >= top && scrollY < bot) {
+        var id = sec.getAttribute('id');
+        var link = document.querySelector('.cat-link[href="#' + id + '"]');
+        if (link) {
+          document.querySelectorAll('.cat-link').forEach(function(a) {
+            a.classList.remove('active');
+            a.querySelector('span').style.background = '#e5e7eb';
+          });
+          link.classList.add('active');
+          link.querySelector('span').style.background = '#fff';
+        }
+      }
+    });
+  });
+
+  // CSRF token helper
+  function csrf() {
+    var v = '; ' + document.cookie, p = v.split('; csrftoken=');
+    return p.length === 2 ? p.pop().split(';').shift() : '';
+  }
+
+  // Add to cart AJAX
+  document.querySelectorAll('.add-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var url = btn.dataset.url;
+      var orig = btn.textContent;
+      btn.textContent = 'Added!';
+      btn.disabled = true;
+      btn.style.background = '#047857';
+      fetch(url, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrf(), 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        var n = d.cart_count;
+        var tot = parseFloat(d.grand_total).toLocaleString('en-NG', {minimumFractionDigits:0});
+        document.getElementById('cart-badge').textContent = n;
+        var sc = document.getElementById('sidebar-count');
+        var st = document.getElementById('sidebar-total');
+        var mc = document.getElementById('mob-count');
+        var mt = document.getElementById('mob-total');
+        if (sc) sc.textContent = n;
+        if (st) st.textContent = '\u20a6' + tot;
+        if (mc) mc.textContent = n;
+        if (mt) mt.textContent = '\u20a6' + tot;
+        if (n > 0) document.getElementById('mob-fab').style.display = 'flex';
+        setTimeout(function() { btn.textContent = orig; btn.disabled = false; btn.style.background = '#059669'; }, 1400);
+      })
+      .catch(function() { btn.textContent = orig; btn.disabled = false; btn.style.background = '#059669'; });
+    });
+  });
+})();
+</script>
+</body>
+</html>

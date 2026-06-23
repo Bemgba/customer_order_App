@@ -1,0 +1,21 @@
+{% extends 'accounts/dashboard1_base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+        <div class="card card-body">
+            <h5>{{ action }} Branch</h5>
+            <hr>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <hr>
+                <a class="btn btn-secondary btn-sm" href="{% url 'branch_list' %}">Cancel</a>
+                <button class="btn btn-primary btn-sm" type="submit">{{ action }}</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-4"></div>
+</div>
+{% endblock %}

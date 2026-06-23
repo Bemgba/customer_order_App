@@ -1,0 +1,193 @@
+{% extends 'accounts/dashboard1_base.html' %}
+{% block title %}Order {{ order.reference }}{% endblock %}
+{% block content %}
+
+<!-- PAGE HEADER -->
+<div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:24px">
+  <div>
+    <a href="{% url 'view_all_orders' %}" style="display:inline-flex;align-items:center;gap:6px;color:#6b7280;font-size:13px;font-weight:600;text-decoration:none;margin-bottom:6px">&#8592; All Orders</a>
+    <h1 style="font-weight:800;font-size:22px;color:#111827;margin:0;letter-spacing:-.4px">Order <span style="font-family:monospace;color:#059669">{{ order.reference }}</span></h1>
+    <p style="font-size:13px;color:#9ca3af;margin:4px 0 0">{{ order.date_create|date:"d M Y, H:i" }}{% if order.branch %} &middot; {{ order.branch.name }}{% endif %}</p>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="padding:6px 14px;border-radius:999px;font-size:12px;font-weight:800;{% if order.status == 'Pending' %}background:#fff7ed;color:#92400e;border:1.5px solid #fed7aa{% elif order.status == 'Confirmed' %}background:#ecfdf5;color:#065f46;border:1.5px solid #a7f3d0{% elif order.status == 'Preparing' %}background:#eff6ff;color:#1e40af;border:1.5px solid #bfdbfe{% elif order.status == 'Out for Delivery' %}background:#f5f3ff;color:#5b21b6;border:1.5px solid #ddd6fe{% elif order.status == 'Delivered' %}background:#ecfdf5;color:#047857;border:1.5px solid #6ee7b7{% elif order.status == 'Cancelled' %}background:#fff1f2;color:#be123c;border:1.5px solid #fecdd3{% else %}background:#f3f4f6;color:#374151;border:1.5px solid #d1d5db{% endif %}">{{ order.status }}</span>
+    {% if order.payment %}<span style="padding:6px 14px;border-radius:999px;font-size:12px;font-weight:800;{% if order.payment.status == 'Paid' %}background:#ecfdf5;color:#065f46;border:1.5px solid #a7f3d0{% elif order.payment.status == 'Failed' %}background:#fff1f2;color:#be123c;border:1.5px solid #fecdd3{% else %}background:#fff7ed;color:#92400e;border:1.5px solid #fed7aa{% endif %}">{{ order.payment.status }}</span>{% endif %}
+    <a href="{% url 'delete_order' order.id %}" style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;color:#e11d48;border:1.5px solid #fecdd3;text-decoration:none;background:#fff1f2">Delete</a>
+  </div>
+</div>
+
+<!-- MAIN GRID -->
+<div style="display:grid;grid-template-columns:1fr;gap:20px" id="od-grid">
+ <div style="display:flex;flex-direction:column;gap:20px">
+  <!-- ITEMS -->
+  <div style="background:#fff;border-radius:18px;border:1.5px solid #e5e7eb;overflow:hidden;box-shadow:0 4px 20px -4px rgba(0,0,0,.1)">
+   <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:linear-gradient(to right,#ecfdf5,#fff);border-bottom:1px solid #e5e7eb">
+    <span style="font-weight:800;font-size:14px;color:#111827">Items Ordered</span>
+    <span style="font-size:12px;font-weight:600;color:#6b7280;background:#f3f4f6;padding:2px 10px;border-radius:20px">{{ order.items.count }} item{{ order.items.count|pluralize }}</span>
+   </div>
+   <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+     <thead><tr style="background:#f9fafb;color:#6b7280;font-size:11px;font-weight:800;text-transform:uppercase"><th style="text-align:left;padding:10px 20px">Product</th><th style="text-align:center;padding:10px 12px">Qty</th><th style="text-align:right;padding:10px 12px">Unit</th><th style="text-align:right;padding:10px 20px">Total</th></tr></thead>
+     <tbody>{% for item in order.items.all %}<tr style="border-top:1px solid #f3f4f6"><td style="padding:12px 20px;font-weight:600;color:#111827">{{ item.product }}</td><td style="padding:12px;text-align:center"><span style="background:#f3f4f6;color:#374151;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700">{{ item.quantity }}</span></td><td style="padding:12px;text-align:right;font-family:monospace;color:#6b7280">{{ item.unit_price|floatformat:2 }}</td><td style="padding:12px 20px;text-align:right;font-family:monospace;font-weight:800;color:#111827">{{ item.line_total|floatformat:2 }}</td></tr>{% endfor %}</tbody>
+     <tfoot><tr style="background:#ecfdf5;border-top:2px solid #a7f3d0"><td colspan="3" style="padding:14px 20px;text-align:right;font-weight:800;color:#374151">Grand Total</td><td style="padding:14px 20px;text-align:right;font-family:monospace;font-weight:800;font-size:17px;color:#059669">&#8358;{{ order.total_amount|floatformat:2 }}</td></tr></tfoot>
+    </table>
+   </div>
+  </div>
+  <!-- PAYMENT -->
+  {% if order.payment %}
+  <div style="background:#fff;border-radius:18px;border:1.5px solid #e5e7eb;overflow:hidden;box-shadow:0 4px 20px -4px rgba(0,0,0,.1)">
+   <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:linear-gradient(to right,#fff1f2,#fff);border-bottom:1px solid #e5e7eb">
+    <span style="font-weight:800;font-size:14px;color:#111827">Payment</span>
+    <span style="padding:4px 12px;border-radius:999px;font-size:11px;font-weight:800;{% if order.payment.status == 'Paid' %}background:#ecfdf5;color:#065f46;border:1.5px solid #a7f3d0{% elif order.payment.status == 'Failed' %}background:#fff1f2;color:#be123c;border:1.5px solid #fecdd3{% else %}background:#fff7ed;color:#92400e;border:1.5px solid #fed7aa{% endif %}">{{ order.payment.status }}</span>
+   </div>
+   <div style="padding:16px 20px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+     <div style="background:#f9fafb;border-radius:12px;padding:12px 14px;border:1px solid #f3f4f6"><p style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px">Method</p><p style="font-weight:700;font-size:14px;color:#111827;margin:0">{{ order.payment.method }}</p></div>
+     <div style="background:#f9fafb;border-radius:12px;padding:12px 14px;border:1px solid #f3f4f6"><p style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px">Amount</p><p style="font-weight:800;font-size:17px;color:#059669;font-family:monospace;margin:0">&#8358;{{ order.payment.amount|floatformat:2 }}</p></div>
+     {% if order.payment.paid_at %}<div style="background:#f9fafb;border-radius:12px;padding:12px 14px;border:1px solid #f3f4f6"><p style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px">Paid At</p><p style="font-weight:600;font-size:13px;color:#374151;margin:0">{{ order.payment.paid_at|date:"d/m/Y H:i" }}</p></div>
+     <div style="background:#f9fafb;border-radius:12px;padding:12px 14px;border:1px solid #f3f4f6"><p style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px">Confirmed By</p><p style="font-weight:600;font-size:13px;color:#374151;margin:0">{{ order.payment.paid_by|default:"&mdash;" }}</p></div>{% endif %}
+    </div>
+    {% if order.payment.payment_reference %}<div style="background:#ecfdf5;border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:8px"><span style="font-size:11px;font-weight:800;color:#065f46;text-transform:uppercase">Ref:</span><span style="font-family:monospace;font-weight:700;font-size:13px;color:#047857">{{ order.payment.payment_reference }}</span></div>{% endif %}
+    {% if order.payment.method == 'Cash on Delivery' %}<div style="background:#fffbeb;border:1.5px solid #fed7aa;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;flex-shrink:0;display:block"></span><p style="font-size:13px;color:#92400e;font-weight:600;margin:0">Cash on Delivery &mdash; payment collected on delivery.</p></div>{% endif %}
+   </div>
+   {% if order.payment.status != 'Paid' %}
+   <div style="border-top:2px dashed #e5e7eb;padding:16px 20px;background:#f9fafb">
+    <p style="font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin:0 0 12px">Update Payment Status</p>
+    <form method="POST" action="{% url 'update_payment_status' order.id %}" style="display:flex;flex-direction:column;gap:10px">
+     {% csrf_token %}
+     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <select name="payment_status" style="padding:9px 12px;border-radius:10px;border:1.5px solid #d1d5db;font-size:13px;font-weight:600;background:#fff;outline:none;color:#374151"><option value="">Select status</option><option value="Paid">Mark as Paid</option><option value="Failed">Mark as Failed</option><option value="Refunded">Mark as Refunded</option></select>
+      <input type="text" name="payment_reference" placeholder="Reference / Transaction ID" style="padding:9px 12px;border-radius:10px;border:1.5px solid #d1d5db;font-size:13px;background:#fff;outline:none;color:#374151"/>
+     </div>
+     <textarea name="payment_notes" rows="2" placeholder="Notes (optional)" style="padding:9px 12px;border-radius:10px;border:1.5px solid #d1d5db;font-size:13px;background:#fff;outline:none;resize:none;color:#374151"></textarea>
+     <button type="submit" style="padding:10px 20px;border-radius:10px;background:#059669;color:#fff;font-weight:800;font-size:13px;border:none;cursor:pointer;align-self:flex-start;box-shadow:0 2px 8px rgba(5,150,105,.3)">Update Payment</button>
+    </form>
+   </div>
+   {% endif %}
+  </div>
+  {% endif %}
+ </div>
+
+ <!-- RIGHT COLUMN -->
+ <div style="display:flex;flex-direction:column;gap:20px">
+  <!-- DELIVERY -->
+  <div style="background:#fff;border-radius:18px;border:1.5px solid #e5e7eb;overflow:hidden;box-shadow:0 4px 20px -4px rgba(0,0,0,.1)">
+   <div style="padding:14px 20px;background:linear-gradient(to right,#ecfdf5,#fff);border-bottom:1px solid #e5e7eb"><span style="font-weight:800;font-size:14px;color:#111827">Delivery Details</span></div>
+   <ul style="list-style:none;margin:0;padding:0">
+    <li style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #f3f4f6"><div><p style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin:0 0 2px">Name</p><p style="font-weight:700;font-size:14px;color:#111827;margin:0">{{ order.delivery_name }}</p></div></li>
+    <li style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #f3f4f6"><div><p style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin:0 0 2px">Phone</p><a href="tel:{{ order.delivery_phone }}" style="font-weight:700;font-size:14px;color:#059669;text-decoration:none">{{ order.delivery_phone }}</a></div></li>
+    {% if order.delivery_email %}<li style="display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #f3f4f6"><div><p style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin:0 0 2px">Email</p><p style="font-weight:600;font-size:13px;color:#374151;margin:0">{{ order.delivery_email }}</p></div></li>{% endif %}
+    <li style="display:flex;gap:12px;padding:12px 20px{% if order.notes %};border-bottom:1px solid #f3f4f6{% endif %}"><div><p style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin:0 0 2px">Address</p><p style="font-weight:600;font-size:13px;color:#374151;margin:0">{{ order.delivery_address }}{% if order.delivery_lga %}, {{ order.delivery_lga }}{% endif %}{% if order.delivery_state %}, {{ order.delivery_state }}{% endif %}</p></div></li>
+    {% if order.notes %}<li style="padding:12px 20px"><div style="background:#fffbeb;border:1.5px solid #fed7aa;border-radius:10px;padding:10px 14px"><p style="font-size:11px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.06em;margin:0 0 3px">Note</p><p style="font-size:13px;color:#78350f;margin:0">{{ order.notes }}</p></div></li>{% endif %}
+   </ul>
+  </div>
+  <!-- ORDER STATUS -->
+  <div style="background:#fff;border-radius:18px;border:1.5px solid #e5e7eb;overflow:hidden;box-shadow:0 4px 20px -4px rgba(0,0,0,.1)">
+   <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:linear-gradient(to right,#fffbeb,#fff);border-bottom:1px solid #e5e7eb">
+    <span style="font-weight:800;font-size:14px;color:#111827">Order Status</span>
+    <span style="padding:4px 12px;border-radius:999px;font-size:11px;font-weight:800;{% if order.status == 'Delivered' %}background:#ecfdf5;color:#047857;border:1.5px solid #6ee7b7{% elif order.status == 'Cancelled' %}background:#fff1f2;color:#be123c;border:1.5px solid #fecdd3{% else %}background:#f3f4f6;color:#374151;border:1.5px solid #d1d5db{% endif %}">{{ order.status }}</span>
+   </div>
+   <div style="padding:16px 20px">
+    {% if order.status != 'Delivered' and order.status != 'Cancelled' %}
+    <form method="POST" style="display:flex;flex-direction:column;gap:12px">
+     {% csrf_token %}
+     <div><label style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px">New Status</label>{{ form.status }}{% if form.status.errors %}<p style="color:#e11d48;font-size:12px;margin:4px 0 0">{{ form.status.errors.0 }}</p>{% endif %}</div>
+     <div><label style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px">Internal Notes</label>{{ form.notes }}</div>
+     {% if order.payment and order.payment.method != 'Cash on Delivery' and order.payment.status != 'Paid' %}<div style="background:#fffbeb;border:1.5px solid #fed7aa;border-radius:10px;padding:10px 14px;display:flex;gap:8px;align-items:flex-start"><p style="font-size:13px;color:#92400e;font-weight:600;margin:0">&#9888; Confirm payment before moving non-COD orders to Preparing.</p></div>{% endif %}
+     <button type="submit" style="padding:11px 0;border-radius:10px;background:#059669;color:#fff;font-weight:800;font-size:14px;border:none;cursor:pointer;box-shadow:0 2px 8px rgba(5,150,105,.3)">Update Status</button>
+    </form>
+    {% else %}
+    <div style="background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:10px;padding:12px 16px;display:flex;gap:8px;align-items:center"><p style="font-size:14px;font-weight:700;color:#065f46;margin:0">Order is <strong>{{ order.status }}</strong> &mdash; complete.</p></div>
+    {% endif %}
+   </div>
+  </div>
+  <!-- DELIVERY CONFIRMATION -->
+  {% if order.status == 'Out for Delivery' %}
+  <div style="background:#fff;border-radius:18px;border:2px solid #c4b5fd;overflow:hidden;box-shadow:0 4px 20px -4px rgba(109,40,217,.2)">
+   <div style="display:flex;align-items:center;gap:10px;padding:14px 20px;background:linear-gradient(to right,#f5f3ff,#fff);border-bottom:1px solid #ede9fe">
+    <span style="font-weight:800;font-size:14px;color:#4c1d95">Delivery Confirmation</span>
+   </div>
+   <div style="padding:16px 20px;display:flex;flex-direction:column;gap:10px">
+    <p style="font-size:13px;color:#6b7280;margin:0">Both dispatcher and customer must confirm. Order completes only when <strong>BOTH</strong> confirm.</p>
+    <div style="background:{% if order.dispatcher_confirmed %}#ecfdf5;border:1.5px solid #a7f3d0{% else %}#f9fafb;border:1.5px solid #e5e7eb{% endif %};border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+     <div style="display:flex;align-items:center;gap:10px"><span style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;{% if order.dispatcher_confirmed %}background:#059669{% else %}background:#fff;border:2px dashed #d1d5db{% endif %}">{% if order.dispatcher_confirmed %}<svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>{% endif %}</span><div><p style="font-weight:700;font-size:13px;color:#111827;margin:0">Dispatcher</p>{% if order.dispatcher_confirmed %}<p style="font-size:12px;color:#059669;font-weight:600;margin:0">&#10003; Confirmed {{ order.dispatcher_confirmed_at|date:"d/m H:i" }}{% if order.dispatcher_confirmed_by %} &middot; {{ order.dispatcher_confirmed_by.username }}{% endif %}</p>{% else %}<p style="font-size:12px;color:#9ca3af;margin:0">Awaiting confirmation</p>{% endif %}</div></div>
+     {% if not order.dispatcher_confirmed %}<form method="POST" action="{% url 'confirm_delivery_dispatcher' order.id %}">{% csrf_token %}<button type="submit" onclick="return confirm('Confirm delivery?')" style="padding:8px 16px;border-radius:10px;background:#059669;color:#fff;font-weight:800;font-size:12px;border:none;cursor:pointer">Confirm</button></form>{% endif %}
+    </div>
+    <div style="background:{% if order.customer_confirmed %}#ecfdf5;border:1.5px solid #a7f3d0{% else %}#f9fafb;border:1.5px solid #e5e7eb{% endif %};border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+     <div style="display:flex;align-items:center;gap:10px"><span style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;{% if order.customer_confirmed %}background:#059669{% else %}background:#fff;border:2px dashed #d1d5db{% endif %}">{% if order.customer_confirmed %}<svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>{% endif %}</span><div><p style="font-weight:700;font-size:13px;color:#111827;margin:0">Customer</p>{% if order.customer_confirmed %}<p style="font-size:12px;color:#059669;font-weight:600;margin:0">&#10003; Confirmed {{ order.customer_confirmed_at|date:"d/m H:i" }}</p>{% else %}<p style="font-size:12px;color:#9ca3af;margin:0">Waiting for customer</p>{% endif %}</div></div>
+     {% if order.customer_confirmed %}<span style="font-size:11px;font-weight:800;color:#059669;background:#ecfdf5;border:1.5px solid #a7f3d0;padding:3px 10px;border-radius:999px">&#10003;</span>{% else %}<span style="font-size:11px;font-weight:800;color:#92400e;background:#fff7ed;border:1.5px solid #fed7aa;padding:3px 10px;border-radius:999px">Pending</span>{% endif %}
+    </div>
+    {% if order.is_fully_delivered %}<div style="background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:10px;padding:10px 16px;display:flex;gap:8px;align-items:center"><p style="font-size:13px;font-weight:700;color:#065f46;margin:0">&#10003; Both confirmed &mdash; order completing!</p></div>{% endif %}
+    {% if order.payment and order.payment.method == 'Cash on Delivery' and not order.is_fully_delivered %}<div style="background:#fffbeb;border:1.5px solid #fed7aa;border-radius:10px;padding:10px 16px;display:flex;gap:8px;align-items:center"><span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;flex-shrink:0;display:block"></span><p style="font-size:13px;font-weight:700;color:#92400e;margin:0">Collect <span style="font-family:monospace">&#8358;{{ order.payment.amount|floatformat:2 }}</span> cash first.</p></div>{% endif %}
+   </div>
+  </div>
+  {% endif %}
+  <!-- ASSIGN DISPATCHER -->
+  {% if can_assign_dispatcher and order.status in 'Pending,Confirmed,Preparing' %}
+  <div style="background:#fff;border-radius:18px;border:1.5px solid #ede9fe;overflow:hidden;box-shadow:0 4px 20px -4px rgba(0,0,0,.1)">
+   <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:linear-gradient(to right,#f5f3ff,#fff);border-bottom:1px solid #ede9fe;flex-wrap:wrap;gap:8px">
+    <span style="font-weight:800;font-size:14px;color:#111827">Assign Dispatcher</span>
+    {% if current_assignment %}<span style="padding:4px 12px;border-radius:999px;font-size:11px;font-weight:800;background:#ecfdf5;color:#065f46;border:1.5px solid #a7f3d0">Assigned: {{ current_assignment.dispatcher.get_full_name|default:current_assignment.dispatcher.username }}</span>
+    {% else %}<span style="padding:4px 12px;border-radius:999px;font-size:11px;font-weight:800;background:#fff7ed;color:#92400e;border:1.5px solid #fed7aa">Unassigned</span>{% endif %}
+   </div>
+   <div style="padding:16px 20px">
+    {% if current_assignment %}
+    <div style="background:#f9fafb;border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:16px;border:1px solid #f3f4f6">
+     <div><p style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin:0 0 3px">Dispatcher</p><p style="font-weight:700;font-size:14px;color:#111827;margin:0">{{ current_assignment.dispatcher.get_full_name|default:current_assignment.dispatcher.username }}</p></div>
+     <div><p style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin:0 0 3px">Assigned By</p><p style="font-weight:600;font-size:13px;color:#374151;margin:0">{{ current_assignment.assigned_by.username|default:"&mdash;" }}</p></div>
+     <div><p style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin:0 0 3px">Assigned At</p><p style="font-weight:600;font-size:13px;color:#374151;margin:0">{{ current_assignment.assigned_at|date:"d/m/Y H:i" }}</p></div>
+    </div>
+    {% endif %}
+    {% if available_dispatchers %}
+    <form method="POST" action="{% url 'assign_dispatcher' order.id %}" style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px">
+     {% csrf_token %}
+     <div style="flex:1;min-width:200px">
+      <label style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:6px">{% if current_assignment %}Reassign to{% else %}Select Dispatcher{% endif %}</label>
+      <select name="dispatcher_id" style="width:100%;padding:9px 12px;border-radius:10px;border:1.5px solid #d1d5db;font-size:13px;font-weight:600;background:#fff;outline:none;color:#374151">
+       <option value="">Select dispatcher</option>
+       {% for d in available_dispatchers %}<option value="{{ d.id }}" {% if current_assignment and current_assignment.dispatcher_id == d.id %}selected{% endif %}>{{ d.get_full_name|default:d.username }} ({{ d.username }})</option>{% endfor %}
+      </select>
+     </div>
+     <button type="submit" style="padding:10px 22px;border-radius:10px;background:#7c3aed;color:#fff;font-weight:800;font-size:13px;border:none;cursor:pointer;white-space:nowrap;box-shadow:0 2px 8px rgba(124,58,237,.3)">{% if current_assignment %}Reassign{% else %}Assign Dispatcher{% endif %}</button>
+    </form>
+    {% else %}
+    <div style="background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:10px;padding:12px 16px"><p style="font-size:13px;color:#6b7280;margin:0">No dispatchers available for this branch. Create a staff user with the Dispatcher role.</p></div>
+    {% endif %}
+   </div>
+  </div>
+  {% endif %}
+ </div>
+</div>
+
+<!-- TRACKING HISTORY -->
+{% if tracking_history %}
+<div style="margin-top:24px;background:#fff;border-radius:18px;border:1.5px solid #e5e7eb;overflow:hidden;box-shadow:0 4px 20px -4px rgba(0,0,0,.1)">
+ <div style="padding:14px 20px;background:linear-gradient(to right,#f9fafb,#fff);border-bottom:1px solid #e5e7eb"><span style="font-weight:800;font-size:14px;color:#111827">Order Tracking History</span></div>
+ <div style="padding:20px 24px">
+  <ol style="list-style:none;margin:0;padding:0;border-left:2px solid #e5e7eb;padding-left:20px">
+   {% for track in tracking_history %}
+   <li style="margin-bottom:24px;position:relative">
+    <span style="position:absolute;left:-29px;top:0;width:16px;height:16px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;{% if track.status == 'Delivered' %}background:#059669{% elif track.status == 'Cancelled' %}background:#e11d48{% elif track.status == 'Out for Delivery' %}background:#7c3aed{% elif track.status == 'Preparing' %}background:#2563eb{% elif track.status == 'Confirmed' %}background:#059669{% else %}background:#9ca3af{% endif %}"></span>
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:8px">
+     <div><span style="display:inline-block;padding:3px 12px;border-radius:999px;font-size:11px;font-weight:800;{% if track.status == 'Delivered' %}background:#ecfdf5;color:#047857{% elif track.status == 'Cancelled' %}background:#fff1f2;color:#be123c{% elif track.status == 'Out for Delivery' %}background:#f5f3ff;color:#5b21b6{% elif track.status == 'Preparing' %}background:#eff6ff;color:#1e40af{% elif track.status == 'Confirmed' %}background:#ecfdf5;color:#065f46{% else %}background:#f3f4f6;color:#374151{% endif %}">{{ track.status }}</span>{% if track.remark %}<p style="font-size:13px;color:#4b5563;margin:6px 0 0">{{ track.remark }}</p>{% endif %}<p style="font-size:12px;color:#9ca3af;margin:4px 0 0">By <strong style="color:#4b5563">{{ track.updated_by.username|default:"System" }}</strong></p></div>
+     <time style="font-family:monospace;font-size:12px;color:#9ca3af;background:#f3f4f6;padding:3px 10px;border-radius:8px;white-space:nowrap">{{ track.created_at|date:"d/m/Y H:i" }}</time>
+    </div>
+   </li>
+   {% endfor %}
+  </ol>
+ </div>
+</div>
+{% endif %}
+
+<script>
+(function(){
+ function layout(){
+  var g=document.getElementById('od-grid');
+  if(!g) return;
+  g.style.gridTemplateColumns = window.innerWidth>=1024 ? '3fr 2fr' : '1fr';
+ }
+ layout();
+ window.addEventListener('resize',layout);
+})();
+</script>
+{% endblock %}

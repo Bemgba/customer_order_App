@@ -1,0 +1,267 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout — {{ COMPANY_NAME }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{brand:{50:'#ECFDF5',100:'#D1FAE5',200:'#A7F3D0',300:'#6EE7B7',400:'#34D399',500:'#10B981',600:'#059669',700:'#047857',800:'#065F46',900:'#064E3B',950:'#022C22'},blossom:{50:'#FFF1F2',100:'#FFE4E6',200:'#FECDD3',300:'#FDA4AF',400:'#FB7185',500:'#F43F5E',600:'#E11D48',700:'#BE123C',800:'#9F1239',900:'#881337'},pepper:{50:'#FFF1F2',500:'#EF4444',600:'#DC2626',700:'#B91C1C'},gold:{50:'#FFFBEB',100:'#FEF3C7',300:'#FCD34D',500:'#F59E0B',700:'#B45309',900:'#78350F'},ink:{50:'#F9FAFB',100:'#F3F4F6',200:'#E5E7EB',300:'#D1D5DB',400:'#9CA3AF',500:'#6B7280',600:'#4B5563',700:'#374151',800:'#1F2937',900:'#111827'},sand:{50:'#FAF9F7',100:'#F5F3EF',200:'#ECE9E2'}},fontFamily:{display:['"Space Grotesk"','sans-serif'],body:['"Plus Jakarta Sans"','sans-serif'],mono:['"JetBrains Mono"','monospace']},boxShadow:{card:'0 1px 3px rgba(0,0,0,.07),0 10px 28px -14px rgba(0,0,0,.14)',pop:'0 8px 30px -8px rgba(5,46,22,.25)'}}}}</script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/fv.css' %}"/>
+</head>
+<body class="font-body text-ink-900 bg-sand-50 min-h-screen">
+
+<!-- Navbar -->
+<header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-ink-100 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+    <a href="{% url 'menu' %}" class="font-display font-bold text-xl text-brand-800 shrink-0">{{ COMPANY_NAME }}<span class="text-blossom-500">.</span></a>
+    <nav class="flex items-center gap-1 sm:gap-2">
+      <a href="{% url 'menu' %}" class="text-sm font-semibold text-ink-600 hover:text-brand-700 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition">Menu</a>
+      <a href="{% url 'cart_view' %}" class="relative btn btn-sm bg-brand-600 hover:bg-brand-700 text-white border-0 rounded-xl normal-case font-bold shadow-pop ml-1">
+        🛒 Cart{% if cart_count %} ({{ cart_count }}){% endif %}
+      </a>
+    </nav>
+  </div>
+</header>
+
+{% if messages %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 mt-4 space-y-2">
+  {% for msg in messages %}
+  <div class="alert {% if 'error' in msg.tags %}bg-blossom-50 border-blossom-200 text-blossom-800{% elif 'success' in msg.tags %}bg-brand-50 border-brand-200 text-brand-800{% else %}bg-gold-50 border-gold-200 text-gold-900{% endif %} border rounded-xl py-3 px-4 text-sm font-medium flex items-center justify-between">
+    <span>{{ msg }}</span>
+    <button onclick="this.parentElement.remove()" class="ml-4 opacity-50 hover:opacity-100">✕</button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+  <h1 class="font-display font-bold text-2xl text-ink-900 mb-6">Checkout</h1>
+
+  <form method="POST" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    {% csrf_token %}
+    <!-- Hidden confirmation field — set to 1 when customer confirms existing account -->
+    <input type="hidden" name="account_confirmed" id="account_confirmed" value="0"/>
+
+    <!-- EXISTING ACCOUNT NOTIFICATION BANNER -->
+    {% if existing_account %}
+    <div class="lg:col-span-3">
+      <div style="background:#fff7ed;border:2px solid #fed7aa;border-radius:16px;padding:20px 24px">
+        <div style="display:flex;align-items:flex-start;gap:14px">
+          <div style="width:40px;height:40px;border-radius:50%;background:#fff;border:2px solid #fdba74;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">👤</div>
+          <div style="flex:1">
+            <h3 style="font-weight:800;font-size:15px;color:#92400e;margin:0 0 6px">We found an existing account</h3>
+            <p style="font-size:13px;color:#78350f;margin:0 0 4px">
+              The details you entered match an account registered as
+              <strong>{{ existing_account.name }}</strong>
+              {% if existing_account.email %}({{ existing_account.email }}){% endif %}
+              {% if existing_account.phone %}&middot; {{ existing_account.phone }}{% endif %}.
+            </p>
+            <p style="font-size:13px;color:#92400e;margin:0 0 14px">
+              Your order will be placed under this existing account. Click <strong>Confirm &amp; Place Order</strong> to proceed, or change your email/phone to use a different account.
+            </p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button type="button" onclick="document.getElementById('account_confirmed').value='1';this.form.submit();"
+                      style="padding:10px 22px;border-radius:10px;background:#059669;color:#fff;font-weight:800;font-size:13px;border:none;cursor:pointer;box-shadow:0 2px 8px rgba(5,150,105,.3)">
+                Confirm &amp; Place Order
+              </button>
+              <button type="button" onclick="document.getElementById('account_confirmed').value='0';"
+                      style="padding:10px 18px;border-radius:10px;background:#fff;color:#92400e;font-weight:700;font-size:13px;border:2px solid #fdba74;cursor:pointer">
+                Use Different Details
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- LEFT: Delivery & Payment -->
+    <div class="lg:col-span-2 space-y-6">
+
+      <!-- Delivery Info -->
+      <div class="bg-white rounded-2xl border border-ink-200 shadow-card p-6">
+        <h2 class="font-display font-bold text-lg text-ink-900 mb-5">Delivery Information</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          <!-- Name -->
+          <div>
+            <label class="block text-sm font-semibold text-ink-700 mb-1">Full Name</label>
+            {{ form.delivery_name }}
+            {% if form.delivery_name.errors %}
+            <p class="text-xs text-blossom-600 mt-1">{{ form.delivery_name.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Phone -->
+          <div>
+            <label class="block text-sm font-semibold text-ink-700 mb-1">Phone Number</label>
+            {{ form.delivery_phone }}
+            {% if form.delivery_phone.errors %}
+            <p class="text-xs text-blossom-600 mt-1">{{ form.delivery_phone.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Email -->
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-semibold text-ink-700 mb-1">Email Address</label>
+            {{ form.delivery_email }}
+            {% if form.delivery_email.errors %}
+            <p class="text-xs text-blossom-600 mt-1">{{ form.delivery_email.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <!-- State -->
+          <div>
+            <label class="block text-sm font-semibold text-ink-700 mb-1">State</label>
+            <select name="delivery_state" id="id_delivery_state" class="select select-bordered w-full rounded-xl border-ink-200 text-sm focus:border-brand-500 focus:outline-none">
+              <option value="">— Select State —</option>
+              {% for value, label in form.delivery_state.field.choices %}
+              <option value="{{ value }}" {% if form.delivery_state.value == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+            {% if form.delivery_state.errors %}
+            <p class="text-xs text-blossom-600 mt-1">{{ form.delivery_state.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <!-- LGA -->
+          <div>
+            <label class="block text-sm font-semibold text-ink-700 mb-1">LGA</label>
+            <select name="delivery_lga" id="id_delivery_lga" class="select select-bordered w-full rounded-xl border-ink-200 text-sm focus:border-brand-500 focus:outline-none">
+              <option value="">— Select LGA —</option>
+              {% for value, label in form.delivery_lga.field.choices %}
+              <option value="{{ value }}" {% if form.delivery_lga.value == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+            {% if form.delivery_lga.errors %}
+            <p class="text-xs text-blossom-600 mt-1">{{ form.delivery_lga.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Address -->
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-semibold text-ink-700 mb-1">Delivery Address</label>
+            {{ form.delivery_address }}
+            {% if form.delivery_address.errors %}
+            <p class="text-xs text-blossom-600 mt-1">{{ form.delivery_address.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Notes -->
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-semibold text-ink-700 mb-1">Order Notes <span class="text-ink-400 font-normal">(optional)</span></label>
+            {{ form.notes }}
+            {% if form.notes.errors %}
+            <p class="text-xs text-blossom-600 mt-1">{{ form.notes.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Payment Method -->
+      <div class="bg-white rounded-2xl border border-ink-200 shadow-card p-6">
+        <h2 class="font-display font-bold text-lg text-ink-900 mb-5">Payment Method</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+
+          <!-- Cash on Delivery -->
+          <label class="cursor-pointer">
+            <input type="radio" name="payment_method" value="Cash on Delivery" class="sr-only peer" {% if form.payment_method.value == 'Cash on Delivery' or not form.payment_method.value %}checked{% endif %}/>
+            <div class="peer-checked:border-brand-500 peer-checked:bg-brand-50 border-2 border-ink-200 rounded-2xl p-4 text-center transition hover:border-brand-300 hover:bg-brand-50/50">
+              <div class="text-3xl mb-2">💵</div>
+              <p class="text-xs font-bold text-ink-700">Cash on Delivery</p>
+            </div>
+          </label>
+
+          <!-- Bank Transfer -->
+          <label class="cursor-pointer">
+            <input type="radio" name="payment_method" value="Bank Transfer" class="sr-only peer" {% if form.payment_method.value == 'Bank Transfer' %}checked{% endif %}/>
+            <div class="peer-checked:border-brand-500 peer-checked:bg-brand-50 border-2 border-ink-200 rounded-2xl p-4 text-center transition hover:border-brand-300 hover:bg-brand-50/50">
+              <div class="text-3xl mb-2">🏦</div>
+              <p class="text-xs font-bold text-ink-700">Bank Transfer</p>
+            </div>
+          </label>
+
+          <!-- Card -->
+          <label class="cursor-pointer">
+            <input type="radio" name="payment_method" value="Card" class="sr-only peer" {% if form.payment_method.value == 'Card' %}checked{% endif %}/>
+            <div class="peer-checked:border-brand-500 peer-checked:bg-brand-50 border-2 border-ink-200 rounded-2xl p-4 text-center transition hover:border-brand-300 hover:bg-brand-50/50">
+              <div class="text-3xl mb-2">💳</div>
+              <p class="text-xs font-bold text-ink-700">Card</p>
+            </div>
+          </label>
+
+          <!-- Mobile Money -->
+          <label class="cursor-pointer">
+            <input type="radio" name="payment_method" value="Mobile Money" class="sr-only peer" {% if form.payment_method.value == 'Mobile Money' %}checked{% endif %}/>
+            <div class="peer-checked:border-brand-500 peer-checked:bg-brand-50 border-2 border-ink-200 rounded-2xl p-4 text-center transition hover:border-brand-300 hover:bg-brand-50/50">
+              <div class="text-3xl mb-2">📱</div>
+              <p class="text-xs font-bold text-ink-700">Mobile Money</p>
+            </div>
+          </label>
+
+        </div>
+        {% if form.payment_method.errors %}
+        <p class="text-xs text-blossom-600 mt-2">{{ form.payment_method.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Sticky Order Summary -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-2xl border border-ink-200 shadow-card p-6 lg:sticky lg:top-24">
+        <h2 class="font-display font-bold text-lg text-ink-900 mb-4">Order Summary</h2>
+        <div class="space-y-2 mb-4">
+          {% for item in cart_items %}
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-ink-700 font-medium">{{ item.product.name }} <span class="text-ink-400">×{{ item.qty }}</span></span>
+            <span class="font-mono text-ink-800">₦{{ item.line_total|floatformat:2 }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="border-t border-ink-200 pt-3 flex items-center justify-between mb-6">
+          <span class="font-display font-bold text-ink-900">Total</span>
+          <span class="font-mono font-bold text-xl text-brand-700">₦{{ grand_total|floatformat:2 }}</span>
+        </div>
+        <button type="submit" class="btn bg-brand-600 hover:bg-brand-700 text-white border-0 rounded-xl normal-case font-bold shadow-pop w-full text-base">
+          Place Order — <span class="font-mono">₦{{ grand_total|floatformat:2 }}</span>
+        </button>
+        <a href="{% url 'cart_view' %}" class="block text-center text-sm text-ink-400 hover:text-brand-600 mt-3 font-medium transition">← Edit Cart</a>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<script>
+  // AJAX LGA loader
+  const stateSelect = document.getElementById('id_delivery_state');
+  const lgaSelect = document.getElementById('id_delivery_lga');
+
+  if (stateSelect && lgaSelect) {
+    stateSelect.addEventListener('change', function() {
+      const stateId = this.value;
+      if (!stateId) {
+        lgaSelect.innerHTML = '<option value="">— Select LGA —</option>';
+        return;
+      }
+      fetch("{% url 'load_lgas' %}?state_id=" + stateId)
+        .then(res => res.json())
+        .then(data => {
+          lgaSelect.innerHTML = '<option value="">— Select LGA —</option>';
+          data.forEach(lga => {
+            const opt = document.createElement('option');
+            opt.value = lga.id;
+            opt.textContent = lga.name;
+            lgaSelect.appendChild(opt);
+          });
+        })
+        .catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>

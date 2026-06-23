@@ -1,0 +1,62 @@
+#pdf download
+def generate_pdf_response(filename):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{filename}.pdf"'
+    return response
+
+def delivered_orders_pdf(request):
+    response = generate_pdf_response("delivered_orders")
+    p = canvas.Canvas(response, pagesize=letter)
+    p.setTitle("Delivered Orders")
+
+    # Header
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(100, 750, "Delivered Orders Report")
+
+    # Table header
+    p.setFont("Helvetica-Bold", 12)
+    p.drawString(30, 720, "Customer")
+    p.drawString(200, 720, "Product")
+    p.drawString(370, 720, "Date Created")
+
+    # Table data
+    y = 700
+    orders = Order.objects.filter(status='Delivered')
+    for order in orders:
+        p.setFont("Helvetica", 12)
+        p.drawString(30, y, str(order.customer))
+        p.drawString(200, y, str(order.product))
+        p.drawString(370, y, str(order.date_create))
+        y -= 20
+
+    p.showPage()
+    p.save()
+    return response
+
+def customer_delivered_orders_pdf(request, pk_test):
+    customer = get_object_or_404(Customer, id=pk_test)
+    response = generate_pdf_response(f"{customer.name}_delivered_orders")
+    p = canvas.Canvas(response, pagesize=letter)
+    p.setTitle(f"{customer.name} Delivered Orders Report")
+
+    # Header
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(100, 750, f"Delivered Orders for {customer.name}")
+
+    # Table header
+    p.setFont("Helvetica-Bold", 12)
+    p.drawString(30, 720, "Product")
+    p.drawString(200, 720, "Date Created")
+
+    # Table data
+    y = 700
+    orders = customer.order_set.filter(status='Delivered')
+    for order in orders:
+        p.setFont("Helvetica", 12)
+        p.drawString(30, y, str(order.product))
+        p.drawString(200, y, str(order.date_create))
+        y -= 20
+
+    p.showPage()
+    p.save()
+    return response

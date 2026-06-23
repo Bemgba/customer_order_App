@@ -1,0 +1,51 @@
+{% extends 'accounts/dashboard1_base.html' %}
+
+{% block content %}
+<h5>Branch Management <small class="text-muted">– CEO View</small></h5>
+<a class="btn btn-success btn-sm mb-3" href="{% url 'create_branch' %}">
+    <i class="fa fa-plus-circle"></i> Add New Branch
+</a>
+<hr>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-body">
+            <table class="table table-bordered table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Branch Name</th>
+                        <th>Location</th>
+                        <th>Phone</th>
+                        <th>Manager</th>
+                        <th>Total Orders</th>
+                        <th>Total Customers</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for branch in branches %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><strong>{{ branch.name }}</strong></td>
+                        <td>{{ branch.location|default:"—" }}</td>
+                        <td>{{ branch.phone|default:"—" }}</td>
+                        <td>{{ branch.manager.username|default:"Unassigned" }}</td>
+                        <td>{{ branch.order_count }}</td>
+                        <td>{{ branch.customer_count }}</td>
+                        <td>
+                            <a class="btn btn-warning btn-sm" href="{% url 'update_branch' branch.id %}">Edit</a>
+                            <a class="btn btn-danger btn-sm" href="{% url 'delete_branch' branch.id %}">Delete</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">No branches created yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

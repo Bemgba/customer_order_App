@@ -1,0 +1,157 @@
+{% extends 'accounts/dashboard1_base.html' %}
+
+{% block content %}
+
+<!-- Page header -->
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="font-display font-bold text-2xl text-ink-900">
+      {{ action }} Staff User
+    </h1>
+    {% if target_user %}
+    <p class="text-sm text-ink-500 mt-0.5">{{ target_user.username }}</p>
+    {% endif %}
+  </div>
+  <a href="{% url 'user_list' %}"
+     class="btn btn-sm border border-ink-200 text-ink-600 hover:bg-ink-50 bg-white rounded-xl normal-case font-semibold">
+    ← Back to Users
+  </a>
+</div>
+
+<div class="max-w-2xl mx-auto">
+  <div class="bg-white rounded-2xl shadow-card border border-ink-100 p-6 md:p-8">
+
+    <!-- Non-field errors -->
+    {% if form.non_field_errors %}
+    <div class="bg-blossom-50 border border-blossom-200 text-blossom-800 rounded-xl px-4 py-3 text-sm mb-5">
+      {{ form.non_field_errors }}
+    </div>
+    {% endif %}
+
+    <!-- Field errors summary -->
+    {% if form.errors %}
+    <div class="bg-gold-50 border border-gold-200 text-gold-900 rounded-xl px-4 py-3 text-sm mb-5">
+      <p class="font-bold mb-1">Please correct the following errors:</p>
+      <ul class="list-disc list-inside space-y-0.5">
+        {% for field, errors in form.errors.items %}
+          {% for error in errors %}
+          <li>{{ field|title }}: {{ error }}</li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <form method="POST" class="space-y-6">
+      {% csrf_token %}
+
+      <!-- ===== CREATE: User fields ===== -->
+      {% if action == 'Create' %}
+      <div>
+        <h2 class="font-display font-bold text-lg text-ink-900 mb-4">Account Details</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+          <!-- Left column -->
+          <div class="space-y-4">
+            <div>
+              <label class="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1.5 block">Username</label>
+              {{ form.username }}
+              {% if form.username.errors %}
+              <p class="text-xs text-blossom-600 mt-1">{{ form.username.errors }}</p>
+              {% endif %}
+            </div>
+            <div>
+              <label class="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1.5 block">Email</label>
+              {{ form.email }}
+              {% if form.email.errors %}
+              <p class="text-xs text-blossom-600 mt-1">{{ form.email.errors.0 }}</p>
+              {% endif %}
+            </div>
+            <div>
+              <label class="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1.5 block">First Name</label>
+              {{ form.first_name }}
+            </div>
+            <div>
+              <label class="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1.5 block">Last Name</label>
+              {{ form.last_name }}
+            </div>
+          </div>
+
+          <!-- Right column: passwords -->
+          <div class="space-y-4">
+            <div>
+              <label class="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1.5 block">Password</label>
+              {{ form.password1 }}
+              {% if form.password1.errors %}
+              <p class="text-xs text-blossom-600 mt-1">{{ form.password1.errors.0 }}</p>
+              {% endif %}
+              <p class="text-xs text-ink-400 mt-1.5">
+                Use a strong password that is NOT similar to username, email, or name. Minimum 8 characters.
+              </p>
+            </div>
+            <div>
+              <label class="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1.5 block">Confirm Password</label>
+              {{ form.password2 }}
+              {% if form.password2.errors %}
+              <p class="text-xs text-blossom-600 mt-1">{{ form.password2.errors.0 }}</p>
+              {% endif %}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="border-t border-ink-100"></div>
+      {% endif %}
+
+      <!-- ===== Branch + CEO + Roles (Create AND Edit) ===== -->
+      <div>
+        <h2 class="font-display font-bold text-lg text-ink-900 mb-4">Access &amp; Permissions</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+          <!-- Branch + CEO -->
+          <div class="space-y-4">
+            <div>
+              <label class="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1.5 block">Assign Branch</label>
+              {{ form.branch }}
+              <p class="text-xs text-ink-400 mt-1">Leave blank for global/CEO-level access.</p>
+            </div>
+            <div class="flex items-start gap-3 bg-gold-50 border border-gold-100 rounded-xl p-4">
+              {{ form.is_ceo }}
+              <div>
+                <label class="font-bold text-sm text-gold-900 cursor-pointer">Grant CEO Access</label>
+                <p class="text-xs text-gold-700 mt-0.5">CEO bypasses all role restrictions.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Roles checklist -->
+          <div>
+            <label class="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1.5 block">Assign Roles</label>
+            <div class="border border-ink-200 rounded-xl p-3 max-h-52 overflow-y-auto scroll-thin bg-sand-50">
+              {{ form.roles }}
+            </div>
+            <p class="text-xs text-ink-400 mt-1.5">
+              A user can hold multiple roles. Permissions are the union of all assigned roles.
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Form actions -->
+      <div class="flex items-center gap-3 pt-2 border-t border-ink-100">
+        <a href="{% url 'user_list' %}"
+           class="btn border border-ink-200 text-ink-600 hover:bg-ink-50 bg-white rounded-xl font-semibold normal-case">
+          Cancel
+        </a>
+        <button type="submit" class="btn bg-brand-600 hover:bg-brand-700 border-none text-white rounded-xl font-semibold normal-case">
+          {% if action == 'Create' %}Create User{% else %}Save Changes{% endif %}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+{% endblock %}

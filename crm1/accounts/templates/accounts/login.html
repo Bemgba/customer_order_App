@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Login — {{ COMPANY_NAME }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{brand:{50:'#ECFDF5',100:'#E1FAE5',500:'#10B981',600:'#059669',700:'#047857',800:'#065F46',900:'#064E3B'},blossom:{400:'#FB7185',500:'#F43F5E',600:'#E11D48'},ink:{100:'#F3F4F6',200:'#E5E7EB',400:'#9CA3AF',500:'#6B7280',600:'#4B5563',700:'#374151',900:'#111827'},sand:{50:'#FAF9F7'}},fontFamily:{display:['"Space Grotesk"','sans-serif'],body:['"Plus Jakarta Sans"','sans-serif']}}}}</script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  {% load static %}<link rel="stylesheet" href="{% static 'css/fv.css' %}"/>
+</head>
+<body class="font-body bg-sand-50 min-h-screen flex">
+
+  <!-- Left panel — brand art (hidden on mobile) -->
+  <div class="hidden lg:flex flex-col justify-between w-1/2 xl:w-5/12 bg-brand-900 p-12 pattern-ankara">
+    <div>
+      <p class="font-display font-bold text-2xl text-white">{{ COMPANY_NAME }}<span class="text-blossom-400">.</span></p>
+    </div>
+    <div>
+      <h1 class="font-display font-bold text-4xl text-white leading-snug mb-4">
+        Delicious food,<br/>delivered with love 🍽
+      </h1>
+      <p class="text-white/80 text-base leading-relaxed">
+        Manage your orders, track deliveries, and run your kitchen — all in one beautiful place.
+      </p>
+    </div>
+    <p class="text-brand-600 text-xs">© 2026 {{ COMPANY_NAME }}. All rights reserved.</p>
+  </div>
+
+  <!-- Right panel — form -->
+  <div class="flex-1 flex items-center justify-center px-5 py-10">
+    <div class="w-full max-w-md">
+
+      <!-- Mobile brand -->
+      <div class="lg:hidden text-center mb-8">
+        <p class="font-display font-bold text-2xl text-brand-800">{{ COMPANY_NAME }}<span class="text-blossom-500">.</span></p>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-card border border-ink-100 p-8">
+        <h2 class="font-display font-bold text-2xl text-ink-900 mb-1">Welcome back</h2>
+        <p class="text-ink-500 text-sm mb-8">Sign in with your username or email.</p>
+
+        {% if messages %}
+        <div class="mb-5 space-y-2">
+          {% for msg in messages %}
+          {% if msg.tags == 'error' %}
+          <div class="bg-blossom-50 border border-blossom-200 text-blossom-700 text-sm rounded-xl px-4 py-3 font-medium">{{ msg }}</div>
+          {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="POST" class="space-y-5">
+          {% csrf_token %}
+          <div>
+            <label class="block text-xs font-bold text-ink-600 uppercase tracking-wider mb-2">Username or Email</label>
+            <input type="text" name="username" placeholder="Enter username or email"
+                   class="input w-full rounded-xl border-ink-200 focus:border-brand-400 focus:outline-none text-sm font-medium bg-sand-50 focus:bg-white"/>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-ink-600 uppercase tracking-wider mb-2">Password</label>
+            <input type="password" name="password" placeholder="Enter password"
+                   class="input w-full rounded-xl border-ink-200 focus:border-brand-400 focus:outline-none text-sm font-medium bg-sand-50 focus:bg-white"/>
+          </div>
+          <div class="flex items-center justify-end">
+            <a href="{% url 'reset_password' %}" class="text-xs text-brand-600 hover:text-brand-800 font-semibold">Forgot password?</a>
+          </div>
+          <button type="submit" class="btn w-full bg-brand-600 hover:bg-brand-700 border-none text-white rounded-xl font-bold text-sm normal-case h-12">Sign In</button>
+        </form>
+
+        <p class="text-center text-sm text-ink-500 mt-6">
+          New customer?
+          <a href="{% url 'register' %}" class="text-blossom-600 hover:text-blossom-700 font-semibold">Create account →</a>
+        </p>
+      </div>
+
+      <p class="text-center text-xs text-ink-400 mt-6">
+        <a href="{% url 'menu' %}" class="hover:text-brand-600">← Browse menu without logging in</a>
+      </p>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+/* ============================================================
+   FoodVendor — Global Design System
+   Color identity: Emerald Green · Blush Pink · Accent Red
+   Fonts: Space Grotesk (display) · Plus Jakarta Sans (body) · JetBrains Mono (numbers)
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@500;600;700&display=swap');
+
+html { scroll-behavior: smooth; }
+body { background-color: #FAF9F7; color: #1C1A16; font-family: 'Plus Jakarta Sans', sans-serif; }
+.font-display { font-family: 'Space Grotesk', sans-serif; }
+.font-body    { font-family: 'Plus Jakarta Sans', sans-serif; }
+.font-mono    { font-family: 'JetBrains Mono', monospace; }
+
+::selection { background: #d1fae5; color: #064e3b; }
+
+/* ---- TWIN-RAIL (coupled order + payment status pills) ---- */
+.twin-rail { display: inline-flex; align-items: center; }
+.twin-rail .rail-pill {
+  padding: .28rem .65rem; font-size: .70rem; font-weight: 700;
+  letter-spacing: .02em; border-radius: 999px; line-height: 1; white-space: nowrap;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.twin-rail .rail-link { width: 20px; height: 14px; margin: 0 -4px; flex-shrink: 0; position: relative; z-index: 1; }
+.twin-rail.lg .rail-pill { padding: .5rem 1rem; font-size: .85rem; }
+.twin-rail.lg .rail-link { width: 28px; height: 20px; }
+.twin-rail.sm .rail-pill { padding: .15rem .45rem; font-size: .62rem; }
+.twin-rail.sm .rail-link { width: 16px; height: 11px; margin: 0 -3px; }
+
+/* Status pill fills */
+.fill-pending   { background:#FEF9EE; color:#92400E; }
+.fill-confirmed { background:#ECFDF5; color:#065F46; }
+.fill-preparing { background:#EFF6FF; color:#1E40AF; }
+.fill-outfordel { background:#F5F3FF; color:#5B21B6; }
+.fill-delivered { background:#ECFDF5; color:#047857; }
+.fill-cancelled { background:#FFF1F2; color:#BE123C; }
+.fill-paid      { background:#ECFDF5; color:#065F46; }
+.fill-failed    { background:#FFF1F2; color:#BE123C; }
+.fill-refunded  { background:#F0FDFA; color:#0E7490; }
+
+/* ---- Ankara texture (dark surfaces only) ---- */
+.pattern-ankara {
+  background-image:
+    linear-gradient(45deg,rgba(255,255,255,.05) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.05) 75%),
+    linear-gradient(45deg,rgba(255,255,255,.05) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.05) 75%);
+  background-size:30px 30px; background-position:0 0,15px 15px;
+}
+
+/* ---- Pulse dot ---- */
+@keyframes pulseDot { 0%,100%{opacity:1} 50%{opacity:.3} }
+.pulse-dot { animation: pulseDot 1.6s ease-in-out infinite; }
+
+/* ---- Hover lift for cards ---- */
+.lift { transition: transform .18s ease, box-shadow .18s ease; }
+.lift:hover { transform: translateY(-3px); box-shadow: 0 8px 30px -8px rgba(5,46,22,.18); }
+
+/* ---- Custom scrollbar ---- */
+.scroll-thin::-webkit-scrollbar { height:6px; width:6px; }
+.scroll-thin::-webkit-scrollbar-thumb { background:#D1FAE5; border-radius:999px; }
+.scroll-thin::-webkit-scrollbar-track { background:transparent; }
+
+/* ---- Sidebar active link ---- */
+.nav-link-active { background: #ECFDF5; color: #065F46 !important; }
+.nav-link-active svg { color: #10B981 !important; }
+
+/* ---- DaisyUI step override to use emerald ---- */
+.step-emerald:before, .step-emerald:after { background-color: #059669 !important; color:#fff !important; }
+.steps .step-pending:before  { background-color:#FEF9EE !important; color:#92400E !important; }
+.steps .step:before  { background-color:#E5E7EB !important; }
+
+/* ---- Product card image ---- */
+.product-img { width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:.75rem .75rem 0 0; }
+.product-img-placeholder { width:100%; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; background:#FFF1F2; border-radius:.75rem .75rem 0 0; }
+
+/* ---- Low stock badge pulse ---- */
+.low-stock-blink { animation: pulseDot 1.8s ease-in-out infinite; }
+
+/* tap highlight reset for mobile */
+* { -webkit-tap-highlight-color: transparent; }
+
+/* ---- Brand gradient (hero, buttons) ---- */
+.bg-brand { background: linear-gradient(135deg,#059669 0%,#10B981 100%); }
+.bg-brand-pink { background: linear-gradient(135deg,#F43F5E 0%,#FB7185 100%); }
+
+/* ---- Sidebar ---- */
+@media (min-width:1024px) {
+  .sidebar-desktop { transform: none !important; }
+}

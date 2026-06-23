@@ -1,0 +1,198 @@
+{% extends 'accounts/dashboard1_base.html' %}
+
+{% block content %}
+
+<!-- Page header -->
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="font-display font-bold text-2xl text-ink-900">🚚 Dispatcher Dashboard</h1>
+    {% if branch %}
+    <p class="text-sm text-ink-500 mt-0.5">{{ branch.name }}</p>
+    {% endif %}
+  </div>
+  <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-100 text-brand-800 font-bold text-sm">
+    <span class="w-2 h-2 rounded-full bg-brand-500 pulse-dot"></span>
+    {{ deliveries|length }} active
+  </span>
+</div>
+
+<!-- ===== ACTIVE DELIVERIES ===== -->
+{% if deliveries %}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+  {% for order in deliveries %}
+  <div class="bg-white rounded-2xl shadow-card border border-ink-100 flex flex-col overflow-hidden lift">
+
+    <!-- Card header -->
+    <div class="bg-brand-700 px-4 py-3 flex items-center justify-between">
+      <span class="font-mono font-bold text-white text-sm tracking-wide">{{ order.reference }}</span>
+      <div class="flex items-center gap-2">
+        {% if order.dispatcher_confirmed %}
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-100 text-brand-800">You ✓</span>
+        {% else %}
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gold-100 text-gold-900">Your confirm needed</span>
+        {% endif %}
+        {% if order.customer_confirmed %}
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-100 text-brand-800">Customer ✓</span>
+        {% else %}
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-ink-100 text-ink-600">Customer ⏳</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="p-4 flex-1 space-y-3">
+
+      <!-- Customer info -->
+      <div>
+        <p class="font-bold text-ink-900 text-sm">{{ order.delivery_name }}</p>
+        <p class="text-sm text-brand-700 mt-0.5">
+          📞 <a href="tel:{{ order.delivery_phone }}" class="hover:underline font-semibold">{{ order.delivery_phone }}</a>
+        </p>
+        <p class="text-xs text-ink-500 mt-0.5">
+          📍 {{ order.delivery_address }}{% if order.delivery_lga %}, {{ order.delivery_lga }}{% endif %}{% if order.delivery_state %}, {{ order.delivery_state }}{% endif %}
+        </p>
+      </div>
+
+      <div class="border-t border-ink-100"></div>
+
+      <!-- Items summary -->
+      <div>
+        <p class="text-xs font-bold text-ink-500 uppercase tracking-wider mb-1.5">Items</p>
+        {% for item in order.items.all %}
+        <div class="flex justify-between text-sm py-0.5">
+          <span class="text-ink-700">{{ item.quantity }}× {{ item.product }}</span>
+          <span class="font-mono text-ink-500">₦{{ item.line_total|floatformat:2 }}</span>
+        </div>
+        {% endfor %}
+        <div class="flex justify-between font-bold border-t border-ink-100 pt-2 mt-1">
+          <span class="text-ink-800">Total</span>
+          <span class="font-mono text-brand-700">₦{{ order.total_amount|floatformat:2 }}</span>
+        </div>
+      </div>
+
+      <!-- COD / Payment alert -->
+      {% if order.payment %}
+      <div class="rounded-xl px-3 py-2.5
+        {% if order.payment.method == 'Cash on Delivery' and order.payment.status != 'Paid' %}
+          bg-gold-50 border border-gold-200
+        {% else %}
+          bg-brand-50 border border-brand-200
+        {% endif %}">
+        <p class="text-xs font-bold
+          {% if order.payment.method == 'Cash on Delivery' and order.payment.status != 'Paid' %}text-gold-900{% else %}text-brand-800{% endif %}">
+          💳 {{ order.payment.method }}
+        </p>
+        {% if order.payment.method == 'Cash on Delivery' and order.payment.status != 'Paid' %}
+        <p class="text-sm font-bold text-gold-900 mt-0.5">
+          Collect <span class="font-mono">₦{{ order.payment.amount|floatformat:2 }}</span> cash from customer
+        </p>
+        {% elif order.payment.status == 'Paid' %}
+        <p class="text-xs text-brand-700 mt-0.5">✓ Already paid</p>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <p class="text-xs text-ink-400">Ordered: {{ order.date_create|date:"d M Y, H:i" }}</p>
+    </div>
+
+    <!-- Confirm footer -->
+    <div class="px-4 pb-4 pt-2 border-t border-ink-100 bg-sand-50">
+      {% if not order.dispatcher_confirmed %}
+      <form method="POST" action="{% url 'confirm_delivery_dispatcher' order.id %}">
+        {% csrf_token %}
+        <button type="submit"
+          onclick="return confirm('Confirm delivery of order {{ order.reference }}?')"
+          class="btn w-full bg-brand-600 hover:bg-brand-700 border-none text-white rounded-xl font-semibold normal-case">
+          ✓ Confirm Delivery
+          {% if order.payment.method == 'Cash on Delivery' and order.payment.status != 'Paid' %}
+            &amp; Cash Collected
+          {% endif %}
+        </button>
+      </form>
+      {% else %}
+      <div class="text-center py-1">
+        <p class="text-brand-700 font-bold text-sm">✓ You confirmed this delivery</p>
+        <p class="text-xs text-ink-400 mt-0.5">{{ order.dispatcher_confirmed_at|date:"d/m H:i" }}</p>
+        {% if not order.customer_confirmed %}
+        <p class="text-xs text-gold-700 mt-1">Waiting for customer to confirm...</p>
+        {% else %}
+        <p class="text-xs text-brand-600 mt-1">Customer also confirmed ✓</p>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="bg-white rounded-2xl shadow-card border border-ink-100 py-16 text-center mb-8">
+  <div class="text-5xl mb-3">🚚</div>
+  <h3 class="font-display font-bold text-lg text-ink-700 mb-1">No active deliveries right now</h3>
+  <p class="text-sm text-ink-400">Orders marked "Out for Delivery" will appear here.</p>
+</div>
+{% endif %}
+
+<!-- ===== RECENTLY DELIVERED ===== -->
+{% if recent_delivered %}
+<div>
+  <h2 class="font-display font-bold text-xl text-ink-900 mb-3">Recently Delivered</h2>
+  <div class="bg-white rounded-2xl shadow-card border border-ink-100 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-brand-50 text-brand-800 text-xs uppercase tracking-wider">
+            <th class="px-4 py-3 text-left font-bold">Ref</th>
+            <th class="px-4 py-3 text-left font-bold">Customer</th>
+            <th class="px-4 py-3 text-right font-bold">Total</th>
+            <th class="px-4 py-3 text-left font-bold">Payment</th>
+            <th class="px-4 py-3 text-left font-bold">Your Confirmation</th>
+            <th class="px-4 py-3 text-left font-bold">Customer Confirmation</th>
+            <th class="px-4 py-3 text-left font-bold">Delivered</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-ink-100">
+          {% for order in recent_delivered %}
+          <tr class="hover:bg-sand-50 transition-colors">
+            <td class="px-4 py-3">
+              <span class="font-mono font-bold text-ink-800 text-xs">{{ order.reference }}</span>
+            </td>
+            <td class="px-4 py-3 text-ink-700">{{ order.delivery_name }}</td>
+            <td class="px-4 py-3 text-right">
+              <span class="font-mono font-bold text-ink-800">₦{{ order.total_amount|floatformat:2 }}</span>
+            </td>
+            <td class="px-4 py-3">
+              {% if order.payment %}
+              <div class="text-xs text-ink-600 mb-0.5">{{ order.payment.method }}</div>
+              {% if order.payment.status == 'Paid' %}
+              <span class="rail-pill fill-paid">✓ Paid</span>
+              {% else %}
+              <span class="rail-pill fill-pending">{{ order.payment.status }}</span>
+              {% endif %}
+              {% endif %}
+            </td>
+            <td class="px-4 py-3 text-xs">
+              {% if order.dispatcher_confirmed %}
+              <span class="text-brand-700 font-semibold">✓ {{ order.dispatcher_confirmed_at|date:"d/m H:i" }}</span>
+              {% else %}
+              <span class="text-blossom-500 font-semibold">✗</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-3 text-xs">
+              {% if order.customer_confirmed %}
+              <span class="text-brand-700 font-semibold">✓ {{ order.customer_confirmed_at|date:"d/m H:i" }}</span>
+              {% else %}
+              <span class="text-ink-400">⏳ Pending</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-3 text-xs text-ink-500">{{ order.updated_at|date:"d/m H:i" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

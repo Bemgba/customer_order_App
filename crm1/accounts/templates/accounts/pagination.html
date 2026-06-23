@@ -1,0 +1,32 @@
+{% if page_obj.has_other_pages %}
+<div class="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
+  <p class="text-sm text-ink-500">
+    Page <span class="font-semibold text-ink-700">{{ page_obj.number }}</span> of {{ page_obj.paginator.num_pages }}
+    &nbsp;·&nbsp; {{ page_obj.paginator.count }} record{{ page_obj.paginator.count|pluralize }}
+  </p>
+  <div class="join">
+    {% if page_obj.has_previous %}
+    <a class="join-item btn btn-sm bg-white border-ink-200 text-ink-600 hover:bg-brand-50 hover:border-brand-300"
+       href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">«</a>
+    {% else %}
+    <button class="join-item btn btn-sm bg-white border-ink-100 text-ink-300" disabled>«</button>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+        <button class="join-item btn btn-sm bg-brand-600 border-brand-600 text-white">{{ num }}</button>
+      {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <a class="join-item btn btn-sm bg-white border-ink-200 text-ink-600 hover:bg-brand-50"
+           href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ num }}">{{ num }}</a>
+      {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+    <a class="join-item btn btn-sm bg-white border-ink-200 text-ink-600 hover:bg-brand-50 hover:border-brand-300"
+       href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">»</a>
+    {% else %}
+    <button class="join-item btn btn-sm bg-white border-ink-100 text-ink-300" disabled>»</button>
+    {% endif %}
+  </div>
+</div>
+{% endif %}

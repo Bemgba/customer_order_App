@@ -1,0 +1,135 @@
+{% extends 'accounts/dashboard1_base.html' %}
+
+{% block content %}
+
+<!-- Page header -->
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="font-display font-bold text-2xl text-ink-900">Inventory Management</h1>
+    <p class="text-sm text-ink-500 mt-0.5">
+      {{ ingredients.count }} ingredients
+      {% if low_stock_count > 0 %}
+      · <span class="text-gold-700 font-semibold">{{ low_stock_count }} low stock</span>
+      {% endif %}
+    </p>
+  </div>
+  <div class="flex items-center gap-3">
+    <a href="{% url 'consumption_history' %}" class="btn btn-sm border border-ink-200 text-ink-600 hover:bg-ink-50 bg-white rounded-xl normal-case font-semibold">
+      View History
+    </a>
+    <a href="{% url 'create_ingredient' %}" class="btn bg-brand-600 hover:bg-brand-700 border-none text-white rounded-xl font-semibold normal-case">
+      + Add Ingredient
+    </a>
+  </div>
+</div>
+
+<!-- Low stock alert banner -->
+{% if low_stock_count > 0 %}
+<div class="flex items-start gap-3 bg-gold-50 border border-gold-200 rounded-2xl px-4 py-3.5 mb-5">
+  <span class="text-xl low-stock-blink">⚠️</span>
+  <div>
+    <p class="font-bold text-gold-900 text-sm">Low Stock Alert</p>
+    <p class="text-gold-700 text-xs mt-0.5">
+      {{ low_stock_count }} ingredient{{ low_stock_count|pluralize }} {{ low_stock_count|pluralize:"is,are" }} below the reorder level. Review and restock as needed.
+    </p>
+  </div>
+</div>
+{% endif %}
+
+<!-- Ingredients table -->
+<div class="bg-white rounded-2xl shadow-card border border-ink-100 overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="bg-brand-50 text-brand-800 text-xs uppercase tracking-wider">
+          <th class="px-4 py-3 text-left font-bold w-10">#</th>
+          {% if is_ceo %}<th class="px-4 py-3 text-left font-bold">Branch</th>{% endif %}
+          <th class="px-4 py-3 text-left font-bold">Ingredient</th>
+          <th class="px-4 py-3 text-left font-bold">Unit</th>
+          <th class="px-4 py-3 text-right font-bold">Available</th>
+          <th class="px-4 py-3 text-right font-bold">Reorder Level</th>
+          <th class="px-4 py-3 text-left font-bold">Status</th>
+          <th class="px-4 py-3 text-left font-bold">Last Updated</th>
+          <th class="px-4 py-3 text-left font-bold">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-ink-100">
+        {% for ing in ingredients %}
+        <tr class="hover:bg-sand-50 transition-colors {% if ing.is_low %}bg-gold-50/40{% endif %}">
+          <td class="px-4 py-3 text-ink-400 text-xs">{{ forloop.counter }}</td>
+          {% if is_ceo %}
+          <td class="px-4 py-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-brand-100 text-brand-800">
+              {{ ing.branch.name }}
+            </span>
+          </td>
+          {% endif %}
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-1.5">
+              <span class="font-bold text-ink-900">{{ ing.name }}</span>
+              {% if ing.is_low %}
+              <span class="text-gold-500 low-stock-blink" title="Low stock">⚠</span>
+              {% endif %}
+            </div>
+          </td>
+          <td class="px-4 py-3 text-ink-600">{{ ing.unit }}</td>
+          <td class="px-4 py-3 text-right">
+            <span class="font-mono font-bold text-sm {% if ing.is_low %}text-blossom-700{% else %}text-brand-700{% endif %}">
+              {{ ing.quantity_available }}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-right">
+            <span class="font-mono text-ink-500 text-sm">{{ ing.reorder_level }}</span>
+          </td>
+          <td class="px-4 py-3">
+            {% if ing.quantity_available == 0 %}
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blossom-100 text-blossom-800">
+              Out of Stock
+            </span>
+            {% elif ing.is_low %}
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gold-100 text-gold-900">
+              Low Stock
+            </span>
+            {% else %}
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-brand-100 text-brand-800">
+              In Stock
+            </span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-3 text-xs text-ink-500">{{ ing.updated_at|date:"M d, Y" }}</td>
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-1.5">
+              <a href="{% url 'update_ingredient' ing.id %}"
+                 class="btn btn-xs border border-gold-300 text-gold-800 hover:bg-gold-50 bg-transparent rounded-lg normal-case font-semibold">
+                Edit
+              </a>
+              <a href="{% url 'delete_ingredient' ing.id %}"
+                 class="btn btn-xs bg-blossom-600 hover:bg-blossom-700 border-none text-white rounded-lg normal-case font-semibold">
+                Delete
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="{% if is_ceo %}9{% else %}8{% endif %}" class="px-4 py-12 text-center">
+            <div class="text-4xl mb-3">📦</div>
+            <p class="text-ink-500 text-sm mb-2">No ingredients yet.</p>
+            <a href="{% url 'create_ingredient' %}" class="text-brand-600 hover:underline text-sm font-semibold">Add the first one.</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Info note -->
+<p class="text-xs text-ink-400 mt-4 flex items-center gap-1.5">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-ink-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 110 20A10 10 0 0112 2z"/>
+  </svg>
+  Ingredients are tracked per branch. When stock falls below the reorder level, they are highlighted in yellow.
+</p>
+
+{% endblock %}

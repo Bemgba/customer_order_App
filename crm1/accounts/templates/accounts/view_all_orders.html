@@ -1,0 +1,128 @@
+{% extends 'accounts/dashboard1_base.html' %}
+{% block title %}All Orders — {{ COMPANY_NAME }}{% endblock %}
+{% block content %}
+
+<!-- Page header -->
+<div class="flex items-center justify-between mb-6">
+  <h1 class="font-display font-bold text-2xl text-ink-900">All Orders</h1>
+</div>
+
+<!-- KPI Strip -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  <div class="bg-white rounded-2xl border border-ink-200 shadow-card px-5 py-4">
+    <p class="text-xs font-bold text-ink-400 uppercase tracking-wider mb-1">Total</p>
+    <p class="font-display font-bold text-2xl text-ink-900">{{ total_orders }}</p>
+  </div>
+  <div class="bg-brand-600 rounded-2xl shadow-pop px-5 py-4">
+    <p class="text-xs font-bold text-brand-200 uppercase tracking-wider mb-1">Delivered</p>
+    <p class="font-display font-bold text-2xl text-white">{{ delivered }}</p>
+  </div>
+  <div class="bg-white rounded-2xl border border-blossom-200 shadow-card px-5 py-4">
+    <p class="text-xs font-bold text-blossom-500 uppercase tracking-wider mb-1">Pending</p>
+    <p class="font-display font-bold text-2xl text-blossom-600">{{ pending }}</p>
+  </div>
+  <div class="bg-white rounded-2xl border border-brand-200 shadow-card px-5 py-4">
+    <p class="text-xs font-bold text-brand-500 uppercase tracking-wider mb-1">Confirmed</p>
+    <p class="font-display font-bold text-2xl text-brand-700">{{ confirmed_count }}</p>
+  </div>
+</div>
+
+<!-- Filter bar -->
+<div class="bg-white rounded-2xl border border-ink-200 shadow-card p-4 mb-6">
+  <form method="GET" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 items-end">
+    <div>
+      <label class="block text-xs font-bold text-ink-500 uppercase tracking-wider mb-1">Status</label>
+      {{ myFilter.form.status }}
+    </div>
+    <div>
+      <label class="block text-xs font-bold text-ink-500 uppercase tracking-wider mb-1">Customer</label>
+      {{ myFilter.form.delivery_name }}
+    </div>
+    <div>
+      <label class="block text-xs font-bold text-ink-500 uppercase tracking-wider mb-1">Reference</label>
+      {{ myFilter.form.reference }}
+    </div>
+    <div>
+      <label class="block text-xs font-bold text-ink-500 uppercase tracking-wider mb-1">From</label>
+      {{ myFilter.form.start_date }}
+    </div>
+    <div>
+      <label class="block text-xs font-bold text-ink-500 uppercase tracking-wider mb-1">To</label>
+      {{ myFilter.form.end_date }}
+    </div>
+    <div class="flex gap-2">
+      <button type="submit" class="btn btn-sm bg-brand-600 hover:bg-brand-700 text-white border-0 rounded-xl normal-case font-bold flex-1">Filter</button>
+      <a href="{% url 'view_all_orders' %}" class="btn btn-sm bg-ink-100 hover:bg-ink-200 text-ink-600 border-0 rounded-xl normal-case font-semibold">Clear</a>
+    </div>
+  </form>
+</div>
+
+<!-- Orders table -->
+<div class="bg-white rounded-2xl border border-ink-200 shadow-card overflow-hidden">
+  <div class="overflow-x-auto scroll-thin">
+    <table class="table table-sm w-full">
+      <thead>
+        <tr class="bg-ink-50 text-xs font-bold text-ink-500 uppercase tracking-wider">
+          <th class="px-4 py-3 text-left">#</th>
+          <th class="px-3 py-3">Reference</th>
+          <th class="px-3 py-3">Customer</th>
+          <th class="px-3 py-3">Phone</th>
+          <th class="px-3 py-3">Address</th>
+          <th class="px-3 py-3 text-center">Items</th>
+          <th class="px-3 py-3 text-right">Total</th>
+          <th class="px-3 py-3">Payment</th>
+          <th class="px-3 py-3">Order Status</th>
+          <th class="px-3 py-3 text-center">D/C</th>
+          <th class="px-3 py-3">Date</th>
+          <th class="px-3 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-ink-100">
+        {% for order in orders_page %}
+        <tr class="hover:bg-sand-50 transition-colors">
+          <td class="px-4 py-3 text-ink-400 text-xs">{{ forloop.counter }}</td>
+          <td class="px-3 py-3 font-mono font-bold text-xs text-ink-800 whitespace-nowrap">{{ order.reference }}</td>
+          <td class="px-3 py-3 text-ink-700 text-sm font-medium whitespace-nowrap">{{ order.delivery_name }}</td>
+          <td class="px-3 py-3 text-ink-500 text-sm whitespace-nowrap">{{ order.delivery_phone }}</td>
+          <td class="px-3 py-3 text-ink-500 text-xs max-w-[140px] truncate">{{ order.delivery_address }}</td>
+          <td class="px-3 py-3 text-center">
+            <span class="badge badge-sm bg-ink-100 text-ink-700 border-0 font-bold">{{ order.items.count }}</span>
+          </td>
+          <td class="px-3 py-3 text-right font-mono font-semibold text-sm text-ink-800 whitespace-nowrap">₦{{ order.total_amount|floatformat:2 }}</td>
+          <td class="px-3 py-3">
+            {% if order.payment %}
+            <span class="rail-pill fill-{% if order.payment.status == 'Paid' %}paid{% elif order.payment.status == 'Failed' %}failed{% elif order.payment.status == 'Refunded' %}refunded{% else %}pending{% endif %} text-xs font-bold px-2 py-0.5 rounded-full">{{ order.payment.status|default:"—" }}</span>
+            {% else %}
+            <span class="text-ink-400 text-xs">—</span>
+            {% endif %}
+          </td>
+          <td class="px-3 py-3">
+            <div class="twin-rail flex items-center gap-1.5">
+              <span class="rail-pill fill-{% if order.status == 'Pending' %}pending{% elif order.status == 'Confirmed' %}confirmed{% elif order.status == 'Preparing' %}preparing{% elif order.status == 'Out for Delivery' %}outfordel{% elif order.status == 'Delivered' %}delivered{% elif order.status == 'Cancelled' %}cancelled{% else %}pending{% endif %} text-xs font-bold px-2 py-0.5 rounded-full">{{ order.status }}</span>
+            </div>
+          </td>
+          <td class="px-3 py-3 text-center">
+            {% if order.status == 'Out for Delivery' %}
+            <div class="flex items-center gap-1 justify-center">
+              <span title="Dispatcher" class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold {% if order.dispatcher_confirmed %}bg-brand-100 text-brand-700{% else %}bg-ink-100 text-ink-400{% endif %}">D</span>
+              <span title="Customer" class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold {% if order.customer_confirmed %}bg-brand-100 text-brand-700{% else %}bg-ink-100 text-ink-400{% endif %}">C</span>
+            </div>
+            {% else %}
+            <span class="text-ink-300 text-xs">—</span>
+            {% endif %}
+          </td>
+          <td class="px-3 py-3 text-ink-400 text-xs whitespace-nowrap">{{ order.date_create|date:"d/m/y H:i" }}</td>
+          <td class="px-3 py-3 whitespace-nowrap">
+            <a href="{% url 'order_detail' order.id %}" class="btn btn-xs bg-brand-50 text-brand-700 border-brand-200 hover:bg-brand-100 rounded-lg normal-case font-semibold">View</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="12" class="px-5 py-12 text-center text-ink-400 text-sm">No orders found matching your filters.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'accounts/pagination.html' with page_obj=orders_page %}
+</div>
+
+{% endblock %}

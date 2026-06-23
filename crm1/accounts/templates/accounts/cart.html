@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Your Cart - {{ COMPANY_NAME }}</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#f8f8f8;color:#111827}
+.qty-input{width:52px;text-align:center;border:1.5px solid #e5e7eb;border-radius:8px;padding:5px 8px;font-size:13px;font-weight:700;font-family:monospace;background:#fff;outline:none}
+.qty-input:focus{border-color:#059669}
+.qty-btn{width:28px;height:28px;border:1.5px solid #e5e7eb;border-radius:8px;background:#fff;cursor:pointer;font-size:16px;font-weight:700;color:#374151;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.qty-btn:hover{background:#ecfdf5;border-color:#059669;color:#065f46}
+.remove-btn{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;border:1.5px solid #fecdd3;background:#fff;cursor:pointer;color:#e11d48;transition:all .15s;flex-shrink:0}
+.remove-btn:hover{background:#fff1f2;border-color:#e11d48}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header style="position:sticky;top:0;z-index:50;background:#fff;border-bottom:2px solid #fce7f3;box-shadow:0 2px 16px rgba(219,39,119,.08)">
+  <div style="max-width:1200px;margin:0 auto;padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+    <a href="{% url 'menu' %}" style="font-weight:800;font-size:18px;color:#065f46;text-decoration:none;letter-spacing:-.4px">{{ COMPANY_NAME }}</a>
+    <div style="display:flex;align-items:center;gap:8px">
+      <a href="{% url 'menu' %}" style="padding:6px 14px;border-radius:999px;font-size:12px;font-weight:700;color:#065f46;border:1.5px solid #a7f3d0;text-decoration:none;background:#ecfdf5">Continue Shopping</a>
+      {% if user.is_authenticated %}
+      <a href="{% url 'my_orders' %}" style="padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600;color:#374151;border:1.5px solid #e5e7eb;text-decoration:none;background:#fff">My Orders</a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+<div style="max-width:1200px;margin:0 auto;padding:24px 20px 80px">
+
+  <!-- Page title -->
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+    <a href="{% url 'menu' %}" style="display:flex;align-items:center;gap:4px;color:#6b7280;font-size:13px;font-weight:600;text-decoration:none">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+      Menu
+    </a>
+    <span style="color:#d1d5db">/</span>
+    <h1 style="font-weight:800;font-size:22px;color:#111827;letter-spacing:-.4px">Your Cart</h1>
+    {% if cart_count > 0 %}
+    <span style="font-size:13px;font-weight:600;color:#6b7280;background:#f3f4f6;padding:3px 10px;border-radius:20px">{{ cart_count }} item{{ cart_count|pluralize }}</span>
+    {% endif %}
+  </div>
+
+  {% if cart_items %}
+  <div style="display:grid;grid-template-columns:1fr;gap:24px">
+
+    <!-- Cart items -->
+    <div style="background:#fff;border-radius:18px;border:1.5px solid #e5e7eb;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06)">
+
+      <!-- Table header (desktop) -->
+      <div style="display:none;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:16px;padding:14px 24px;background:#f9fafb;border-bottom:1px solid #e5e7eb;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#6b7280" id="cart-thead">
+        <span>Product</span>
+        <span style="text-align:center">Unit Price</span>
+        <span style="text-align:center">Quantity</span>
+        <span style="text-align:center">Subtotal</span>
+        <span></span>
+      </div>
+
+      <!-- Cart rows -->
+      {% for item in cart_items %}
+      <div style="display:flex;align-items:center;gap:16px;padding:16px 20px;border-bottom:1px solid #f3f4f6;flex-wrap:wrap">
+
+        <!-- Image -->
+        <div style="width:64px;height:64px;border-radius:12px;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#fce7f3,#ecfdf5)">
+          {% if item.product.image %}
+          <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width:100%;height:100%;object-fit:cover"/>
+          {% else %}
+          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.5rem">&#127869;</div>
+          {% endif %}
+        </div>
+
+        <!-- Product name -->
+        <div style="flex:1;min-width:120px">
+          <p style="font-weight:700;font-size:14px;color:#111827;line-height:1.3;margin-bottom:3px">{{ item.product.name }}</p>
+          {% if item.product.description %}
+          <p style="font-size:12px;color:#9ca3af;line-height:1.3">{{ item.product.description|truncatechars:60 }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Unit price -->
+        <div style="text-align:center;min-width:80px">
+          <p style="font-size:11px;color:#9ca3af;margin-bottom:2px;font-weight:600">Unit Price</p>
+          <p style="font-family:monospace;font-weight:700;font-size:14px;color:#374151">&#8358;{{ item.product.price|floatformat:0 }}</p>
+        </div>
+
+        <!-- Quantity control -->
+        <form method="post" action="{% url 'cart_add' item.product.id %}" style="display:flex;align-items:center;gap:6px">
+          {% csrf_token %}
+          <button type="button" class="qty-btn" onclick="var inp=this.nextElementSibling;inp.value=Math.max(1,parseInt(inp.value)-1);this.form.submit()">-</button>
+          <input type="number" name="qty" value="{{ item.qty }}" min="1" max="99" class="qty-input" data-price="{{ item.product.price }}"
+                 onchange="this.form.submit()" id="qty-{{ item.product.id }}"/>
+          <button type="button" class="qty-btn" onclick="var inp=this.previousElementSibling;inp.value=Math.min(99,parseInt(inp.value)+1);this.form.submit()">+</button>
+        </form>
+
+        <!-- Line total -->
+        <div style="text-align:center;min-width:90px">
+          <p style="font-size:11px;color:#9ca3af;margin-bottom:2px;font-weight:600">Subtotal</p>
+          <p style="font-family:monospace;font-weight:800;font-size:15px;color:#059669" id="line-{{ item.product.id }}">&#8358;{{ item.line_total|floatformat:0 }}</p>
+        </div>
+
+        <!-- Remove -->
+        <a href="{% url 'cart_remove' item.product.id %}" class="remove-btn" title="Remove">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </a>
+
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Order summary card -->
+    <div style="background:#fff;border-radius:18px;border:1.5px solid #e5e7eb;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.06);max-width:420px;margin-left:auto;width:100%">
+      <h2 style="font-weight:800;font-size:16px;color:#111827;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f3f4f6">Order Summary</h2>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:14px;color:#6b7280;font-weight:500">Subtotal ({{ cart_count }} item{{ cart_count|pluralize }})</span>
+        <span style="font-family:monospace;font-weight:700;font-size:14px;color:#374151">&#8358;{{ grand_total|floatformat:0 }}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #f3f4f6">
+        <span style="font-size:14px;color:#6b7280;font-weight:500">Delivery</span>
+        <span style="font-size:13px;font-weight:600;color:#059669;background:#ecfdf5;padding:2px 10px;border-radius:20px">Calculated at checkout</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <span style="font-size:16px;font-weight:800;color:#111827">Total</span>
+        <span style="font-family:monospace;font-weight:800;font-size:20px;color:#059669">&#8358;{{ grand_total|floatformat:0 }}</span>
+      </div>
+      <a href="{% url 'checkout' %}" style="display:block;text-align:center;padding:14px 0;border-radius:12px;background:#059669;color:#fff;font-weight:800;font-size:15px;text-decoration:none;box-shadow:0 4px 16px rgba(5,150,105,.3);transition:background .15s">Proceed to Checkout &rarr;</a>
+      <a href="{% url 'menu' %}" style="display:block;text-align:center;padding:11px 0;border-radius:12px;border:1.5px solid #e5e7eb;color:#374151;font-weight:700;font-size:14px;text-decoration:none;margin-top:10px;transition:background .15s">Continue Shopping</a>
+    </div>
+
+  </div>
+
+  {% else %}
+  <!-- Empty cart -->
+  <div style="text-align:center;padding:80px 20px;background:#fff;border-radius:20px;border:1.5px solid #e5e7eb">
+    <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#fce7f3,#ecfdf5);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:2rem">
+      <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#059669" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 5h14.6M10 21a1 1 0 11-2 0 1 1 0 012 0zm9 0a1 1 0 11-2 0 1 1 0 012 0z"/></svg>
+    </div>
+    <h2 style="font-weight:800;font-size:20px;color:#111827;margin-bottom:8px">Your cart is empty</h2>
+    <p style="font-size:14px;color:#6b7280;margin-bottom:24px">Add some delicious items from our menu!</p>
+    <a href="{% url 'menu' %}" style="display:inline-block;padding:12px 28px;border-radius:12px;background:#059669;color:#fff;font-weight:700;font-size:14px;text-decoration:none;box-shadow:0 4px 16px rgba(5,150,105,.3)">Browse Menu</a>
+  </div>
+  {% endif %}
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,121 @@
+{% extends 'accounts/dashboard1_base.html' %}
+
+{% block content %}
+
+<!-- Page header -->
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="font-display font-bold text-2xl text-ink-900">Roles Management</h1>
+    <p class="text-sm text-ink-500 mt-0.5">CEO Only — define staff permissions</p>
+  </div>
+  <a href="{% url 'create_role' %}" class="btn bg-brand-600 hover:bg-brand-700 border-none text-white rounded-xl font-semibold normal-case">
+    + Create New Role
+  </a>
+</div>
+
+<!-- Roles table -->
+<div class="bg-white rounded-2xl shadow-card border border-ink-100 overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="bg-brand-50 text-brand-800 text-xs uppercase tracking-wider">
+          <th class="px-4 py-3 text-left font-bold w-10">#</th>
+          <th class="px-4 py-3 text-left font-bold">Role Name</th>
+          <th class="px-4 py-3 text-left font-bold">Description</th>
+          <th class="px-4 py-3 text-left font-bold">Permissions Granted</th>
+          <th class="px-4 py-3 text-center font-bold">Users</th>
+          <th class="px-4 py-3 text-left font-bold">Created By</th>
+          <th class="px-4 py-3 text-left font-bold">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-ink-100">
+        {% for role in roles %}
+        <tr class="hover:bg-sand-50 transition-colors align-top">
+          <td class="px-4 py-3 text-ink-400 text-xs">{{ forloop.counter }}</td>
+          <td class="px-4 py-3">
+            <span class="font-bold text-ink-900">{{ role.name }}</span>
+          </td>
+          <td class="px-4 py-3 text-ink-500 text-xs max-w-[180px]">{{ role.description|default:"—" }}</td>
+          <td class="px-4 py-3">
+            <div class="flex flex-wrap gap-1">
+              {% if role.can_manage_orders %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-100 text-brand-800">Manage Orders</span>
+              {% endif %}
+              {% if role.can_delete_orders %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-blossom-100 text-blossom-800">Delete Orders</span>
+              {% endif %}
+              {% if role.can_view_products %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-ink-100 text-ink-700">View Products</span>
+              {% endif %}
+              {% if role.can_add_products %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-100 text-brand-800">Add Products</span>
+              {% endif %}
+              {% if role.can_edit_products %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-100 text-brand-800">Edit Products</span>
+              {% endif %}
+              {% if role.can_delete_products %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-blossom-100 text-blossom-800">Delete Products</span>
+              {% endif %}
+              {% if role.can_manage_customers %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-ink-100 text-ink-700">Manage Customers</span>
+              {% endif %}
+              {% if role.can_view_reports %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-100 text-brand-800">View Reports</span>
+              {% endif %}
+              {% if role.can_manage_users %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gold-100 text-gold-900">Manage Users</span>
+              {% endif %}
+              {% if role.can_manage_branches %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-ink-200 text-ink-800">Manage Branches</span>
+              {% endif %}
+              {% if role.can_manage_inventory %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-100 text-brand-800">Manage Inventory</span>
+              {% endif %}
+              {% if role.can_manage_payments %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-100 text-brand-800">Manage Payments</span>
+              {% endif %}
+              {% if role.can_confirm_delivery %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-brand-100 text-brand-800">Confirm Delivery</span>
+              {% endif %}
+              {% if role.can_assign_dispatcher %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800">Assign Dispatcher</span>
+              {% endif %}
+              {% if not role.can_manage_orders and not role.can_delete_orders and not role.can_view_products and not role.can_add_products and not role.can_edit_products and not role.can_delete_products and not role.can_manage_customers and not role.can_view_reports and not role.can_manage_users and not role.can_manage_branches and not role.can_manage_inventory and not role.can_manage_payments and not role.can_confirm_delivery and not role.can_assign_dispatcher %}
+              <span class="text-ink-400 text-xs italic">No permissions</span>
+              {% endif %}
+            </div>
+          </td>
+          <td class="px-4 py-3 text-center">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-ink-100 text-ink-700">
+              {{ role.user_count }}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-xs text-ink-500">{{ role.created_by.username|default:"—" }}</td>
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-1.5">
+              <a href="{% url 'update_role' role.id %}"
+                 class="btn btn-xs border border-gold-300 text-gold-800 hover:bg-gold-50 bg-transparent rounded-lg normal-case font-semibold">
+                Edit
+              </a>
+              <a href="{% url 'delete_role' role.id %}"
+                 class="btn btn-xs bg-blossom-600 hover:bg-blossom-700 border-none text-white rounded-lg normal-case font-semibold">
+                Delete
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="px-4 py-12 text-center">
+            <div class="text-4xl mb-3">🔐</div>
+            <p class="text-ink-500 text-sm mb-2">No roles yet.</p>
+            <a href="{% url 'create_role' %}" class="text-brand-600 hover:underline text-sm font-semibold">Create the first role.</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

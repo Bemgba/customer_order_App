@@ -1,0 +1,155 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order Confirmed — {{ COMPANY_NAME }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{brand:{50:'#ECFDF5',100:'#E1FAE5',200:'#A7F3D0',300:'#6EE7B7',400:'#34D399',500:'#10B981',600:'#059669',700:'#047857',800:'#065F46',900:'#064E3B',950:'#022C22'},blossom:{50:'#FFF1F2',100:'#FFE4E6',200:'#FECDD3',300:'#FDA4AF',400:'#FB7185',500:'#F43F5E',600:'#E11D48',700:'#BE123C',800:'#9F1239',900:'#881337'},pepper:{50:'#FFF1F2',500:'#EF4444',600:'#DC2626',700:'#B91C1C'},gold:{50:'#FFFBEB',100:'#FEF3C7',300:'#FCD34D',500:'#F59E0B',700:'#B45309',900:'#78350F'},ink:{50:'#F9FAFB',100:'#F3F4F6',200:'#E5E7EB',300:'#D1D5DB',400:'#9CA3AF',500:'#6B7280',600:'#4B5563',700:'#374151',800:'#1F2937',900:'#111827'},sand:{50:'#FAF9F7',100:'#F5F3EF',200:'#ECE9E2'}},fontFamily:{display:['"Space Grotesk"','sans-serif'],body:['"Plus Jakarta Sans"','sans-serif'],mono:['"JetBrains Mono"','monospace']},boxShadow:{card:'0 1px 3px rgba(0,0,0,.07),0 10px 28px -14px rgba(0,0,0,.14)',pop:'0 8px 30px -8px rgba(5,46,22,.25)'}}}}</script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'css/fv.css' %}"/>
+</head>
+<body class="font-body text-ink-900 bg-sand-50 min-h-screen">
+
+<!-- Navbar -->
+<header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-ink-100 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+    <a href="{% url 'menu' %}" class="font-display font-bold text-xl text-brand-800 shrink-0">{{ COMPANY_NAME }}<span class="text-blossom-500">.</span></a>
+    <nav class="flex items-center gap-2">
+      <a href="{% url 'menu' %}" class="text-sm font-semibold text-ink-600 hover:text-brand-700 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition">Menu</a>
+      <a href="{% url 'my_orders' %}" class="text-sm font-semibold text-ink-600 hover:text-brand-700 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition">My Orders</a>
+    </nav>
+  </div>
+</header>
+
+<div class="max-w-2xl mx-auto px-4 sm:px-6 py-10">
+
+  <!-- Hero checkmark -->
+  <div class="text-center mb-8">
+    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-brand-100 mb-4">
+      <svg class="w-10 h-10 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <circle cx="12" cy="12" r="10" stroke-width="1.5" class="text-brand-200"/>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M7 13l3 3 7-7"/>
+      </svg>
+    </div>
+    <h1 class="font-display font-bold text-3xl text-ink-900 mb-1">Order Placed! 🎉</h1>
+    <p class="text-ink-500 text-sm">Thank you for your order. We're getting it ready for you.</p>
+    <div class="inline-block mt-3 bg-brand-900 text-brand-100 font-mono font-bold text-sm px-4 py-2 rounded-xl tracking-wider">
+      {{ order.reference }}
+    </div>
+  </div>
+
+  <!-- Items -->
+  <div class="bg-white rounded-2xl border border-ink-200 shadow-card overflow-hidden mb-4">
+    <div class="px-5 py-3 border-b border-ink-100 bg-ink-50">
+      <h2 class="font-display font-bold text-sm text-ink-700 uppercase tracking-wider">Order Items</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="table table-sm w-full">
+        <thead>
+          <tr class="text-xs font-bold text-ink-400 uppercase tracking-wider">
+            <th class="px-5 py-2 text-left">Item</th>
+            <th class="px-3 py-2 text-center">Qty</th>
+            <th class="px-3 py-2 text-right">Price</th>
+            <th class="px-3 py-2 text-right">Total</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-ink-100">
+          {% for item in order.items.all %}
+          <tr>
+            <td class="px-5 py-3 font-medium text-ink-800">{{ item.product }}</td>
+            <td class="px-3 py-3 text-center text-ink-600">{{ item.quantity }}</td>
+            <td class="px-3 py-3 text-right font-mono text-sm text-ink-700">₦{{ item.unit_price|floatformat:2 }}</td>
+            <td class="px-3 py-3 text-right font-mono font-semibold text-ink-800">₦{{ item.line_total|floatformat:2 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr class="bg-sand-50 border-t-2 border-ink-200">
+            <td colspan="3" class="px-5 py-3 text-right font-display font-bold text-ink-800">Total</td>
+            <td class="px-3 py-3 text-right font-mono font-bold text-brand-700">₦{{ order.total_amount|floatformat:2 }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- Delivery Address -->
+  <div class="bg-white rounded-2xl border border-ink-200 shadow-card p-5 mb-4">
+    <h2 class="font-display font-bold text-sm text-ink-700 uppercase tracking-wider mb-3">Delivery Address</h2>
+    <p class="font-semibold text-ink-800">{{ order.delivery_name }}</p>
+    <p class="text-sm text-ink-600">{{ order.delivery_phone }}</p>
+    {% if order.delivery_email %}
+    <p class="text-sm text-ink-500">{{ order.delivery_email }}</p>
+    {% endif %}
+    <p class="text-sm text-ink-700 mt-1">{{ order.delivery_address }}{% if order.delivery_lga %}, {{ order.delivery_lga }}{% endif %}{% if order.delivery_state %}, {{ order.delivery_state }}{% endif %}</p>
+  </div>
+
+  <!-- Payment Section -->
+  {% if order.payment %}
+  <div class="mb-4">
+    {% if order.payment.method == 'Cash on Delivery' %}
+    <div class="bg-gold-50 border border-gold-200 rounded-2xl p-5">
+      <div class="flex items-start gap-3">
+        <span class="text-2xl">💵</span>
+        <div>
+          <h3 class="font-display font-bold text-gold-900 mb-1">Cash on Delivery</h3>
+          <p class="text-sm text-gold-800">Please have <strong class="font-mono">₦{{ order.payment.amount|floatformat:2 }}</strong> ready to pay the delivery rider when your order arrives.</p>
+        </div>
+      </div>
+    </div>
+
+    {% elif order.payment.method == 'Bank Transfer' %}
+    <div class="bg-brand-50 border border-brand-200 rounded-2xl p-5">
+      <div class="flex items-start gap-3">
+        <span class="text-2xl">🏦</span>
+        <div class="flex-1">
+          <h3 class="font-display font-bold text-brand-800 mb-3">Bank Transfer Details</h3>
+          <div class="bg-white rounded-xl border border-brand-200 p-4 space-y-2 text-sm">
+            <div class="flex justify-between"><span class="text-ink-500 font-medium">Bank</span><span class="font-semibold text-ink-800">First Bank</span></div>
+            <div class="flex justify-between"><span class="text-ink-500 font-medium">Account Number</span><span class="font-mono font-bold text-ink-900">1234567890</span></div>
+            <div class="flex justify-between"><span class="text-ink-500 font-medium">Account Name</span><span class="font-semibold text-ink-800">{{ COMPANY_NAME }} Ltd</span></div>
+            <div class="flex justify-between"><span class="text-ink-500 font-medium">Amount</span><span class="font-mono font-bold text-brand-700">₦{{ order.payment.amount|floatformat:2 }}</span></div>
+            <div class="flex justify-between border-t border-brand-100 pt-2"><span class="text-ink-500 font-medium">Narration</span><span class="font-mono font-bold text-brand-700">{{ order.reference }}</span></div>
+          </div>
+          <p class="text-xs text-brand-700 mt-2 font-medium">Use the order reference as your transfer narration.</p>
+        </div>
+      </div>
+    </div>
+
+    {% else %}
+    <div class="bg-brand-50 border border-brand-200 rounded-2xl p-5">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center text-white font-bold">✓</div>
+        <div>
+          <h3 class="font-display font-bold text-brand-800">Payment Confirmed</h3>
+          <p class="text-sm text-brand-700">Your {{ order.payment.get_method_display }} payment of <span class="font-mono font-bold">₦{{ order.payment.amount|floatformat:2 }}</span> has been received.</p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Account credentials -->
+  <div class="bg-ink-900 rounded-2xl p-5 mb-6">
+    <h3 class="font-display font-bold text-white mb-1">Your Account</h3>
+    <p class="text-ink-300 text-sm mb-3">We created an account so you can track your orders.</p>
+    <div class="bg-ink-800 rounded-xl p-4 space-y-2 text-sm">
+      <div class="flex justify-between"><span class="text-ink-400 font-medium">Username</span><span class="font-mono font-bold text-white">{{ order.delivery_email|default:order.delivery_phone }}</span></div>
+      <div class="flex justify-between"><span class="text-ink-400 font-medium">Password</span><span class="font-mono font-bold text-brand-300">{{ order.delivery_phone }}</span></div>
+    </div>
+    <p class="text-xs text-ink-400 mt-2">Use your email as username and your phone number as the default password. You can change it in account settings.</p>
+  </div>
+
+  <!-- CTAs -->
+  <div class="flex flex-col sm:flex-row gap-3">
+    <a href="{% url 'my_orders' %}" class="btn flex-1 bg-brand-600 hover:bg-brand-700 text-white border-0 rounded-xl normal-case font-bold shadow-pop">📋 View My Orders</a>
+    <a href="{% url 'order_track' %}" class="btn flex-1 bg-white border-ink-200 text-ink-700 hover:bg-ink-50 rounded-xl normal-case font-semibold">🔍 Track Without Login</a>
+    <a href="{% url 'menu' %}" class="btn flex-1 bg-white border-brand-200 text-brand-700 hover:bg-brand-50 rounded-xl normal-case font-semibold">🍽 Order More</a>
+  </div>
+
+</div>
+</body>
+</html>
