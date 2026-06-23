@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import logging
 
 from django.contrib.auth.models import User
@@ -26,3 +27,31 @@ def create_user_profile(sender, instance, created, **kwargs):
         from .models import UserProfile
         UserProfile.objects.get_or_create(user=instance)
         logger.info('UserProfile created for %s', instance.username)
+=======
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from .models import Customer
+from django.contrib.auth.models import Group
+
+
+#@receiver(post_save, sender=User)
+def customer_profile(sender, instance, created, **kwargs):
+    if created:
+        group=Group.objects.get(name='customers')
+        instance.groups.add(group)
+        
+        Customer.objects.create(
+        user=instance,
+        name=instance.username,
+        ) 
+        print('Profile created')
+post_save.connect(customer_profile,sender=User)
+    
+    
+# @receiver(post_save, sender=User)
+# def update_profile(sender, instance, created, **kwargs):
+#     if not created:
+#         instance.profile.save()
+#         print('Profile updated')
+>>>>>>> bda2651b2d659a1fa8eddca086b4a11b677495ca

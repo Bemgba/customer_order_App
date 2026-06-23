@@ -8,6 +8,7 @@ python manage.py migrate // run migrations
 python manage.py createsuperuser// create super admin
  
 pip install django-filter// for the SEARCH bar
+<<<<<<< HEAD
 pip install pillow //image library
 pip install reportlab// to generate pdf
 
@@ -16,3 +17,6 @@ painter
 mechanic
 plumber
 Electrician
+=======
+pip install pillow //image library
+>>>>>>> bda2651b2d659a1fa8eddca086b4a11b677495ca

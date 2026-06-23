@@ -1,4 +1,5 @@
 from django.contrib import admin
+<<<<<<< HEAD
 from django.db.models import Sum, F, DecimalField, Value
 from django.db.models.functions import Coalesce
 from .models import (
@@ -282,3 +283,14 @@ class AuditLogAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Tag)
+=======
+from . models import *
+
+# Register your models here.
+admin.site.register(Customer)
+admin.site.register(Product)
+admin.site.register(Tag)
+admin.site.register(Order)
+
+
+>>>>>>> bda2651b2d659a1fa8eddca086b4a11b677495ca

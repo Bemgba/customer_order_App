@@ -27,8 +27,11 @@ urlpatterns = [
          
 ]
 urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+<<<<<<< HEAD
 
 # Custom error handlers
 handler403 = 'accounts.views.custom_403'
 handler404 = 'accounts.views.custom_404'
 handler500 = 'accounts.views.custom_500'
+=======
+>>>>>>> bda2651b2d659a1fa8eddca086b4a11b677495ca
