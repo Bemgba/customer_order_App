@@ -15,8 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.http.response import HttpResponse
-from django.urls import path,include
+from django.urls import path, include
 from django.http import JsonResponse
 from django.conf import settings
 from django.conf.urls.static import static
@@ -24,14 +23,11 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('accounts.urls')),
-         
 ]
-urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
-<<<<<<< HEAD
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Custom error handlers
 handler403 = 'accounts.views.custom_403'
 handler404 = 'accounts.views.custom_404'
 handler500 = 'accounts.views.custom_500'
-=======
->>>>>>> bda2651b2d659a1fa8eddca086b4a11b677495ca

@@ -20,9 +20,5 @@ def main():
     execute_from_command_line(sys.argv)
 
 
-<<<<<<< HEAD
 if __name__ == '__main__':
-=======
-if __name__ == "__main__":
->>>>>>> bda2651b2d659a1fa8eddca086b4a11b677495ca
     main()
