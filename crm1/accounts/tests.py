@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 """
 Test suite for the Food Vendor CRM.
 
@@ -623,8 +622,3 @@ class SignalTests(TestCase):
     def test_new_profile_has_no_roles(self):
         user = User.objects.create_user(username='noroles', password='pass')
         self.assertEqual(user.profile.roles.count(), 0)
-=======
-from django.test import TestCase
-
-# Create your tests here.
->>>>>>> bda2651b2d659a1fa8eddca086b4a11b677495ca
