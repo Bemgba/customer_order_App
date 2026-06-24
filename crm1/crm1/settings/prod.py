@@ -80,15 +80,19 @@ except OSError:
 
 # ---------------------------------------------------------------------------
 # Static files — Django 5.x STORAGES dict with WhiteNoise
-# Overrides base.py's STORAGES to use the manifest variant (content hashing)
-# which is correct for production. dev.py uses the simpler non-manifest one.
+# Using CompressedStaticFilesStorage (NOT Manifest) because the legacy
+# assets/css/app.css references files (e.g. sprite-skin-flat.png) that
+# don't exist in the static tree. The Manifest variant validates every
+# CSS url() reference and hard-fails on missing files during collectstatic.
+# CompressedStaticFilesStorage still gzips and brotli-compresses everything
+# but skips the strict reference validation.
 # ---------------------------------------------------------------------------
 STORAGES = {
     'default': {
         'BACKEND': 'django.core.files.storage.FileSystemStorage',
     },
     'staticfiles': {
-        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
     },
 }
 

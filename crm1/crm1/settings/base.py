@@ -114,9 +114,13 @@ STORAGES = {
     'default': {
         'BACKEND': 'django.core.files.storage.FileSystemStorage',
     },
-    # Static files served by WhiteNoise with compression + content-hash cache busting
+    # Static files served by WhiteNoise with compression.
+    # Using CompressedStaticFilesStorage (not Manifest) because the legacy
+    # assets/css/app.css references image files that don't exist in the
+    # static tree — the Manifest variant validates all CSS url() references
+    # and hard-fails on collectstatic if any are missing.
     'staticfiles': {
-        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
     },
 }
 
