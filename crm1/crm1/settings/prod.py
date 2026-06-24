@@ -8,12 +8,14 @@ Required environment variables on Render:
     SECRET_KEY       — long random string
     DATABASE_URL     — auto-set by Render Postgres add-on
     ALLOWED_HOSTS    — your-app.onrender.com  (or leave blank to use the default below)
+    MEDIA_ROOT       — mount path of the Render Persistent Disk, e.g. /opt/render/media
     COMPANY_NAME, COMPANY_SHORT_NAME, COMPANY_TAGLINE — branding
     EMAIL_*          — SMTP credentials
 
 Never set DEBUG=True here.
 """
 import os
+from pathlib import Path
 import dj_database_url
 from .base import *  # noqa: F401, F403
 from decouple import config, Csv
@@ -79,8 +81,30 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
 # ---------------------------------------------------------------------------
-# Logging — console only (Render has no persistent disk on free tier).
-# Render captures stdout/stderr and shows them in the dashboard log viewer.
+# Media files — Render Persistent Disk
+# ---------------------------------------------------------------------------
+# On Render: attach a Persistent Disk and set its mount path, e.g. /opt/render/media
+# Then add MEDIA_ROOT=/opt/render/media as an environment variable.
+# MEDIA_URL stays '/images/' so existing template URLs keep working.
+#
+# If MEDIA_ROOT env var is not set (first deploy before disk is attached),
+# falls back safely to BASE_DIR/media — change to disk path before going live.
+# ---------------------------------------------------------------------------
+_media_root_env = os.environ.get('MEDIA_ROOT', '')
+if _media_root_env:
+    MEDIA_ROOT = Path(_media_root_env)
+else:
+    MEDIA_ROOT = BASE_DIR / 'media'   # safe fallback, not persistent
+
+# Ensure the media directory exists. Wrapped in try/except so collectstatic
+# and migrate (which run before the disk is fully ready) don't fail.
+try:
+    MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
+except OSError:
+    pass
+
+# ---------------------------------------------------------------------------
+# Logging — console only (Render captures stdout/stderr in the log viewer)
 # ---------------------------------------------------------------------------
 LOGGING = {
     'version': 1,
