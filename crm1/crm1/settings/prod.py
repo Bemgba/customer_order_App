@@ -67,16 +67,27 @@ else:
     }
 
 # ---------------------------------------------------------------------------
-# Media files — ephemeral on Render Free plan
-# Files are stored inside the container and lost on redeploy/restart.
-# MEDIA_ROOT env var can override this when upgrading to a paid disk.
+# Media files — served via WhiteNoise on Render Free plan
+# ---------------------------------------------------------------------------
+# Product images are committed to git under static/images/.
+# collectstatic copies them to staticfiles/images/.
+# WhiteNoise serves staticfiles/ at /static/, so images are available at
+# /static/images/menu/x.png.
+#
+# base.py sets MEDIA_URL='/images/' which works in dev (Django's static()
+# helper maps /images/ → static/images/ when DEBUG=True).
+# In production DEBUG=False so that helper is inactive — we override
+# MEDIA_URL to '/static/images/' so product.image.url renders the correct
+# path that WhiteNoise actually serves.
 # ---------------------------------------------------------------------------
 _media_env = os.environ.get('MEDIA_ROOT', '')
-MEDIA_ROOT = Path(_media_env) if _media_env else BASE_DIR / 'media'
+MEDIA_ROOT = Path(_media_env) if _media_env else BASE_DIR / 'static' / 'images'
 try:
     MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 except OSError:
-    pass  # read-only filesystem during collectstatic — fine
+    pass
+
+MEDIA_URL = '/static/images/'
 
 # ---------------------------------------------------------------------------
 # Static files — Django 5.x STORAGES dict with WhiteNoise
