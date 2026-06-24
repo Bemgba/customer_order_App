@@ -74,7 +74,6 @@ WSGI_APPLICATION = 'crm1.wsgi.application'
 # ---------------------------------------------------------------------------
 # Database — configured per environment (dev.py / prod.py)
 # ---------------------------------------------------------------------------
-# Override in subclasses. Default shown here is SQLite (dev only).
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -101,13 +100,32 @@ USE_I18N = True
 USE_TZ = True
 
 # ---------------------------------------------------------------------------
-# Static & media files
+# Static files — Django 5.x STORAGES dict (future-proof)
+# WhiteNoise serves compressed + hashed static files.
+# dev.py overrides to CompressedStaticFilesStorage (no manifest, no hashing).
 # ---------------------------------------------------------------------------
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'          # collectstatic target
-STATICFILES_DIRS = [BASE_DIR / 'static']        # source during development
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_ROOT = BASE_DIR / 'staticfiles'       # collectstatic target
+STATICFILES_DIRS = [BASE_DIR / 'static']     # source during development
 
+STORAGES = {
+    # User-uploaded media — local disk (dev). prod.py keeps this as-is
+    # because free-tier Render has no persistent disk; uploads are ephemeral.
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    # Static files served by WhiteNoise with compression + content-hash cache busting
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
+
+# ---------------------------------------------------------------------------
+# Media files
+# On Render Free plan: ephemeral — files lost on redeploy. Acceptable for
+# a demo/pilot. Upgrade to Render paid disk or Cloudinary when persistence
+# is needed.
+# ---------------------------------------------------------------------------
 MEDIA_URL = '/images/'
 MEDIA_ROOT = BASE_DIR / 'static' / 'images'
 

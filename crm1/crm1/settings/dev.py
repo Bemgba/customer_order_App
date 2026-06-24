@@ -10,10 +10,17 @@ from decouple import config
 DEBUG = True
 
 # ---------------------------------------------------------------------------
-# Static files — use simple whitenoise storage in dev (no manifest/hashing)
-# This avoids collectstatic errors from broken references in old app.css
+# Static files — no manifest/hashing in dev (avoids collectstatic errors
+# from broken references). Uses the new Django 5.x STORAGES dict.
 # ---------------------------------------------------------------------------
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
+    },
+}
 
 # ---------------------------------------------------------------------------
 # Session security

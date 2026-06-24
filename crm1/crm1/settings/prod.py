@@ -1,5 +1,5 @@
 """
-Production settings — used on Render (and any similar platform).
+Production settings — used on Render Free plan (and any similar platform).
 
 Set this env var on Render:
     DJANGO_SETTINGS_MODULE=crm1.settings.prod
@@ -7,10 +7,18 @@ Set this env var on Render:
 Required environment variables on Render:
     SECRET_KEY       — long random string
     DATABASE_URL     — auto-set by Render Postgres add-on
-    ALLOWED_HOSTS    — your-app.onrender.com  (or leave blank to use the default below)
-    MEDIA_ROOT       — mount path of the Render Persistent Disk, e.g. /opt/render/media
+    ALLOWED_HOSTS    — your-app.onrender.com
     COMPANY_NAME, COMPANY_SHORT_NAME, COMPANY_TAGLINE — branding
     EMAIL_*          — SMTP credentials
+
+Media files note (Render Free plan):
+    Persistent Disk is a PAID feature. On the free plan, MEDIA_ROOT points
+    to a directory inside the container — uploads work while the container
+    is running but are wiped on every redeploy or restart.
+    This is acceptable for a demo/pilot deployment.
+    When you're ready for persistence, upgrade to a paid Render instance
+    and add a Persistent Disk mounted at /opt/render/media, then set:
+        MEDIA_ROOT=/opt/render/media  (env var on Render dashboard)
 
 Never set DEBUG=True here.
 """
@@ -23,8 +31,7 @@ from decouple import config, Csv
 DEBUG = False
 
 # ---------------------------------------------------------------------------
-# Allowed hosts — always include Render's wildcard + your custom domain
-# Reads ALLOWED_HOSTS from env (comma-separated), falls back to onrender.com
+# Allowed hosts
 # ---------------------------------------------------------------------------
 ALLOWED_HOSTS = config(
     'ALLOWED_HOSTS',
@@ -33,9 +40,7 @@ ALLOWED_HOSTS = config(
 )
 
 # ---------------------------------------------------------------------------
-# Database — Render injects DATABASE_URL automatically when you attach a
-# Postgres instance.  dj-database-url parses it into Django's DATABASES dict.
-# CONN_MAX_AGE=60 keeps connections alive across requests (better throughput).
+# Database — Render injects DATABASE_URL automatically
 # ---------------------------------------------------------------------------
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
@@ -47,7 +52,7 @@ if DATABASE_URL:
         )
     }
 else:
-    # Fallback: individual vars (local prod testing without DATABASE_URL)
+    # Fallback for local prod testing without DATABASE_URL
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -62,9 +67,35 @@ else:
     }
 
 # ---------------------------------------------------------------------------
+# Media files — ephemeral on Render Free plan
+# Files are stored inside the container and lost on redeploy/restart.
+# MEDIA_ROOT env var can override this when upgrading to a paid disk.
+# ---------------------------------------------------------------------------
+_media_env = os.environ.get('MEDIA_ROOT', '')
+MEDIA_ROOT = Path(_media_env) if _media_env else BASE_DIR / 'media'
+try:
+    MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
+except OSError:
+    pass  # read-only filesystem during collectstatic — fine
+
+# ---------------------------------------------------------------------------
+# Static files — Django 5.x STORAGES dict with WhiteNoise
+# Overrides base.py's STORAGES to use the manifest variant (content hashing)
+# which is correct for production. dev.py uses the simpler non-manifest one.
+# ---------------------------------------------------------------------------
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
+
+# ---------------------------------------------------------------------------
 # Session security
 # ---------------------------------------------------------------------------
-SESSION_COOKIE_AGE = 60 * 60 * 8   # 8 hours hard cap
+SESSION_COOKIE_AGE = 60 * 60 * 8
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
@@ -72,36 +103,13 @@ CSRF_COOKIE_SECURE = True
 # Security headers
 # ---------------------------------------------------------------------------
 SECURE_SSL_REDIRECT = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # required behind Render's proxy
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
-
-# ---------------------------------------------------------------------------
-# Media files — Render Persistent Disk
-# ---------------------------------------------------------------------------
-# On Render: attach a Persistent Disk and set its mount path, e.g. /opt/render/media
-# Then add MEDIA_ROOT=/opt/render/media as an environment variable.
-# MEDIA_URL stays '/images/' so existing template URLs keep working.
-#
-# If MEDIA_ROOT env var is not set (first deploy before disk is attached),
-# falls back safely to BASE_DIR/media — change to disk path before going live.
-# ---------------------------------------------------------------------------
-_media_root_env = os.environ.get('MEDIA_ROOT', '')
-if _media_root_env:
-    MEDIA_ROOT = Path(_media_root_env)
-else:
-    MEDIA_ROOT = BASE_DIR / 'media'   # safe fallback, not persistent
-
-# Ensure the media directory exists. Wrapped in try/except so collectstatic
-# and migrate (which run before the disk is fully ready) don't fail.
-try:
-    MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
-except OSError:
-    pass
 
 # ---------------------------------------------------------------------------
 # Logging — console only (Render captures stdout/stderr in the log viewer)
