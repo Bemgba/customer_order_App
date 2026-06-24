@@ -10,3 +10,6 @@ pip install -r requirements.txt
 
 python manage.py collectstatic --noinput
 python manage.py migrate
+
+# Seed Nigeria states and LGAs (idempotent — safe to run on every deploy)
+python manage.py seed_locations
